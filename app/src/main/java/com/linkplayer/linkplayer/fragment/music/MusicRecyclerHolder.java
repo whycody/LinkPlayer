@@ -2,7 +2,6 @@ package com.linkplayer.linkplayer.fragment.music;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -16,12 +15,14 @@ public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements Musi
 
     private ImageView albumPhoto;
     private TextView titleText, authorText;
-    private MusicPresenter musicPresenter;
+    private MusicPresenterImpl musicPresenterImpl;
+    private View itemView;
     private Context context;
 
-    public MusicRecyclerHolder(MusicPresenter musicPresenter, View itemView, Context context){
+    public MusicRecyclerHolder(MusicPresenterImpl musicPresenterImpl, View itemView, Context context){
         super(itemView);
-        this.musicPresenter = musicPresenter;
+        this.musicPresenterImpl = musicPresenterImpl;
+        this.itemView = itemView;
         albumPhoto = itemView.findViewById(R.id.album_photo);
         titleText = itemView.findViewById(R.id.title_text);
         authorText = itemView.findViewById(R.id.author_text);
@@ -46,5 +47,10 @@ public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements Musi
     @Override
     public void setImage(Drawable drawable) {
         Glide.with(context).load(drawable).into(albumPhoto);
+    }
+
+    @Override
+    public void setOnClick(View.OnClickListener onClick) {
+        itemView.setOnClickListener(onClick);
     }
 }

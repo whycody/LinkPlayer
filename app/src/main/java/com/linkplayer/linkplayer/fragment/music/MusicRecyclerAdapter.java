@@ -11,11 +11,11 @@ import com.linkplayer.linkplayer.R;
 
 public class MusicRecyclerAdapter extends RecyclerView.Adapter<MusicRecyclerHolder> {
 
-    private MusicPresenter musicPresenter;
+    private MusicPresenterImpl musicPresenterImpl;
     private Context context;
 
-    public MusicRecyclerAdapter(MusicPresenter musicPresenter, Context context){
-        this.musicPresenter = musicPresenter;
+    public MusicRecyclerAdapter(MusicPresenterImpl musicPresenterImpl, Context context){
+        this.musicPresenterImpl = musicPresenterImpl;
         this.context = context;
     }
 
@@ -25,16 +25,16 @@ public class MusicRecyclerAdapter extends RecyclerView.Adapter<MusicRecyclerHold
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.music_row, parent, false);
 
-        return new MusicRecyclerHolder(musicPresenter, view, context);
+        return new MusicRecyclerHolder(musicPresenterImpl, view, context);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MusicRecyclerHolder holder, int position) {
-        musicPresenter.onBindSongRowViewAtPosition(holder, position);
+        musicPresenterImpl.onBindSongRowViewAtPosition(holder, position);
     }
 
     @Override
     public int getItemCount() {
-        return musicPresenter.getSongRowsCount();
+        return musicPresenterImpl.getSongRowsCount();
     }
 }
