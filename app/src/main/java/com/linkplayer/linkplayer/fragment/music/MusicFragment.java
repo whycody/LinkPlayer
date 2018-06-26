@@ -32,9 +32,17 @@ public class MusicFragment extends Fragment {
         recyclerAdapter = new MusicRecyclerAdapter(new MusicPresenter(new MusicListData(getActivity()).getSongList(),
                 getActivity()), getActivity());
         musicListRecycler.setAdapter(recyclerAdapter);
-        musicListRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         musicListRecycler.addItemDecoration(new LinearVerticalSpacing(6));
 
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity()){
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
+
+        musicListRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        musicListRecycler.setNestedScrollingEnabled(false);
 
         return view;
     }
