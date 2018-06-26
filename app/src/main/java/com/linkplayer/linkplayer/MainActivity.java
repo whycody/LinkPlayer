@@ -22,9 +22,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mainTabLayout = findViewById(R.id.main_tab_layout);
         mainViewPager = findViewById(R.id.main_view_pager);
 
-        mainTabLayout.addTab(mainTabLayout.newTab().setText("Music"));
-        mainTabLayout.addTab(mainTabLayout.newTab().setText("Artist"));
-        mainTabLayout.addTab(mainTabLayout.newTab().setText("Playlist"));
+        final String MUSIC = getResources().getString(R.string.music);
+        final String ARTIST = getResources().getString(R.string.artist);
+        final String PLAYLIST = getResources().getString(R.string.playlist);
+
+        mainTabLayout.addTab(mainTabLayout.newTab().setText(MUSIC));
+        mainTabLayout.addTab(mainTabLayout.newTab().setText(ARTIST));
+        mainTabLayout.addTab(mainTabLayout.newTab().setText(PLAYLIST));
 
         tabsPagerAdapter = new MainTabsPagerAdapter(getSupportFragmentManager(), mainTabLayout.getTabCount());
         mainViewPager.setAdapter(tabsPagerAdapter);
@@ -38,7 +42,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         mainViewPager.setCurrentItem(tab.getPosition());
-        mainToolbar.setTitle(tab.getText());
+        mainToolbar.setTitle(firstCharToUpperCase(String.valueOf(tab.getText())));
+    }
+
+    private String firstCharToUpperCase(String text){
+        return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
 
     @Override

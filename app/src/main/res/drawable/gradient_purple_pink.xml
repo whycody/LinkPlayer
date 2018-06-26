@@ -6,7 +6,7 @@
                 android:startColor="@color/colorPrimaryDark"
                 android:centerColor="@color/colorPrimaryDark"
                 android:endColor="@color/colorPink"
-                android:angle="225"/>
+                android:angle="270"/>
         </shape>
     </item>
 
