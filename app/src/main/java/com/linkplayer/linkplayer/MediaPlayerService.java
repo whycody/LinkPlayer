@@ -43,7 +43,12 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-
+        if(songPos < songList.size()) {
+            songPos++;
+        }else{
+            songPos = 0;
+        }
+        playSong();
     }
 
     @Override

@@ -3,7 +3,7 @@
 <item android:state_selected="true">
     <shape>
         <solid
-            android:color="@color/colorAccent"/>
+            android:color="@color/colorLight"/>
         <corners
             android:radius="20dp"/>
         <padding

@@ -35,7 +35,7 @@
         android:background="@color/colorPrimary"
         app:tabIndicatorColor="@android:color/transparent"
         app:tabTextColor="@android:color/white"
-        app:tabBackground="@drawable/yellow_border"
+        app:tabBackground="@drawable/light_gray_border"
         style="@style/AppTabLayout"
         app:tabMode="scrollable"
         app:tabMinWidth="70dp"

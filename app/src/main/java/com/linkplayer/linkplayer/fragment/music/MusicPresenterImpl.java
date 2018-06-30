@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -15,17 +16,16 @@ import com.linkplayer.linkplayer.model.Song;
 
 import java.util.ArrayList;
 
-public class MusicPresenterImpl implements MusicPresenter{
+public class MusicPresenterImpl{
 
     private ArrayList<Song> songList;
     private Context context;
-    private MediaPlayerService musicService;
-    private Intent playIntent;
-    private boolean musicBound = false;
+    private MusicFragmentView fragmentView;
 
-    public MusicPresenterImpl(ArrayList<Song> songList, Context context){
+    public MusicPresenterImpl(ArrayList<Song> songList, MusicFragmentView fragmentView, Context context){
         this.songList = songList;
         this.context = context;
+        this.fragmentView = fragmentView;
     }
 
     public void onBindSongRowViewAtPosition(MusicRecyclerHolder musicRecyclerHolder, final int position){
@@ -40,8 +40,7 @@ public class MusicPresenterImpl implements MusicPresenter{
         musicRecyclerHolder.setOnClick(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                musicService.setSong(position);
-                musicService.playSong();
+               fragmentView.playMusic(position);
             }
         });
     }
@@ -50,27 +49,4 @@ public class MusicPresenterImpl implements MusicPresenter{
         return songList.size();
     }
 
-    @Override
-    public void onStart() {
-        if(playIntent==null){
-            playIntent = new Intent(context, MediaPlayerService.class);
-            context.bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            context.startService(playIntent);
-        }
-    }
-
-    private ServiceConnection musicConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            MediaPlayerService.LocalBinder musicBinder = (MediaPlayerService.LocalBinder) service;
-            musicService = musicBinder.getService();
-            musicService.setList(songList);
-            musicBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            musicBound = false;
-        }
-    };
 }

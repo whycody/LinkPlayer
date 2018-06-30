@@ -10,12 +10,12 @@
         android:id="@+id/constraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:background="#CFD8DC">
+        android:background="@color/colorLightPrimary">
 
         <ImageView
             android:id="@+id/album_photo"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:background="@color/colorGray"
@@ -35,7 +35,7 @@
             android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_three_dotes_black" />
+            app:srcCompat="@drawable/ic_three_dotes_white" />
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout"
@@ -55,7 +55,7 @@
                 android:id="@+id/title_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#000000"
+                android:textColor="#ffffff"
                 android:textSize="17sp"
                 android:maxLines="1"
                 android:ellipsize="end"
@@ -67,6 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:foregroundGravity="fill"
+                android:textColor="#ffffff"
                 android:maxLines="1"
                 android:ellipsize="end"
                 app:layout_constraintBottom_toBottomOf="parent"
