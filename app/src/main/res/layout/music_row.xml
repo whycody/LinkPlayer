@@ -7,10 +7,10 @@
     android:layout_height="wrap_content">
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/constraintLayout2"
+        android:id="@+id/music_row_background"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:background="@color/colorLightPrimary">
+        android:background="#4c4c4c">
 
         <ImageView
             android:id="@+id/album_photo"
