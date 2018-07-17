@@ -41,6 +41,8 @@ public class MusicPresenterImpl{
             @Override
             public void onClick(View v) {
                fragmentView.playMusic(position);
+               fragmentView.setLatestMusic(position);
+               fragmentView.showMusicIsPlaying(position);
             }
         });
     }

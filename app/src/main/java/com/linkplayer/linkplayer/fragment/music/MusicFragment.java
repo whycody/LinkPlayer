@@ -19,6 +19,7 @@ import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
 import com.linkplayer.linkplayer.model.Song;
+import com.linkplayer.linkplayer.data.SongDao;
 
 import java.util.ArrayList;
 
@@ -33,6 +34,8 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
     private Intent playIntent;
     private boolean musicBound = false;
 
+    private SongDao songDao;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -45,6 +48,13 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         musicListRecycler.setAdapter(recyclerAdapter);
         musicListRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         musicListRecycler.addItemDecoration(new LinearVerticalSpacing(6));
+
+        songDao = new SongDao(getActivity());
+//        songDao.insertSongList(songList.get(0), "musicladasd");
+//        songDao.changeLatestMusic(songList.get(18));
+//
+//        Song latestSong = songDao.getLatestMusic();
+//        Toast.makeText(getActivity(), latestSong.getTitle(), Toast.LENGTH_SHORT).show();
 
         return view;
     }
@@ -78,5 +88,15 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
     public void playMusic(int position) {
         musicService.setSong(position);
         musicService.playSong();
+    }
+
+    @Override
+    public void showMusicIsPlaying(int position) {
+
+    }
+
+    @Override
+    public void setLatestMusic(int position) {
+        songDao.changeLatestMusic(songList.get(position));
     }
 }
