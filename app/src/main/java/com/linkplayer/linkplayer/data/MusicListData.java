@@ -1,4 +1,4 @@
-package com.linkplayer.linkplayer.fragment.music;
+package com.linkplayer.linkplayer.data;
 
 import android.content.ContentResolver;
 import android.content.Context;

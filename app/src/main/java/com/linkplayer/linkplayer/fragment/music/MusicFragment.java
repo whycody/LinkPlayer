@@ -1,22 +1,17 @@
 package com.linkplayer.linkplayer.fragment.music;
 
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.linkplayer.linkplayer.MediaPlayerService;
+import com.linkplayer.linkplayer.MainActivity;
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.data.SongDao;
@@ -30,9 +25,6 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
     private MusicRecyclerAdapter recyclerAdapter;
     private ArrayList<Song> songList;
     private MusicPresenterImpl musicPresenter;
-    private MediaPlayerService musicService;
-    private Intent playIntent;
-    private boolean musicBound = false;
 
     private SongDao songDao;
 
@@ -60,43 +52,9 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        if(playIntent==null){
-            playIntent = new Intent(getActivity(), MediaPlayerService.class);
-            getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            getActivity().startService(playIntent);
-        }
-    }
-
-    private ServiceConnection musicConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            MediaPlayerService.LocalBinder musicBinder = (MediaPlayerService.LocalBinder) service;
-            musicService = musicBinder.getService();
-            musicService.setList(songList);
-            musicBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            musicBound = false;
-        }
-    };
-
-    @Override
     public void playMusic(int position) {
-        musicService.setSong(position);
-        musicService.playSong();
+        ((MainActivity)getActivity()).playSong(position);
     }
 
-    @Override
-    public void showMusicIsPlaying(int position) {
 
-    }
-
-    @Override
-    public void setLatestMusic(int position) {
-        songDao.changeLatestMusic(songList.get(position));
-    }
 }
