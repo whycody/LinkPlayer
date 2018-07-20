@@ -32,6 +32,11 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
     private int currentSong;
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return Service.START_NOT_STICKY;
+    }
+
+    @Override
     public IBinder onBind(Intent intent) {
         return iBinder;
     }
@@ -39,6 +44,7 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
     @Override
     public boolean onUnbind(Intent intent) {
         player.stop();
+        player.reset();
         player.release();
         return false;
     }
