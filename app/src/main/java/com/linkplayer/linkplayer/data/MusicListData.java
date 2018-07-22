@@ -26,15 +26,17 @@ public class MusicListData {
 
     public ArrayList<Song> getSongList() {
 
+        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         ArrayList<Song> songList = new ArrayList<>();
         ContentResolver musicResolver = context.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+        Cursor musicCursor = musicResolver.query(musicUri, null, selection, null, null);
 
         if (musicCursor != null && musicCursor.moveToFirst()) {
             int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int durationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
             int column_index = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
 
             do {
@@ -42,6 +44,7 @@ public class MusicListData {
                 String path = musicCursor.getString(column_index);
                 String title = musicCursor.getString(titleColumn);
                 String artist = musicCursor.getString(artistColumn);
+                String duration = musicCursor.getString(durationColumn);
 
                 metaRetriver.setDataSource(path);
                 tryRetrievePhoto();

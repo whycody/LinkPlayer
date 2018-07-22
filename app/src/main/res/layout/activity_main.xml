@@ -84,7 +84,6 @@
                 android:paddingTop="8dp"
                 android:alpha="0.8"
                 android:scaleType="centerInside"
-                android:src="@drawable/shuffle_white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
@@ -101,7 +100,6 @@
                     android:layout_height="40dp"
                     android:background="@android:color/transparent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/back_white"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0" />
@@ -114,7 +112,6 @@
                     android:layout_marginStart="8dp"
                     android:background="@android:color/transparent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/play_button_white"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/back_song_btn"
                     app:layout_constraintTop_toTopOf="parent"
@@ -129,7 +126,6 @@
                     android:background="@android:color/transparent"
                     android:rotation="180"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/back_white"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/play_song_btn"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -145,7 +141,6 @@
                 android:background="@android:color/transparent"
                 android:paddingTop="8dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/replay_white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />

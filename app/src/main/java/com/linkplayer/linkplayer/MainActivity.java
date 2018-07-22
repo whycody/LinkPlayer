@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private TextView musicTitleView;
     private ImageButton playSongBtn, backSongBtn, nextSongBtn, randomMusicBtn, repeatMusicBtn;
     private SongDao songDao;
+    private MusicListData musicListData;
 
     private MediaPlayerService musicService;
     private Intent playIntent;
@@ -62,8 +63,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         nextSongBtn = findViewById(R.id.next_song_btn);
         randomMusicBtn = findViewById(R.id.random_music_btn);
         repeatMusicBtn = findViewById(R.id.repeat_music_btn);
-        songList = new MusicListData(this).getSongList();
-        shuffledSongList = new MusicListData(this).getSongList();
+        musicListData = new MusicListData(this);
+        songList = musicListData.getSongList();
+        shuffledSongList = (ArrayList<Song>)songList.clone();
         Collections.shuffle(shuffledSongList);
         songDao = new SongDao(this);
         sharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
@@ -74,6 +76,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         nextSongBtn.setOnClickListener(playNextSongOnClick);
         randomMusicBtn.setOnClickListener(setRandomMusicModeOnClick);
         repeatMusicBtn.setOnClickListener(setRepeatMusicModeOnClick);
+
+        Glide.with(this).load(R.drawable.back_white).into(backSongBtn);
+        Glide.with(this).load(R.drawable.back_white).into(nextSongBtn);
+        Glide.with(this).load(R.drawable.play_button_white).into(playSongBtn);
+        Glide.with(this).load(R.drawable.replay_white).into(repeatMusicBtn);
+        Glide.with(this).load(R.drawable.shuffle_white).into(randomMusicBtn);
 
         final String MUSIC = getResources().getString(R.string.music);
         final String ARTIST = getResources().getString(R.string.artist);
@@ -263,17 +271,25 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private void saveRandomPreferences(boolean random){
         if(random) {
             musicService.setList(shuffledSongList);
-            randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorYellow),
-                    PorterDuff.Mode.MULTIPLY);
-            randomMusicBtn.setAlpha(1f);
+            showRandomIsChosed();
         }else {
             musicService.setList(songList);
-            randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, android.R.color.white),
-                    PorterDuff.Mode.MULTIPLY);
-            randomMusicBtn.setAlpha(0.8f);
+            showRandomIsNotChosed();
         }
         musicService.setOptionsRandomRepeat(random, repeat);
         saveInSharedPreferences(random, repeat);
+    }
+
+    private void showRandomIsChosed(){
+        randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorYellow),
+                PorterDuff.Mode.MULTIPLY);
+        randomMusicBtn.setAlpha(1f);
+    }
+
+    private void showRandomIsNotChosed(){
+        randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, android.R.color.white),
+                PorterDuff.Mode.MULTIPLY);
+        randomMusicBtn.setAlpha(0.8f);
     }
 
     private View.OnClickListener setRepeatMusicModeOnClick = new View.OnClickListener() {
@@ -286,16 +302,24 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private void saveRepeatReferences(boolean repeat){
         if(repeat){
-            repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorYellow),
-                    PorterDuff.Mode.MULTIPLY);
-            repeatMusicBtn.setAlpha(1f);
+            showRepeatIsChosed();
         }else {
-            repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, android.R.color.white),
-                    PorterDuff.Mode.MULTIPLY);
-            repeatMusicBtn.setAlpha(0.8f);
+            showRepeatIsNotChosed();
         }
         musicService.setOptionsRandomRepeat(random, repeat);
         saveInSharedPreferences(random, repeat);
+    }
+
+    private void showRepeatIsChosed(){
+        repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorYellow),
+                PorterDuff.Mode.MULTIPLY);
+        repeatMusicBtn.setAlpha(1f);
+    }
+
+    private void showRepeatIsNotChosed(){
+        repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, android.R.color.white),
+                PorterDuff.Mode.MULTIPLY);
+        repeatMusicBtn.setAlpha(0.8f);
     }
 
     private void saveInSharedPreferences(boolean random, boolean repeat){
