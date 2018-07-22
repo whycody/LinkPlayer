@@ -1,7 +1,6 @@
 package com.linkplayer.linkplayer.data;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
@@ -120,7 +119,6 @@ public class SongDao {
     }
 
     public Song getLatestMusic(){
-        int idLastSongValue = 1999999999;
         SongRealm songRealm = realm.where(SongRealm.class).equalTo("key", idLastSongValue).findFirst();
         if(songRealm==null) {
             return new Song(0l, "Play a song!", "", "", null, false);

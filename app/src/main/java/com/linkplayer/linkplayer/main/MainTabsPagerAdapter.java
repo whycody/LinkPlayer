@@ -1,4 +1,4 @@
-package com.linkplayer.linkplayer;
+package com.linkplayer.linkplayer.main;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

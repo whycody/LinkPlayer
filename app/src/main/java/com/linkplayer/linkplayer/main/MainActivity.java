@@ -1,10 +1,9 @@
-package com.linkplayer.linkplayer;
+package com.linkplayer.linkplayer.main;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
@@ -20,13 +19,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.linkplayer.linkplayer.data.SongDao;
-import com.linkplayer.linkplayer.fragment.music.MainView;
-import com.linkplayer.linkplayer.data.MusicListData;
-import com.linkplayer.linkplayer.model.Song;
+import com.linkplayer.linkplayer.MediaPlayerService;
+import com.linkplayer.linkplayer.R;
 
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView {
 
@@ -36,18 +31,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private MainTabsPagerAdapter tabsPagerAdapter;
     private TextView musicTitleView;
     private ImageButton playSongBtn, backSongBtn, nextSongBtn, randomMusicBtn, repeatMusicBtn;
-    private SongDao songDao;
-    private MusicListData musicListData;
+    private MainPresenter mainPresenter;
 
     private MediaPlayerService musicService;
     private Intent playIntent;
-    private ArrayList<Song> songList;
-    private ArrayList<Song> shuffledSongList;
     private boolean musicBound = false;
-    private boolean repeat, random;
-    private final String PREFERENCES = "preferences";
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor preferencesEditor;
+    private boolean repeat = false;
+    private boolean random = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +53,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         nextSongBtn = findViewById(R.id.next_song_btn);
         randomMusicBtn = findViewById(R.id.random_music_btn);
         repeatMusicBtn = findViewById(R.id.repeat_music_btn);
-        musicListData = new MusicListData(this);
-        songList = musicListData.getSongList();
-        shuffledSongList = (ArrayList<Song>)songList.clone();
-        Collections.shuffle(shuffledSongList);
-        songDao = new SongDao(this);
-        sharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
-        preferencesEditor = sharedPreferences.edit();
+        mainPresenter = new MainPresenterImpl(MainActivity.this, MainActivity.this);
 
-        playSongBtn.setOnClickListener(resumeOnClick);
+        playSongBtn.setOnClickListener(playLatestSongOnClick);
         backSongBtn.setOnClickListener(playLastSongOnClick);
         nextSongBtn.setOnClickListener(playNextSongOnClick);
         randomMusicBtn.setOnClickListener(setRandomMusicModeOnClick);
@@ -97,16 +81,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mainTabLayout.addOnTabSelectedListener(this);
 
         setSupportActionBar(mainToolbar);
-        setTitle();
         startAnimation();
-    }
-
-    private void getPreferencesAndSetButtons() {
-        random = sharedPreferences.getBoolean("random", false);
-        repeat = sharedPreferences.getBoolean("repeat", false);
-
-        saveRandomPreferences(random);
-        saveRepeatReferences(repeat);
     }
 
     @Override
@@ -139,13 +114,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         public void onServiceConnected(ComponentName name, IBinder service) {
             MediaPlayerService.LocalBinder musicBinder = (MediaPlayerService.LocalBinder) service;
             musicService = musicBinder.getService();
-            if(random) {
-                musicService.setList(shuffledSongList);
-            }else
-                musicService.setList(songList);
+            mainPresenter.setMusicService(musicService);
+            musicService.setSong(mainPresenter.getLatestSong());
+            mainPresenter.getPreferencesAndSetButtons();
             musicBound = true;
-            setLatestSong();
-            getPreferencesAndSetButtons();
         }
 
         @Override
@@ -157,15 +129,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private void startAnimation() {
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.from_left_to_right);
         musicTitleView.startAnimation(animation);
-    }
-
-    private void setLatestSong(){
-        for(int i =0; i<songList.size(); i++){
-            if(songList.get(i).getPath().equals(songDao.getLatestMusic().getPath())){
-                musicService.setSong(i);
-                break;
-            }
-        }
     }
 
     @Override
@@ -191,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void playSong(int position) {
         if(random) {
-            playClickedSong(position);
+            mainPresenter.setClickedSongIfRandom(position);
         }else
             musicService.setSong(position);
         musicService.playSong();
@@ -199,23 +162,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setTitle();
     }
 
-    private void playClickedSong(int position){
-        for (int i = 0; i < shuffledSongList.size(); i++) {
-            if (shuffledSongList.get(i).getPath().equals(songList.get(position).getPath())) {
-                musicService.setSong(i);
-            }
-        }
-    }
-
     private void setTitle() {
-        SongDao songDao = new SongDao(this);
-        String title = songDao.getLatestMusic().getTitle();
-        String author = songDao.getLatestMusic().getArtist();
-        if (!author.equals("<unknown>")) {
-            musicTitleView.setText(author + " - " + title);
-        } else {
-            musicTitleView.setText(title);
-        }
+        musicTitleView.setText(mainPresenter.getTitle());
     }
 
     private void setViewsOnPlaying() {
@@ -233,6 +181,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         public void onClick(View v) {
             musicService.pauseSong();
             setViewsOnStopped();
+        }
+    };
+
+    private View.OnClickListener playLatestSongOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            musicService.playSong();
+            setViewsOnPlaying();
         }
     };
 
@@ -264,67 +220,43 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         @Override
         public void onClick(View v) {
             random = !random;
-            saveRandomPreferences(random);
+            mainPresenter.saveRandomPreferences(random);
         }
     };
-
-    private void saveRandomPreferences(boolean random){
-        if(random) {
-            musicService.setList(shuffledSongList);
-            showRandomIsChosed();
-        }else {
-            musicService.setList(songList);
-            showRandomIsNotChosed();
-        }
-        musicService.setOptionsRandomRepeat(random, repeat);
-        saveInSharedPreferences(random, repeat);
-    }
-
-    private void showRandomIsChosed(){
-        randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorYellow),
-                PorterDuff.Mode.MULTIPLY);
-        randomMusicBtn.setAlpha(1f);
-    }
-
-    private void showRandomIsNotChosed(){
-        randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, android.R.color.white),
-                PorterDuff.Mode.MULTIPLY);
-        randomMusicBtn.setAlpha(0.8f);
-    }
 
     private View.OnClickListener setRepeatMusicModeOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             repeat = !repeat;
-            saveRepeatReferences(repeat);
+            mainPresenter.saveRepeatReferences(repeat);
         }
     };
 
-    private void saveRepeatReferences(boolean repeat){
-        if(repeat){
-            showRepeatIsChosed();
-        }else {
-            showRepeatIsNotChosed();
-        }
-        musicService.setOptionsRandomRepeat(random, repeat);
-        saveInSharedPreferences(random, repeat);
+    @Override
+    public void showRandomIsChosed(){
+        randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorYellow),
+                PorterDuff.Mode.MULTIPLY);
+        randomMusicBtn.setAlpha(1f);
     }
 
-    private void showRepeatIsChosed(){
+    @Override
+    public void showRandomIsNotChosed(){
+        randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, android.R.color.white),
+                PorterDuff.Mode.MULTIPLY);
+        randomMusicBtn.setAlpha(0.8f);
+    }
+
+    @Override
+    public void showRepeatIsChosed(){
         repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorYellow),
                 PorterDuff.Mode.MULTIPLY);
         repeatMusicBtn.setAlpha(1f);
     }
 
-    private void showRepeatIsNotChosed(){
+    @Override
+    public void showRepeatIsNotChosed(){
         repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, android.R.color.white),
                 PorterDuff.Mode.MULTIPLY);
         repeatMusicBtn.setAlpha(0.8f);
-    }
-
-    private void saveInSharedPreferences(boolean random, boolean repeat){
-        preferencesEditor.putBoolean("random", random);
-        preferencesEditor.putBoolean("repeat", repeat);
-        preferencesEditor.commit();
     }
 }

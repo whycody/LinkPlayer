@@ -1,16 +1,8 @@
 package com.linkplayer.linkplayer.fragment.music;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
-import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.model.Song;
 
@@ -34,9 +26,8 @@ public class MusicPresenterImpl{
         musicRecyclerHolder.setAuthor(song.getArtist());
         if(song.isAlbumPhotoAvailable()) {
             musicRecyclerHolder.setImage(song.getArt());
-        }else {
+        }else
             musicRecyclerHolder.setImage(context.getResources().getDrawable(R.drawable.gray_color));
-        }
         musicRecyclerHolder.setOnClick(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
