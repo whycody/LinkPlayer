@@ -9,11 +9,9 @@ public interface MusicRowView {
 
     void setAuthor(String author);
 
-    void setDuration(String duration);
+    void setMinutes(String minutes);
 
-    void setFirstLetter(char letter);
-
-    void setGradientDrawable(GradientDrawable gradientDrawable);
+    void setSeconds(String seconds);
 
     void setOnClick(View.OnClickListener onClick);
 }

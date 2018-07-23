@@ -27,15 +27,15 @@ public class MusicPresenterImpl{
         Song song = songList.get(position);
         musicRecyclerHolder.setTitle(song.getTitle());
         musicRecyclerHolder.setAuthor(song.getArtist());
-        musicRecyclerHolder.setFirstLetter(Character.toUpperCase(song.getTitle().charAt(0)));
-        musicRecyclerHolder.setDuration(getDuration(Integer.valueOf(song.getDuration())));
+        musicRecyclerHolder.setMinutes(getMinutes(Integer.parseInt(song.getDuration())));
+        musicRecyclerHolder.setSeconds(getSeconds(Integer.parseInt(song.getDuration())));
         musicRecyclerHolder.setOnClick(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                fragmentView.playMusic(position);
             }
         });
-        musicRecyclerHolder.setGradientDrawable(getGradientDrawable());
+       // musicRecyclerHolder.setGradientDrawable(getGradientDrawable());
     }
 
     private String getDuration(int duration){
@@ -45,6 +45,19 @@ public class MusicPresenterImpl{
             return (minutes + ":" + "0" +seconds);
         }else
             return (minutes + ":" + seconds);
+    }
+
+    private String getMinutes(int duration){
+        return String.valueOf(duration/60000);
+    }
+
+    private String getSeconds(int duration){
+        int minutes = duration/60000;
+        int seconds = (duration/1000) - minutes*60;
+        if(seconds<10) {
+            return ("0" +seconds);
+        }else
+            return String.valueOf(seconds);
     }
 
     private GradientDrawable getGradientDrawable(){

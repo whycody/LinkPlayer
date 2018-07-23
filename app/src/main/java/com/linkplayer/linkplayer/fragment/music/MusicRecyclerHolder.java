@@ -1,35 +1,26 @@
 package com.linkplayer.linkplayer.fragment.music;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.linkplayer.linkplayer.R;
 
 public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements MusicRowView{
 
-    private TextView titleText, authorText, durationText, letterText;
+    private TextView titleText, authorText, minutesNumber, secondsNumber;
     private View albumPhoto;
-    private MusicPresenterImpl musicPresenterImpl;
     private View itemView;
-    private Context context;
 
-    public MusicRecyclerHolder(MusicPresenterImpl musicPresenterImpl, View itemView, Context context){
+    public MusicRecyclerHolder(View itemView){
         super(itemView);
-        this.musicPresenterImpl = musicPresenterImpl;
         this.itemView = itemView;
         titleText = itemView.findViewById(R.id.title_text);
         authorText = itemView.findViewById(R.id.author_text);
-        durationText = itemView.findViewById(R.id.duration_text);
-        letterText = itemView.findViewById(R.id.first_letter);
+        minutesNumber = itemView.findViewById(R.id.minutes_number);
+        secondsNumber = itemView.findViewById(R.id.seconds_number);
         albumPhoto = itemView.findViewById(R.id.album_photo);
-        this.context= context;
     }
 
     @Override
@@ -43,19 +34,15 @@ public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements Musi
     }
 
     @Override
-    public void setDuration(String duration) {
-        durationText.setText(duration);
+    public void setMinutes(String minutes) {
+        minutesNumber.setText(minutes);
     }
 
     @Override
-    public void setFirstLetter(char letter) {
-        letterText.setText(String.valueOf(letter));
+    public void setSeconds(String seconds) {
+        secondsNumber.setText(seconds);
     }
 
-    @Override
-    public void setGradientDrawable(GradientDrawable gradientDrawable) {
-        albumPhoto.setBackgroundDrawable(gradientDrawable);
-    }
 
     @Override
     public void setOnClick(View.OnClickListener onClick) {

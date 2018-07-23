@@ -25,7 +25,7 @@ public class MusicRecyclerAdapter extends RecyclerView.Adapter<MusicRecyclerHold
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.music_row, parent, false);
 
-        return new MusicRecyclerHolder(musicPresenterImpl, view, context);
+        return new MusicRecyclerHolder(view);
     }
 
     @Override
