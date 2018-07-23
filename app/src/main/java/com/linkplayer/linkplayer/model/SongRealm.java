@@ -7,7 +7,6 @@ import io.realm.annotations.PrimaryKey;
 public class SongRealm extends RealmObject{
 
     private String title, artist, path;
-    private boolean albumPhotoAvailable;
     private long id;
     @PrimaryKey
     private int key;
@@ -16,11 +15,10 @@ public class SongRealm extends RealmObject{
 
     }
 
-    public SongRealm(String title, String artist, String path, boolean albumPhotoAvailable, long id) {
+    public SongRealm(String title, String artist, String path, long id) {
         this.title = title;
         this.artist = artist;
         this.path = path;
-        this.albumPhotoAvailable = albumPhotoAvailable;
         this.id = id;
     }
 
@@ -46,14 +44,6 @@ public class SongRealm extends RealmObject{
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public boolean isAlbumPhotoAvailable() {
-        return albumPhotoAvailable;
-    }
-
-    public void setAlbumPhotoAvailable(boolean albumPhotoAvailable) {
-        this.albumPhotoAvailable = albumPhotoAvailable;
     }
 
     public long getId() {

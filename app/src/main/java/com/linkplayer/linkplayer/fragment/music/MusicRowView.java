@@ -1,8 +1,6 @@
 package com.linkplayer.linkplayer.fragment.music;
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.view.View;
 
 public interface MusicRowView {
@@ -11,9 +9,11 @@ public interface MusicRowView {
 
     void setAuthor(String author);
 
-    void setImage(Bitmap image);
+    void setDuration(String duration);
 
-    void setImage(Drawable drawable);
+    void setFirstLetter(char letter);
+
+    void setGradientDrawable(GradientDrawable gradientDrawable);
 
     void setOnClick(View.OnClickListener onClick);
 }

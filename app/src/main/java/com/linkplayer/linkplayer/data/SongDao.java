@@ -111,7 +111,6 @@ public class SongDao {
 
     private void createLatestMusic(Song song){
         SongRealm songRealm = realm.createObject(SongRealm.class, idLastSongValue);
-        songRealm.setAlbumPhotoAvailable(song.isAlbumPhotoAvailable());
         songRealm.setArtist(song.getArtist());
         songRealm.setId(song.getId());
         songRealm.setPath(song.getPath());
@@ -121,7 +120,7 @@ public class SongDao {
     public Song getLatestMusic(){
         SongRealm songRealm = realm.where(SongRealm.class).equalTo("key", idLastSongValue).findFirst();
         if(songRealm==null) {
-            return new Song(0l, "Play a song!", "", "", null, false);
+            return new Song(0l, "Play a song!", "", "", "");
         }
         Song song = songMapper.fromRealm(songRealm);
         return song;

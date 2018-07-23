@@ -12,16 +12,56 @@
         android:layout_height="65dp"
         android:background="#4c4c4c">
 
-        <ImageView
-            android:id="@+id/album_photo"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+        <TextView
+            android:id="@+id/duration_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:text="1:50"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/constraintLayout"
+            app:layout_constraintTop_toBottomOf="@+id/imageButton" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/a"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:background="@color/colorGray"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/gray_color"
+                android:alpha="1.0"/>
+
+            <ImageView
+                android:id="@+id/album_photo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/gray_color"
+                android:alpha="0.1"/>
+
+            <TextView
+                android:id="@+id/first_letter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/album_photo" />
+        </android.support.constraint.ConstraintLayout>
 
 
         <ImageButton
@@ -48,17 +88,17 @@
             android:foregroundGravity="right"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/imageButton"
-            app:layout_constraintStart_toEndOf="@+id/album_photo"
+            app:layout_constraintStart_toEndOf="@+id/a"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/title_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="#ffffff"
                 android:textSize="17sp"
-                android:maxLines="1"
-                android:ellipsize="end"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -66,10 +106,10 @@
                 android:id="@+id/author_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:foregroundGravity="fill"
-                android:textColor="#ffffff"
-                android:maxLines="1"
                 android:ellipsize="end"
+                android:foregroundGravity="fill"
+                android:maxLines="1"
+                android:textColor="#ffffff"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/title_text"
                 app:layout_constraintTop_toBottomOf="@+id/title_text" />

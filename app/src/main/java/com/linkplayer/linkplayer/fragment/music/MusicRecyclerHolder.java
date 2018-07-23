@@ -3,6 +3,7 @@ package com.linkplayer.linkplayer.fragment.music;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,8 +14,8 @@ import com.linkplayer.linkplayer.R;
 
 public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements MusicRowView{
 
-    private ImageView albumPhoto;
-    private TextView titleText, authorText;
+    private TextView titleText, authorText, durationText, letterText;
+    private View albumPhoto;
     private MusicPresenterImpl musicPresenterImpl;
     private View itemView;
     private Context context;
@@ -23,9 +24,11 @@ public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements Musi
         super(itemView);
         this.musicPresenterImpl = musicPresenterImpl;
         this.itemView = itemView;
-        albumPhoto = itemView.findViewById(R.id.album_photo);
         titleText = itemView.findViewById(R.id.title_text);
         authorText = itemView.findViewById(R.id.author_text);
+        durationText = itemView.findViewById(R.id.duration_text);
+        letterText = itemView.findViewById(R.id.first_letter);
+        albumPhoto = itemView.findViewById(R.id.album_photo);
         this.context= context;
     }
 
@@ -40,13 +43,18 @@ public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements Musi
     }
 
     @Override
-    public void setImage(Bitmap image) {
-        Glide.with(context).load(image).into(albumPhoto);
+    public void setDuration(String duration) {
+        durationText.setText(duration);
     }
 
     @Override
-    public void setImage(Drawable drawable) {
-        Glide.with(context).load(drawable).into(albumPhoto);
+    public void setFirstLetter(char letter) {
+        letterText.setText(String.valueOf(letter));
+    }
+
+    @Override
+    public void setGradientDrawable(GradientDrawable gradientDrawable) {
+        albumPhoto.setBackgroundDrawable(gradientDrawable);
     }
 
     @Override

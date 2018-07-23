@@ -4,29 +4,26 @@ import android.graphics.Bitmap;
 
 public class Song {
 
-    private String title, artist, path;
-    private boolean albumPhotoAvailable;
-    private Bitmap art;
+    private String title, artist, path, duration;
     private long id;
 
     public Song() {
     }
 
-    public Song(long id, String title, String artist, String path, Bitmap art, boolean albumPhotoAvailable) {
+    public Song(long id, String title, String artist, String path, String duration) {
         this.title = title;
         this.id = id;
         this.artist = artist;
-        this.art = art;
-        this.albumPhotoAvailable = albumPhotoAvailable;
         this.path = path;
+        this.duration = duration;
     }
 
-    public boolean isAlbumPhotoAvailable() {
-        return albumPhotoAvailable;
+    public String getDuration() {
+        return duration;
     }
 
-    public void setAlbumPhotoAvailable(boolean albumPhotoAvailable) {
-        this.albumPhotoAvailable = albumPhotoAvailable;
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     public String getTitle() {
@@ -51,14 +48,6 @@ public class Song {
 
     public void setArtist(String artist) {
         this.artist = artist;
-    }
-
-    public Bitmap getArt() {
-        return art;
-    }
-
-    public void setArt(Bitmap art) {
-        this.art = art;
     }
 
     public String getPath(){
