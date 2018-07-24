@@ -4,26 +4,26 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
-public class ArtistList implements Comparable<ArtistList>{
+public class PlaylistList implements Comparable<PlaylistList>{
 
-    private String artist;
+    private String title;
     private ArrayList<Song> songList = new ArrayList<>();
 
-    public ArtistList(){
+    public PlaylistList(){
 
     }
 
-    public ArtistList(String artist, ArrayList<Song> songList) {
-        this.artist = artist;
+    public PlaylistList(String title, ArrayList<Song> songList) {
+        this.title = title;
         this.songList = songList;
     }
 
-    public String getArtist() {
-        return artist;
+    public String getTitle() {
+        return title;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public void addSong(Song song){
@@ -39,8 +39,8 @@ public class ArtistList implements Comparable<ArtistList>{
     }
 
     @Override
-    public int compareTo(@NonNull ArtistList artistList) {
-        int compareSongSize = artistList.getSongList().size();
+    public int compareTo(@NonNull PlaylistList playlistList) {
+        int compareSongSize = playlistList.getSongList().size();
         return this.getSongList().size()-compareSongSize;
     }
 }

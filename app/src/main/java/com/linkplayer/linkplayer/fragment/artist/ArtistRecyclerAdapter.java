@@ -8,9 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.linkplayer.linkplayer.R;
-import com.linkplayer.linkplayer.model.ArtistList;
-
-import java.util.ArrayList;
 
 public class ArtistRecyclerAdapter extends RecyclerView.Adapter<ArtistRecyclerHolder> {
 

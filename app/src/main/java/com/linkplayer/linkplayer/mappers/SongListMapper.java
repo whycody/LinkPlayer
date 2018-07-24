@@ -16,12 +16,12 @@ public class SongListMapper {
     public SongListRealm toRealm(SongList songList){
         SongListRealm songListRealm = new SongListRealm();
         RealmList<SongRealm> realmSongList = new RealmList<>();
-        ArrayList<Song> songArrayList = songList.getSongArrayList();
+        ArrayList<Song> songArrayList = songList.getSongList();
         for(Song song : songArrayList){
             realmSongList.add(songMapper.toRealm(song));
         }
         songListRealm.setSongList(realmSongList);
-        songListRealm.setTitle(songList.getName());
+        songListRealm.setTitle(songList.getTitle());
         return songListRealm;
     }
 
@@ -32,8 +32,8 @@ public class SongListMapper {
         for(SongRealm songRealm: realmSongList){
             songArrayList.add(songMapper.fromRealm(songRealm));
         }
-        songList.setSongArrayList(songArrayList);
-        songList.setName(songListRealm.getName());
+        songList.setSongList(songArrayList);
+        songList.setTitle(songListRealm.getName());
         return songList;
     }
 }

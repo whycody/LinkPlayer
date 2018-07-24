@@ -1,6 +1,5 @@
 package com.linkplayer.linkplayer.model;
 
-import android.graphics.Bitmap;
 
 public class Song {
 
