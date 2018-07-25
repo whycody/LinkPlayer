@@ -16,5 +16,7 @@ public interface MusicRowView {
 
     void setBackground(Drawable drawable);
 
-    void setOnClick(View.OnClickListener onClick);
+    void setOnClickItemView(View.OnClickListener onClick);
+
+    void setOnClickPopupMenu(View.OnClickListener onClick);
 }

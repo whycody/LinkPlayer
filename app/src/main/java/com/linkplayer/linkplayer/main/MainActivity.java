@@ -119,7 +119,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             musicService.setRefreshView(MainActivity.this);
             mainPresenter.setMusicService(musicService);
             mainPresenter.getPreferencesAndSetButtons();
-            musicService.setSong(mainPresenter.getLatestSong());
+            if(!random)
+                musicService.setSong(mainPresenter.getLatestSong());
+            else
+                musicService.setTargetRandomSong(mainPresenter.getLatestSong());
             musicBound = true;
         }
 

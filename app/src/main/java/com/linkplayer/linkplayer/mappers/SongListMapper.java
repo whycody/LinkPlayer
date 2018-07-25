@@ -34,6 +34,7 @@ public class SongListMapper {
         }
         songList.setSongList(songArrayList);
         songList.setTitle(songListRealm.getName());
+        songList.setKey(songListRealm.getKey());
         return songList;
     }
 }

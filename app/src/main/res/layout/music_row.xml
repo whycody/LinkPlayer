@@ -62,7 +62,7 @@
 
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/music_dotes_button"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginEnd="8dp"
@@ -84,7 +84,7 @@
             android:layout_marginTop="8dp"
             android:foregroundGravity="right"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton"
+            app:layout_constraintEnd_toStartOf="@+id/music_dotes_button"
             app:layout_constraintStart_toEndOf="@+id/a"
             app:layout_constraintTop_toTopOf="parent">
 

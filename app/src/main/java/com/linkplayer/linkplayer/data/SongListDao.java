@@ -63,12 +63,14 @@ public class SongListDao {
     }
 
     public void deleteSongListById(final int key) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.where(SongListRealm.class).equalTo("key", key).findFirst().deleteFromRealm();
-            }
-        });
+        if(realm.where(SongListRealm.class).equalTo("key", key).findFirst()!=null) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.where(SongListRealm.class).equalTo("key", key).findFirst().deleteFromRealm();
+                }
+            });
+        }
     }
 
     private int idLastSongListValue = 1999999999;

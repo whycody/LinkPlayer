@@ -11,8 +11,7 @@ import com.linkplayer.linkplayer.R;
 public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements MusicRowView{
 
     private TextView titleText, authorText, minutesNumber, secondsNumber;
-    private View albumPhoto, musicRowBackground;
-    private View itemView;
+    private View musicRowBackground, itemView, musicDotesButton;
 
     public MusicRecyclerHolder(View itemView){
         super(itemView);
@@ -22,7 +21,7 @@ public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements Musi
         authorText = itemView.findViewById(R.id.author_text);
         minutesNumber = itemView.findViewById(R.id.minutes_number);
         secondsNumber = itemView.findViewById(R.id.seconds_number);
-        albumPhoto = itemView.findViewById(R.id.album_photo);
+        musicDotesButton = itemView.findViewById(R.id.music_dotes_button);
     }
 
     @Override
@@ -51,7 +50,12 @@ public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements Musi
     }
 
     @Override
-    public void setOnClick(View.OnClickListener onClick) {
+    public void setOnClickItemView(View.OnClickListener onClick) {
         itemView.setOnClickListener(onClick);
+    }
+
+    @Override
+    public void setOnClickPopupMenu(View.OnClickListener onClick) {
+        musicDotesButton.setOnClickListener(onClick);
     }
 }
