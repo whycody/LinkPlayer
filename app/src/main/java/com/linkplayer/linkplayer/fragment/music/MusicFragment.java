@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.R;
@@ -44,5 +45,14 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         ((MainActivity)getActivity()).playSong(position);
     }
 
+    @Override
+    public void notifyItemChanged(int lastPosition, int position){
+        Song song = songList.get(lastPosition);
+        song.setChoosed(false);
+        Song newSong = songList.get(position);
+        newSong.setChoosed(true);
+        recyclerAdapter.notifyItemChanged(position);
+        recyclerAdapter.notifyItemChanged(lastPosition);
+    }
 
 }

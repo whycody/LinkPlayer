@@ -45,6 +45,8 @@ public class MainPresenterImpl implements MainPresenter{
         random = sharedPreferences.getBoolean("random", false);
         repeat = sharedPreferences.getBoolean("repeat", false);
 
+        mainView.setSettings(random, repeat);
+        musicService.setNotShuffledList(songList);
         saveRandomPreferences(random);
         saveRepeatReferences(repeat);
     }
@@ -111,7 +113,7 @@ public class MainPresenterImpl implements MainPresenter{
     @Override
     public void setClickedSongIfRandom(int position) {
         for (int i = 0; i < shuffledSongList.size(); i++) {
-            if (shuffledSongList.get(i).getPath().equals(songList.get(position).getPath())) {
+            if (shuffledSongList.get(position).getPath().equals(songList.get(i).getPath())) {
                 musicService.setSong(i);
             }
         }

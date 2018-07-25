@@ -10,7 +10,7 @@
         android:id="@+id/music_row_background"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:background="#4c4c4c">
+        android:background="@drawable/gray_row_color">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/a"

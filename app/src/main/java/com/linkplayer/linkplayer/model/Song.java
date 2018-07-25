@@ -4,6 +4,7 @@ package com.linkplayer.linkplayer.model;
 public class Song {
 
     private String title, artist, path, duration;
+    private boolean choosed = false;
     private long id;
 
     public Song() {
@@ -15,6 +16,14 @@ public class Song {
         this.artist = artist;
         this.path = path;
         this.duration = duration;
+    }
+
+    public boolean isChoosed() {
+        return choosed;
+    }
+
+    public void setChoosed(boolean choosed) {
+        this.choosed = choosed;
     }
 
     public String getDuration() {

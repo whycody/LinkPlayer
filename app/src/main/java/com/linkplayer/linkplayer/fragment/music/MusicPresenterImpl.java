@@ -25,6 +25,10 @@ public class MusicPresenterImpl{
 
     public void onBindSongRowViewAtPosition(MusicRecyclerHolder musicRecyclerHolder, final int position){
         Song song = songList.get(position);
+        if(song.isChoosed()){
+            musicRecyclerHolder.setBackground(context.getResources().getDrawable(R.drawable.gray_color));
+        }else
+            musicRecyclerHolder.setBackground(context.getResources().getDrawable(R.drawable.gray_row_color));
         musicRecyclerHolder.setTitle(song.getTitle());
         musicRecyclerHolder.setAuthor(song.getArtist());
         musicRecyclerHolder.setMinutes(getMinutes(Integer.parseInt(song.getDuration())));

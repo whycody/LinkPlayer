@@ -21,9 +21,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 
 
-public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView {
+public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView {
 
     private Toolbar mainToolbar;
     private TabLayout mainTabLayout;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private boolean musicBound = false;
     private boolean repeat = false;
     private boolean random = false;
+    private MusicFragment musicFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,9 +116,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         public void onServiceConnected(ComponentName name, IBinder service) {
             MediaPlayerService.LocalBinder musicBinder = (MediaPlayerService.LocalBinder) service;
             musicService = musicBinder.getService();
+            musicService.setRefreshView(MainActivity.this);
             mainPresenter.setMusicService(musicService);
-            musicService.setSong(mainPresenter.getLatestSong());
             mainPresenter.getPreferencesAndSetButtons();
+            musicService.setSong(mainPresenter.getLatestSong());
             musicBound = true;
         }
 
@@ -132,13 +135,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     @Override
+    public void setSettings(boolean random, boolean repeat){
+        this.random = random;
+        this.repeat = repeat;
+    }
+
+    @Override
     public void onTabSelected(TabLayout.Tab tab) {
         mainViewPager.setCurrentItem(tab.getPosition());
         mainToolbar.setTitle(firstCharToUpperCase(String.valueOf(tab.getText())));
-    }
-
-    private String firstCharToUpperCase(String text) {
-        return text.substring(0, 1).toUpperCase() + text.substring(1);
+        if(tab.getPosition()==0)
+            musicService.setSong(musicService.getSong());
     }
 
     @Override
@@ -151,15 +158,26 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     }
 
+    private String firstCharToUpperCase(String text) {
+        return text.substring(0, 1).toUpperCase() + text.substring(1);
+    }
+
     @Override
     public void playSong(int position) {
-        if(random) {
-            mainPresenter.setClickedSongIfRandom(position);
-        }else
+        if(random)
+            musicService.setTargetRandomSong(position);
+        else
             musicService.setSong(position);
         musicService.playSong();
         setViewsOnPlaying();
         setTitle();
+    }
+
+    @Override
+    public void notifyItemChanged(int lastPosition, int position) {
+        musicFragment = tabsPagerAdapter.getMusicFragment();
+        if(musicFragment!=null)
+            musicFragment.notifyItemChanged(lastPosition, position);
     }
 
     private void setTitle() {

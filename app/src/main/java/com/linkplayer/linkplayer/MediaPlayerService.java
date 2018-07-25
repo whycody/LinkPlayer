@@ -12,6 +12,7 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import com.linkplayer.linkplayer.data.SongDao;
+import com.linkplayer.linkplayer.main.RefreshView;
 import com.linkplayer.linkplayer.model.Song;
 
 import java.util.ArrayList;
@@ -24,9 +25,11 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
     private final IBinder iBinder = new LocalBinder();
     private MediaPlayer player;
     private ArrayList<Song> songList;
+    private ArrayList<Song> notShuffled;
     private SongDao songDao = new SongDao(getBaseContext());
     boolean repeat = false;
     boolean random = false;
+    private RefreshView refreshView;
 
     private int songPos;
     private int currentSong;
@@ -68,9 +71,9 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
 
     private void playNextSongAutomatically(){
         if(songPos == songList.size()-1 && repeat){
-            songPos = 0;
+            setSong(0);
         }else
-            songPos++;
+            setSong(songPos + 1);
         playSong();
     }
 
@@ -99,25 +102,77 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
 
     }
 
+    private int lastSongPoisition;
+
     public void setSong(int songPos){
         this.songPos = songPos;
+        if(songList!=null && refreshView !=null) {
+            if(random) {
+                refreshView.notifyItemChanged(lastSongPoisition, getRandomSongTruePosition(songPos));
+                lastSongPoisition = getRandomSongTruePosition(songPos);
+            } else {
+                refreshView.notifyItemChanged(lastSongPoisition, songPos);
+                lastSongPoisition = songPos;
+            }
+
+        }
+    }
+
+    public void setTargetRandomSong(int songPos){
+        this.songPos = getTargetRandomSongTruePosition(songPos);
+        if(songList!=null && refreshView !=null) {
+            if(random) {
+                refreshView.notifyItemChanged(lastSongPoisition, songPos);
+                lastSongPoisition = songPos;
+            } else {
+                refreshView.notifyItemChanged(lastSongPoisition, songPos);
+                lastSongPoisition = songPos;
+            }
+
+        }
+    }
+
+    public int getRandomSongTruePosition(int position) {
+        for(int i =0; i<songList.size(); i++){
+            if(songList.get(position).getId()==notShuffled.get(i).getId()){
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    public int getTargetRandomSongTruePosition(int position) {
+        for(int i =0; i<songList.size(); i++){
+            if(songList.get(i).getId()==notShuffled.get(position).getId()){
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    public int getSong(){
+        return songPos;
     }
 
     public void playSong(){
-        player.reset();
-        Song playSong = songList.get(songPos);
-        currentSong = songPos;
-        setLastSong();
-        long currSong = playSong.getId();
-        Uri trackUri = ContentUris.withAppendedId(
+        try{
+            player.reset();
+            Song playSong = songList.get(songPos);
+            currentSong = songPos;
+            setLastSong();
+            long currSong = playSong.getId();
+            Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 currSong);
-        try{
             player.setDataSource(getApplicationContext(), trackUri);
         }catch(Exception e){
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
         player.prepareAsync();
+    }
+
+    public void setRefreshView(RefreshView refreshView){
+        this.refreshView = refreshView;
     }
 
     public void pauseSong(){
@@ -133,7 +188,7 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
 
     public void playNextSong(){
         if(songPos < songList.size()-1) {
-            songPos++;
+            setSong(songPos+1);
             setLastSong();
         }
         if(player.isPlaying())
@@ -142,7 +197,7 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
 
     public void playLastSong(){
         if(songPos!=0) {
-            songPos--;
+            setSong(songPos-1);
             setLastSong();
         }
         if(player.isPlaying())
@@ -157,7 +212,7 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
     @Override
     public void onCreate() {
         super.onCreate();
-        songPos = 0;
+        setSong(0);
         player = new MediaPlayer();
         initMediaPlayer();
     }
@@ -172,6 +227,10 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
 
     public void setList(ArrayList<Song> songList){
         this.songList = songList;
+    }
+
+    public void setNotShuffledList(ArrayList<Song> notShuffled){
+        this.notShuffled = notShuffled;
     }
 
     public void setOptionsRandomRepeat(boolean random, boolean repeat){

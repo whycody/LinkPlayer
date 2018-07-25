@@ -5,6 +5,7 @@
     <color name="colorAccent">#454444</color>
     <color name="colorLightPrimary">#454444</color>
     <color name="colorDarkLight">#515151</color>
+    <color name="colorGrayRow">#4c4c4c</color>
     <color name="colorLight">#5E5E5E</color>
     <color name="colorPink">#FF00F5</color>
     <color name="colorYellow">#ffc400</color>
