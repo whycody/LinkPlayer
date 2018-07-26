@@ -55,4 +55,10 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         recyclerAdapter.notifyItemChanged(lastPosition);
     }
 
+    @Override
+    public void notifyItemDeleted(int position) {
+        songList.remove(position);
+        recyclerAdapter.notifyItemRemoved(position);
+    }
+
 }

@@ -19,12 +19,14 @@ public class SongListDao {
     private Realm realm;
     private Context context;
     private SongMapper songMapper;
+    private SongListMapper songListMapper;
 
     public SongListDao(Context context){
         this.context = context;
         Realm.init(context);
         realm = Realm.getDefaultInstance();
         songMapper = new SongMapper();
+        songListMapper = new SongListMapper();
     }
 
     public ArrayList<SongList> getAllListSongs() {
@@ -37,6 +39,15 @@ public class SongListDao {
         return songs;
     }
 
+    public boolean songListContainsSong(int key, Song song){
+        SongList songList = getSongListWithKey(key);
+        for(Song songFromList: songList.getSongList()){
+            if(songFromList.getPath().equals(song.getPath()))
+                return true;
+        }
+        return false;
+    }
+
     public void insertSongToListWithKey(int key, Song song){
         realm.beginTransaction();
 
@@ -46,6 +57,11 @@ public class SongListDao {
             songListRealm.addSong(songRealm);
 
         realm.commitTransaction();
+    }
+
+    public SongList getSongListWithKey(int key){
+        SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", key).findFirst();
+        return songListMapper.fromRealm(songListRealm);
     }
 
     public void insertSongList(String title){

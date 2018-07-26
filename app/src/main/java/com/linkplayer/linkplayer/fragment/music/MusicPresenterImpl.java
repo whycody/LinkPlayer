@@ -1,5 +1,6 @@
 package com.linkplayer.linkplayer.fragment.music;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.linkplayer.linkplayer.DeleteSongDialogFragment;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.model.Song;
@@ -18,23 +20,23 @@ import java.util.ArrayList;
 public class MusicPresenterImpl{
 
     private ArrayList<Song> songArrayList;
-    private Context context;
+    private Activity activity;
     private MusicFragmentView fragmentView;
     private SongListDao songListDao;
 
-    public MusicPresenterImpl(ArrayList<Song> songArrayList, MusicFragmentView fragmentView, Context context){
+    public MusicPresenterImpl(ArrayList<Song> songArrayList, MusicFragmentView fragmentView, Activity activity){
         this.songArrayList = songArrayList;
-        this.context = context;
+        this.activity = activity;
         this.fragmentView = fragmentView;
-        this.songListDao = new SongListDao(context);
+        this.songListDao = new SongListDao(activity);
     }
 
     public void onBindSongRowViewAtPosition(MusicRecyclerHolder musicRecyclerHolder, final int position){
         Song song = songArrayList.get(position);
         if(song.isChoosed()){
-            musicRecyclerHolder.setBackground(context.getResources().getDrawable(R.drawable.gray_color));
+            musicRecyclerHolder.setBackground(activity.getResources().getDrawable(R.drawable.gray_color));
         }else
-            musicRecyclerHolder.setBackground(context.getResources().getDrawable(R.drawable.gray_row_color));
+            musicRecyclerHolder.setBackground(activity.getResources().getDrawable(R.drawable.gray_row_color));
         musicRecyclerHolder.setTitle(song.getTitle());
         musicRecyclerHolder.setAuthor(song.getArtist());
         musicRecyclerHolder.setMinutes(getMinutes(Integer.parseInt(song.getDuration())));
@@ -68,7 +70,7 @@ public class MusicPresenterImpl{
     }
 
     private void showPopupMenu(View view, final int position){
-        PopupMenu popupMenu = new PopupMenu(context, view);
+        PopupMenu popupMenu = new PopupMenu(activity, view);
         popupMenu.getMenuInflater().inflate(R.menu.music_popup_menu, popupMenu.getMenu());
 
 
@@ -80,7 +82,13 @@ public class MusicPresenterImpl{
                     .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    songListDao.insertSongToListWithKey(songList.getKey(), songArrayList.get(position));
+                    if(!songListDao.songListContainsSong(songList.getKey(), songArrayList.get(position))) {
+                        songListDao.insertSongToListWithKey(songList.getKey(), songArrayList.get(position));
+                        Toast.makeText(activity, "Song added", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(activity, "This playlist already contains this song", Toast.LENGTH_SHORT).show();
+                    }
+
                     return true;
                 }
             });
@@ -92,10 +100,14 @@ public class MusicPresenterImpl{
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
                     case(R.id.delete_song_item):
-                        Toast.makeText(context, "We cant delete, sorry", Toast.LENGTH_SHORT).show();
+                        DeleteSongDialogFragment dialogFragment = new DeleteSongDialogFragment();
+                        dialogFragment.setFragmentView(fragmentView);
+                        dialogFragment.setPosition(position);
+                        dialogFragment.setSong(songArrayList.get(position));
+                        dialogFragment.show(activity.getFragmentManager(), "DeleteSongDialogFragment");
                         return true;
                     case(R.id.new_playlist_item):
-                        Toast.makeText(context, "You havent playlist", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, "You havent playlist", Toast.LENGTH_SHORT).show();
                         return true;
                         default:
                             return false;
