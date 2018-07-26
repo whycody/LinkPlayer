@@ -6,7 +6,9 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
 import com.linkplayer.linkplayer.fragment.music.MusicFragmentView;
@@ -45,8 +47,16 @@ public class DeleteSongDialogFragment extends DialogFragment {
     }
 
     private void deleteSong(){
+        boolean deleted;
         File file = new File(song.getPath());
-        boolean deleted = file.getAbsoluteFile().delete();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getActivity().getContentResolver().delete(
+                    FileProvider.getUriForFile(getActivity(), "com.linkplayer.linkplayer.fileprovider", file),
+                    null, null);
+            deleted = true;
+        } else {
+            deleted = file.getAbsoluteFile().delete();
+        }
         if(deleted)
             fragmentView.notifyItemDeleted(position);
         else
