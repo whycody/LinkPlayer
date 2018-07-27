@@ -1,6 +1,5 @@
 package com.linkplayer.linkplayer.fragment.music;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -21,7 +20,7 @@ public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements Musi
         authorText = itemView.findViewById(R.id.author_text);
         minutesNumber = itemView.findViewById(R.id.minutes_number);
         secondsNumber = itemView.findViewById(R.id.seconds_number);
-        musicDotesButton = itemView.findViewById(R.id.music_dotes_button);
+        musicDotesButton = itemView.findViewById(R.id.dotes_button);
     }
 
     @Override

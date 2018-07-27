@@ -20,7 +20,7 @@ public class ArtistRecyclerHolder extends RecyclerView.ViewHolder implements Art
         super(itemView);
         this.itemView = itemView;
         this.context = context;
-        artistTitleText = itemView.findViewById(R.id.artist_title_text);
+        artistTitleText = itemView.findViewById(R.id.title_text);
         songsNumberText = itemView.findViewById(R.id.songs_number_text);
         singerPhoto = itemView.findViewById(R.id.singer_photo);
         Glide.with(context).load(R.drawable.singer_white).into(singerPhoto);

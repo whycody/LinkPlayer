@@ -1,7 +1,6 @@
 package com.linkplayer.linkplayer.fragment.music;
 
 import android.app.Activity;
-import android.content.Context;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -9,7 +8,8 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import com.linkplayer.linkplayer.DeleteSongDialogFragment;
+import com.linkplayer.linkplayer.dialog.fragments.AddNewPlaylistDialogFragment;
+import com.linkplayer.linkplayer.dialog.fragments.DeleteSongDialogFragment;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.model.Song;
@@ -107,7 +107,9 @@ public class MusicPresenterImpl{
                         dialogFragment.show(activity.getFragmentManager(), "DeleteSongDialogFragment");
                         return true;
                     case(R.id.new_playlist_item):
-                        Toast.makeText(activity, "You havent playlist", Toast.LENGTH_SHORT).show();
+                        AddNewPlaylistDialogFragment playlistDialogFragment = new AddNewPlaylistDialogFragment();
+                        playlistDialogFragment.setSong(songArrayList.get(position));
+                        playlistDialogFragment.show(activity.getFragmentManager(), "AddNewPlaylistDialogFragment");
                         return true;
                         default:
                             return false;

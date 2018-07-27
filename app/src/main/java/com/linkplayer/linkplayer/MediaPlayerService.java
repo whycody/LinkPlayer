@@ -1,5 +1,7 @@
 package com.linkplayer.linkplayer;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentUris;
 import android.content.Intent;
@@ -11,7 +13,9 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
+import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongDao;
+import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.main.RefreshView;
 import com.linkplayer.linkplayer.model.Song;
 
@@ -33,6 +37,7 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
 
     private int songPos;
     private int currentSong;
+    private static final int NOTIFY_ID=1;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -58,6 +63,11 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
     }
 
     @Override
+    public void onDestroy() {
+        stopForeground(true);
+    }
+
+    @Override
     public void onCompletion(MediaPlayer mp) {
         if(songPos < songList.size()-1 || repeat) {
             playNextSongAutomatically();
@@ -79,6 +89,7 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
+        mp.reset();
         return false;
     }
 
@@ -90,6 +101,22 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
+        Intent notIntent = new Intent(this, MainActivity.class);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendInt = PendingIntent.getActivity(this, 0,
+                notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification.Builder builder = new Notification.Builder(this);
+
+        builder.setContentIntent(pendInt)
+                .setSmallIcon(R.drawable.play_button_white)
+                .setTicker(songList.get(songPos).getTitle())
+                .setOngoing(true)
+                .setContentTitle(songList.get(songPos).getTitle())
+                .setContentText(songList.get(songPos).getTitle());
+        Notification not = builder.build();
+
+        startForeground(NOTIFY_ID, not);
     }
 
     @Override
@@ -195,7 +222,7 @@ MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.
             playSong();
     }
 
-    public void playLastSong(){
+    public void playPreviousSong(){
         if(songPos!=0) {
             setSong(songPos-1);
             setLastSong();

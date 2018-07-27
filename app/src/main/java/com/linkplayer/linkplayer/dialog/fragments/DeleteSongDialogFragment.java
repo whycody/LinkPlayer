@@ -1,4 +1,4 @@
-package com.linkplayer.linkplayer;
+package com.linkplayer.linkplayer.dialog.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -48,19 +48,28 @@ public class DeleteSongDialogFragment extends DialogFragment {
 
     private void deleteSong(){
         boolean deleted;
+        Uri uri = null;
+        String authority = "com.linkplayer.linkplayer.fileprovider";
         File file = new File(song.getPath());
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getActivity().getContentResolver().delete(
-                    FileProvider.getUriForFile(getActivity(), "com.linkplayer.linkplayer.fileprovider", file),
-                    null, null);
-            deleted = true;
+            try {
+                uri =  FileProvider.getUriForFile(getActivity(), authority, file);
+                getActivity().getContentResolver().delete(uri, null, null);
+                deleted = true;
+            }catch(Exception e){
+                deleted = false;
+            }
         } else {
             deleted = file.getAbsoluteFile().delete();
         }
-        if(deleted)
+
+        if(deleted) {
             fragmentView.notifyItemDeleted(position);
-        else
-            Toast.makeText(getActivity(), file.exists() + "", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
+            getActivity().sendBroadcast(intent);
+        }else
+            Toast.makeText(getActivity(), "Cannot delete", Toast.LENGTH_SHORT).show();
     }
 
     public void setSong(Song song){

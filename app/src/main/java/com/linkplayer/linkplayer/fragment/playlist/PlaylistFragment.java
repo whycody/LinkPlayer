@@ -3,28 +3,47 @@ package com.linkplayer.linkplayer.fragment.playlist;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.data.SongListDao;
+import com.linkplayer.linkplayer.data.SongListData;
+import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
+import com.linkplayer.linkplayer.model.SongList;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class PlaylistFragment extends Fragment {
+import java.util.ArrayList;
 
 
-    public PlaylistFragment() {
-        // Required empty public constructor
-    }
+public class PlaylistFragment extends Fragment implements PlaylistView{
 
+    private RecyclerView playlistRecycler;
+    private PlaylistPresenter playlistPresenter;
+    private PlaylistRecyclerAdapter recyclerAdapter;
+    private ArrayList<SongList> songListArrayList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_playlist, container, false);
+        View view = inflater.inflate(R.layout.fragment_playlist, container, false);
+        playlistRecycler = view.findViewById(R.id.playlist_recycler);
+
+        songListArrayList = new SongListDao(getActivity()).getAllListSongs();
+        playlistPresenter = new PlaylistPresenterImpl(songListArrayList, this, getActivity());
+        recyclerAdapter = new PlaylistRecyclerAdapter(playlistPresenter, getActivity());
+        playlistRecycler.setAdapter(recyclerAdapter);
+        playlistRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        playlistRecycler.addItemDecoration(new LinearVerticalSpacing(6));
+
+        return view;
     }
 
+    @Override
+    public void notifyItemDeleted(int position) {
+        songListArrayList.remove(position);
+        recyclerAdapter.notifyItemRemoved(position);
+    }
 }

@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -24,7 +25,7 @@ import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 
 
-public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView {
+public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView{
 
     private Toolbar mainToolbar;
     private TabLayout mainTabLayout;
@@ -35,16 +36,20 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private MainPresenter mainPresenter;
 
     private MediaPlayerService musicService;
+
     private Intent playIntent;
     private boolean musicBound = false;
     private boolean repeat = false;
     private boolean random = false;
     private MusicFragment musicFragment;
+    private boolean paused=false, playbackPaused=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.d("tag", "oncreate");
 
         mainToolbar = findViewById(R.id.main_toolbar);
         mainTabLayout = findViewById(R.id.main_tab_layout);
@@ -58,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mainPresenter = new MainPresenterImpl(MainActivity.this, MainActivity.this);
 
         playSongBtn.setOnClickListener(playLatestSongOnClick);
-        backSongBtn.setOnClickListener(playLastSongOnClick);
+        backSongBtn.setOnClickListener(playPreviousSongOnClick);
         nextSongBtn.setOnClickListener(playNextSongOnClick);
         randomMusicBtn.setOnClickListener(setRandomMusicModeOnClick);
         repeatMusicBtn.setOnClickListener(setRepeatMusicModeOnClick);
@@ -89,27 +94,45 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     protected void onStart() {
         super.onStart();
-        if (playIntent == null) {
-            playIntent = new Intent(this, MediaPlayerService.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
-        }
+        playIntent = new Intent(this, MediaPlayerService.class);
+        bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+        startService(playIntent);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        paused = false;
         setTitle();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if(musicConnection!=null){
-            unbindService(musicConnection);
-        }
+    protected void onStop() {
+        super.onStop();
     }
+
+    //    @Override
+//    public void onBackPressed() {
+//        new AlertDialog.Builder(this)
+//                .setTitle("Really Exit?")
+//                .setMessage("Are you sure you want to exit?")
+//                .setNegativeButton(android.R.string.no, null)
+//                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//
+//                    public void onClick(DialogInterface arg0, int arg1) {
+//                        finish();
+//                    }
+//                }).create().show();
+//    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(playIntent);
+        musicService = null;
+        super.onDestroy();
+    }
+
 
     private ServiceConnection musicConnection = new ServiceConnection() {
         @Override
@@ -172,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         else
             musicService.setSong(position);
         musicService.playSong();
+        playbackPaused=false;
         setViewsOnPlaying();
         setTitle();
     }
@@ -224,18 +248,29 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private View.OnClickListener playNextSongOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            musicService.playNextSong();
-            setTitle();
+            playNextSong();
         }
     };
 
-    private View.OnClickListener playLastSongOnClick = new View.OnClickListener() {
+    private void playNextSong(){
+        musicService.playNextSong();
+        setTitle();
+        playbackPaused=false;
+
+    }
+
+    private View.OnClickListener playPreviousSongOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            musicService.playLastSong();
-            setTitle();
+            playPreviousSong();
         }
     };
+
+    private void playPreviousSong(){
+        musicService.playPreviousSong();
+        setTitle();
+        playbackPaused=false;
+    }
 
     private View.OnClickListener setRandomMusicModeOnClick = new View.OnClickListener() {
         @Override
@@ -279,5 +314,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, android.R.color.white),
                 PorterDuff.Mode.MULTIPLY);
         repeatMusicBtn.setAlpha(0.8f);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        paused = true;
     }
 }

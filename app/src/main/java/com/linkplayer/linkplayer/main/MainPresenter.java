@@ -1,7 +1,6 @@
 package com.linkplayer.linkplayer.main;
 
 import com.linkplayer.linkplayer.MediaPlayerService;
-import com.linkplayer.linkplayer.model.Song;
 
 public interface MainPresenter {
 

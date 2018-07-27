@@ -33,8 +33,10 @@ public class SongListDao {
         ArrayList<SongList> songs = new ArrayList<>();
         SongListMapper mapper = new SongListMapper();
         RealmResults<SongListRealm> all = realm.where(SongListRealm.class).findAll().sort("key");
-        for (SongListRealm noteRealm : all) {
-            songs.add(mapper.fromRealm(noteRealm));
+        for (SongListRealm songRealm : all) {
+            if(songRealm.getKey()==idLastSongListValue)
+                continue;
+            songs.add(mapper.fromRealm(songRealm));
         }
         return songs;
     }
@@ -64,12 +66,13 @@ public class SongListDao {
         return songListMapper.fromRealm(songListRealm);
     }
 
-    public void insertSongList(String title){
+    public SongList insertSongList(String title){
         realm.beginTransaction();
 
         SongListRealm songListRealm = realm.createObject(SongListRealm.class, generateIdForList());
         songListRealm.setTitle(title);
         realm.commitTransaction();
+        return songListMapper.fromRealm(songListRealm);
     }
 
     public void editSongListTitle(int key, String title){
