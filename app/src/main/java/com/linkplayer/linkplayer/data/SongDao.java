@@ -75,9 +75,8 @@ public class SongDao {
     public Song getLatestMusic(){
         SongRealm songRealm = realm.where(SongRealm.class).equalTo("key", idLastSongValue).findFirst();
         if(songRealm==null) {
-            return new Song(0l, "Play a song!", "", "", "");
+            return new MusicListData(context).getSongList().get(0);
         }
-        Song song = songMapper.fromRealm(songRealm);
-        return song;
+        return songMapper.fromRealm(songRealm);
     }
 }

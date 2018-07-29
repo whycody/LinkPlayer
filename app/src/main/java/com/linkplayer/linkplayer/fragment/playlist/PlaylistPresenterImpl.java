@@ -6,8 +6,14 @@ import android.view.View;
 import android.widget.PopupMenu;
 
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.dialog.fragments.DeletePlaylistDialogFragment;
+import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsDialogFragment;
+import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenter;
+import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenterImpl;
+import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsRecyclerAdapter;
+import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
 import java.util.ArrayList;
@@ -57,9 +63,17 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
                     case R.id.delete_playlits_item:
                         DeletePlaylistDialogFragment dialogFragment = new DeletePlaylistDialogFragment();
                         dialogFragment.setPosition(position);
-                        dialogFragment.setSongList(songListArrayList.get(position));
+                        dialogFragment.setSongList(new SongListDao(activity).getAllTheSongLists().get(position));
                         dialogFragment.setPlaylistView(playlistView);
                         dialogFragment.show(activity.getFragmentManager(), "DeletePlaylistDialogFragment");
+                        return true;
+                    case R.id.add_song_to_playlist_item:
+                        AddSongsPresenter addSongsPresenter = new AddSongsPresenterImpl(new MusicListData(activity).getSongList(), activity);
+                        AddSongsDialogFragment addSongsDialogFragment = new AddSongsDialogFragment();
+                        addSongsDialogFragment.setAddSongsPresenter(addSongsPresenter);
+                        addSongsDialogFragment.setSongList(songListArrayList.get(position));
+                        addSongsDialogFragment.setRecyclerAdapter(new AddSongsRecyclerAdapter(addSongsPresenter, activity));
+                        addSongsDialogFragment.show(activity.getFragmentManager(), "AddSongsDialogFragment");
                         return true;
                         default:
                             return false;
@@ -69,6 +83,24 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
 
 
         popupMenu.show();
+    }
+
+    private ArrayList<Song> getSongsAvailable(int position){
+        SongList songList = songListArrayList.get(position);
+        ArrayList<Song> songArrayList = new MusicListData(activity).getSongList();
+        ArrayList<Song> songsAvailable = new ArrayList<>();
+        boolean available;
+        for(Song song: songList.getSongList()){
+            available = true;
+            for(int i =0; i<songArrayList.size(); i++){
+                if(song.getPath().equals(songArrayList.get(i).getPath())){
+                    available = false;
+                }
+            }
+            if(available)
+                songsAvailable.add(song);
+        }
+        return songsAvailable;
     }
 
     @Override

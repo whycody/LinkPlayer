@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey;
 
 public class SongListRealm extends RealmObject{
 
-    private RealmList<SongRealm> songList = new RealmList<>();
+    private RealmList<SongRealm> songList;
     private String name;
     @PrimaryKey
     private int key;
@@ -21,7 +21,6 @@ public class SongListRealm extends RealmObject{
     }
 
     public String getName() {
-
         return name;
     }
 

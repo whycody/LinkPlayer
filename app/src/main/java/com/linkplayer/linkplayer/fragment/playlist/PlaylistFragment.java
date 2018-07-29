@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongListDao;
-import com.linkplayer.linkplayer.data.SongListData;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
 import com.linkplayer.linkplayer.model.SongList;
 
@@ -31,7 +30,7 @@ public class PlaylistFragment extends Fragment implements PlaylistView{
         View view = inflater.inflate(R.layout.fragment_playlist, container, false);
         playlistRecycler = view.findViewById(R.id.playlist_recycler);
 
-        songListArrayList = new SongListDao(getActivity()).getAllListSongs();
+        songListArrayList = new SongListDao(getActivity()).getAllTheSongLists();
         playlistPresenter = new PlaylistPresenterImpl(songListArrayList, this, getActivity());
         recyclerAdapter = new PlaylistRecyclerAdapter(playlistPresenter, getActivity());
         playlistRecycler.setAdapter(recyclerAdapter);

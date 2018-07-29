@@ -77,21 +77,19 @@ public class MusicPresenterImpl{
         Menu menu = popupMenu.getMenu();
         SubMenu subMenu = menu.getItem(1).getSubMenu();
 
-        for(final SongList songList: songListDao.getAllListSongs()){
-            subMenu.add(0, songList.getKey(), Menu.NONE, songList.getTitle())
-                    .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    if(!songListDao.songListContainsSong(songList.getKey(), songArrayList.get(position))) {
-                        songListDao.insertSongToListWithKey(songList.getKey(), songArrayList.get(position));
-                        Toast.makeText(activity, "Song added", Toast.LENGTH_SHORT).show();
-                    }else{
-                        Toast.makeText(activity, "This playlist already contains this song", Toast.LENGTH_SHORT).show();
-                    }
+        for(final SongList songList: songListDao.getAllTheSongLists()){
+            if(!songListDao.songListContainsSong(songList.getKey(), songArrayList.get(position))) {
+                subMenu.add(0, songList.getKey(), Menu.NONE, songList.getTitle())
+                        .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                songListDao.insertSongToListWithKey(songList.getKey(), songArrayList.get(position));
+                                Toast.makeText(activity, "Song added", Toast.LENGTH_SHORT).show();
 
-                    return true;
-                }
-            });
+                                return true;
+                            }
+                        });
+            }
         }
 
 

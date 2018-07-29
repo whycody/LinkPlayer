@@ -1,6 +1,7 @@
 package com.linkplayer.linkplayer.data;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import com.linkplayer.linkplayer.mappers.SongListMapper;
 import com.linkplayer.linkplayer.mappers.SongMapper;
@@ -9,9 +10,11 @@ import com.linkplayer.linkplayer.model.SongList;
 import com.linkplayer.linkplayer.model.SongListRealm;
 import com.linkplayer.linkplayer.model.SongRealm;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class SongListDao {
@@ -29,36 +32,71 @@ public class SongListDao {
         songListMapper = new SongListMapper();
     }
 
-    public ArrayList<SongList> getAllListSongs() {
+    public ArrayList<SongList> getAllTheSongLists() {
         ArrayList<SongList> songs = new ArrayList<>();
         SongListMapper mapper = new SongListMapper();
         RealmResults<SongListRealm> all = realm.where(SongListRealm.class).findAll().sort("key");
         for (SongListRealm songRealm : all) {
             if(songRealm.getKey()==idLastSongListValue)
                 continue;
+            //checkSongListRealm(songRealm);
             songs.add(mapper.fromRealm(songRealm));
         }
         return songs;
     }
 
+    private void checkSongListRealm(SongListRealm songListRealm){
+        for(SongRealm songRealm: songListRealm.getSongList()){
+            File file = new File(songRealm.getPath());
+            if(!file.exists()){
+                deleteSongFromSonglist(songRealm.getKey(), songListRealm.getKey());
+            }
+        }
+    }
+
+    public void deleteSongFromSonglist(int songKey, int songListKey){
+        realm.beginTransaction();
+
+        SongRealm songRealm = realm.where(SongRealm.class).equalTo("key", songKey).findFirst();
+        SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", songListKey).findFirst();
+        for(int i =0; i<songListRealm.getSongList().size(); i++){
+            SongRealm songRealmAtList = songListRealm.getSongList().get(i);
+            if(songRealmAtList.getPath().equals(songRealm.getPath())){
+                songListRealm.getSongList().remove(i);
+            }
+        }
+
+        realm.commitTransaction();
+    }
+
     public boolean songListContainsSong(int key, Song song){
         SongList songList = getSongListWithKey(key);
         for(Song songFromList: songList.getSongList()){
-            if(songFromList.getPath().equals(song.getPath()))
+            if(songFromList.getId()==song.getId())
                 return true;
         }
         return false;
     }
 
-    public void insertSongToListWithKey(int key, Song song){
-        realm.beginTransaction();
-
-        SongRealm songRealm = songMapper.toRealm(song);
-        SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", key).findFirst();
-        if(songListRealm!=null)
-            songListRealm.addSong(songRealm);
-
-        realm.commitTransaction();
+    public void insertSongToListWithKey(final int key, Song song){
+        final SongRealm songRealm = songMapper.toRealm(song);
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", key).findFirst();
+                if(songListRealm != null) {
+                    Toast.makeText(context, songListRealm.getSongList().get(0).getTitle(), Toast.LENGTH_SHORT).show();
+                    SongRealm savedSongRealm = realm.copyToRealmOrUpdate(songRealm);
+                    RealmList<SongRealm> songs = songListRealm.getSongList();
+                    if(!songs.contains(savedSongRealm)) {
+                        songs.add(savedSongRealm);
+                    }
+                    for(SongRealm song: songListRealm.getSongList()) {
+                        Toast.makeText(context, song.getTitle(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
     }
 
     public SongList getSongListWithKey(int key){
