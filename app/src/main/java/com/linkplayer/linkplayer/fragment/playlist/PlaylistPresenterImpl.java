@@ -68,7 +68,7 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
                         dialogFragment.show(activity.getFragmentManager(), "DeletePlaylistDialogFragment");
                         return true;
                     case R.id.add_song_to_playlist_item:
-                        AddSongsPresenter addSongsPresenter = new AddSongsPresenterImpl(new MusicListData(activity).getSongList(), activity);
+                        AddSongsPresenter addSongsPresenter = new AddSongsPresenterImpl(new MusicListData(activity).getAddSongItems(), activity);
                         AddSongsDialogFragment addSongsDialogFragment = new AddSongsDialogFragment();
                         addSongsDialogFragment.setAddSongsPresenter(addSongsPresenter);
                         addSongsDialogFragment.setSongList(songListArrayList.get(position));

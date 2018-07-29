@@ -9,6 +9,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import com.linkplayer.linkplayer.model.AddSongItem;
 import com.linkplayer.linkplayer.model.Song;
 
 import java.util.ArrayList;
@@ -50,5 +51,16 @@ public class MusicListData {
             } while (musicCursor.moveToNext());
         }
         return songList;
+    }
+
+    public ArrayList<AddSongItem> getAddSongItems(){
+        ArrayList<AddSongItem> addSongItems = new ArrayList<>();
+        for(Song song: getSongList()){
+            AddSongItem addSongItem = new AddSongItem();
+            addSongItem.setSong(song);
+            addSongItem.setChecked(false);
+            addSongItems.add(addSongItem);
+        }
+        return addSongItems;
     }
 }

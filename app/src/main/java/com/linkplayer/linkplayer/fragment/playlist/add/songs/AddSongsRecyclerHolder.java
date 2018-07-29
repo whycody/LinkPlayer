@@ -2,25 +2,37 @@ package com.linkplayer.linkplayer.fragment.playlist.add.songs;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.linkplayer.linkplayer.R;
 
 public class AddSongsRecyclerHolder extends RecyclerView.ViewHolder implements AddSongRowView{
 
     private TextView titleText, artistText;
-    private ToggleButton addSongToggle;
+    private View itemView;
+    private CheckBox addSongBox;
 
     public AddSongsRecyclerHolder(View itemView) {
         super(itemView);
         titleText = itemView.findViewById(R.id.title_text);
         artistText = itemView.findViewById(R.id.author_text);
-        addSongToggle = itemView.findViewById(R.id.add_song_toggle);
+        addSongBox = itemView.findViewById(R.id.add_song_box);
+        itemView.setOnClickListener(onClickListener);
     }
+
+    private View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addSongBox.setChecked(!addSongBox.isChecked());
+                }
+            });
+        }
+    };
 
     @Override
     public void setTitle(String title) {
@@ -33,8 +45,13 @@ public class AddSongsRecyclerHolder extends RecyclerView.ViewHolder implements A
     }
 
     @Override
+    public void setChecked(boolean checked) {
+        addSongBox.setChecked(checked);
+    }
+
+    @Override
     public void setOnCheckedListener(CompoundButton.OnCheckedChangeListener onCheckedListener) {
-        addSongToggle.setOnCheckedChangeListener(onCheckedListener);
+        addSongBox.setOnCheckedChangeListener(onCheckedListener);
     }
 
 
