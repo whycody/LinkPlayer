@@ -1,17 +1,18 @@
 package com.linkplayer.linkplayer.fragment.playlist.add.songs;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.linkplayer.linkplayer.R;
 
 public class AddSongsRecyclerHolder extends RecyclerView.ViewHolder implements AddSongRowView{
 
     private TextView titleText, artistText;
-    private View itemView;
     private CheckBox addSongBox;
 
     public AddSongsRecyclerHolder(View itemView) {
@@ -25,12 +26,8 @@ public class AddSongsRecyclerHolder extends RecyclerView.ViewHolder implements A
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    addSongBox.setChecked(!addSongBox.isChecked());
-                }
-            });
+            boolean checked = addSongBox.isChecked();
+            addSongBox.setChecked(!checked);
         }
     };
 

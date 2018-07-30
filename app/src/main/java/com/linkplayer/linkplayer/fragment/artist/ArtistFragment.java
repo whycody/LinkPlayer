@@ -14,11 +14,12 @@ import com.linkplayer.linkplayer.data.SongListData;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
 
 
-public class ArtistFragment extends Fragment {
+public class ArtistFragment extends Fragment implements ArtistFragmentView{
 
     private ArtistPresenterImpl artistPresenter;
     private ArtistRecyclerAdapter recyclerAdapter;
     private RecyclerView artistRecycler;
+    int latestSong;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -26,7 +27,7 @@ public class ArtistFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_artist, container, false);
 
         artistRecycler = view.findViewById(R.id.artist_recycler);
-        artistPresenter = new ArtistPresenterImpl(new SongListData(getActivity()).getArtistList(), getActivity());
+        artistPresenter = new ArtistPresenterImpl(new SongListData(getActivity()).getArtistList(), this, getActivity());
         recyclerAdapter = new ArtistRecyclerAdapter(getActivity(), artistPresenter);
         artistRecycler.setAdapter(recyclerAdapter);
         artistRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -34,5 +35,17 @@ public class ArtistFragment extends Fragment {
 
         return view;
     }
+
+    @Override
+    public void notifyItemChanged(int lastSong, int position) {
+        recyclerAdapter.notifyItemChanged(lastSong);
+        recyclerAdapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public void setLatestSong(int latestSong) {
+        this.latestSong = latestSong;
+    }
+
 
 }

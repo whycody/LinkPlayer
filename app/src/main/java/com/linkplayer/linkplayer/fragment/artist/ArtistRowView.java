@@ -1,5 +1,6 @@
 package com.linkplayer.linkplayer.fragment.artist;
 
+import android.graphics.drawable.Drawable;
 import android.view.View;
 
 public interface ArtistRowView {
@@ -9,4 +10,6 @@ public interface ArtistRowView {
     void setSongsNumber(String number);
 
     void setOnClick(View.OnClickListener onClick);
+
+    void setBackground(Drawable drawable);
 }

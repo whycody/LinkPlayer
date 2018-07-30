@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private boolean repeat = false;
     private boolean random = false;
     private MusicFragment musicFragment;
-    private boolean paused=false, playbackPaused=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     protected void onResume() {
         super.onResume();
-        paused = false;
         setTitle();
     }
 
@@ -195,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         else
             musicService.setSong(position);
         musicService.playSong();
-        playbackPaused=false;
         setViewsOnPlaying();
         setTitle();
     }
@@ -255,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private void playNextSong(){
         musicService.playNextSong();
         setTitle();
-        playbackPaused=false;
 
     }
 
@@ -269,7 +265,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private void playPreviousSong(){
         musicService.playPreviousSong();
         setTitle();
-        playbackPaused=false;
     }
 
     private View.OnClickListener setRandomMusicModeOnClick = new View.OnClickListener() {
@@ -319,6 +314,5 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     protected void onPause() {
         super.onPause();
-        paused = true;
     }
 }
