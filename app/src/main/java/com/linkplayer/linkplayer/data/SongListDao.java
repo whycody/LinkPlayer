@@ -36,24 +36,14 @@ public class SongListDao {
 
     public ArrayList<SongList> getAllTheSongLists() {
         ArrayList<SongList> songs = new ArrayList<>();
-        SongListMapper mapper = new SongListMapper();
+        SongListMapper songListMapper = new SongListMapper();
         RealmResults<SongListRealm> all = realm.where(SongListRealm.class).findAll().sort("key");
-        for (SongListRealm songRealm : all) {
-            if(songRealm.getKey()==idLastSongListValue)
+        for (SongListRealm songListRealm : all) {
+            if(songListRealm.getKey()==idLastSongListValue)
                 continue;
-            //checkSongListRealm(songRealm);
-            songs.add(mapper.fromRealm(songRealm));
+            songs.add(songListMapper.fromRealm(songListRealm));
         }
         return songs;
-    }
-
-    private void checkSongListRealm(SongListRealm songListRealm){
-        for(SongRealm songRealm: songListRealm.getSongList()){
-            File file = new File(songRealm.getPath());
-            if(!file.exists()){
-                deleteSongFromSonglist(songRealm.getKey(), songListRealm.getKey());
-            }
-        }
     }
 
     public void deleteSongFromSonglist(int songKey, int songListKey){
@@ -80,16 +70,14 @@ public class SongListDao {
         return false;
     }
 
-    public void insertSongToListWithKey(final int key, Song song){
-        final SongRealm songRealm = songMapper.toRealm(song);
+    public void insertSongToListWithKey(final int key, final Song song){
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm r) {
+                SongRealm songRealmNew = createSongRealm(song);
                 SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", key).findFirst();
                 if (songListRealm != null) {
-                    printAllSongsInPlaylist("before");
-                    SongRealm savedSongRealm = realm.copyToRealmOrUpdate(songRealm);
-                    printAllSongsInPlaylist("after");
+                    SongRealm savedSongRealm = realm.copyToRealmOrUpdate(songRealmNew);
                     RealmList<SongRealm> songs = songListRealm.getSongList();
                     if(!songs.contains(savedSongRealm)) {
                         songs.add(savedSongRealm);
@@ -99,12 +87,13 @@ public class SongListDao {
         });
     }
 
-    private void printAllSongsInPlaylist(String time){
-        for(SongList songList: getAllTheSongLists()){
-            for(Song song1: songList.getSongList()){
-                Log.d("Playlist " + songList.getTitle() + " " + time + ": ", song1.toString());
-            }
-        }
+    private SongRealm createSongRealm(Song song){
+        SongRealm songRealmNew = realm.createObject(SongRealm.class, generateIdForSong());
+        songRealmNew.setId(song.getId());
+        songRealmNew.setTitle(song.getTitle());
+        songRealmNew.setPath(song.getPath());
+        songRealmNew.setArtist(song.getArtist());
+        return songRealmNew;
     }
 
     public SongList getSongListWithKey(int key){
@@ -177,5 +166,11 @@ public class SongListDao {
         if(realm.where(SongListRealm.class).max("key")==null)
             return 0;
         return realm.where(SongListRealm.class).max("key").intValue() + 1;
+    }
+
+    private int generateIdForSong() {
+        if(realm.where(SongRealm.class).max("key")==null)
+            return 0;
+        return realm.where(SongRealm.class).max("key").intValue() + 1;
     }
 }
