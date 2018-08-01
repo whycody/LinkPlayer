@@ -1,6 +1,7 @@
 package com.linkplayer.linkplayer.data;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.linkplayer.linkplayer.mappers.SongListMapper;
@@ -12,6 +13,7 @@ import com.linkplayer.linkplayer.model.SongRealm;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -82,21 +84,27 @@ public class SongListDao {
         final SongRealm songRealm = songMapper.toRealm(song);
         realm.executeTransaction(new Realm.Transaction() {
             @Override
-            public void execute(Realm realm) {
+            public void execute(Realm r) {
                 SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", key).findFirst();
-                if(songListRealm != null) {
-                    Toast.makeText(context, songListRealm.getSongList().get(0).getTitle(), Toast.LENGTH_SHORT).show();
+                if (songListRealm != null) {
+                    printAllSongsInPlaylist("before");
                     SongRealm savedSongRealm = realm.copyToRealmOrUpdate(songRealm);
+                    printAllSongsInPlaylist("after");
                     RealmList<SongRealm> songs = songListRealm.getSongList();
                     if(!songs.contains(savedSongRealm)) {
                         songs.add(savedSongRealm);
                     }
-                    for(SongRealm song: songListRealm.getSongList()) {
-                        Toast.makeText(context, song.getTitle(), Toast.LENGTH_SHORT).show();
-                    }
                 }
             }
         });
+    }
+
+    private void printAllSongsInPlaylist(String time){
+        for(SongList songList: getAllTheSongLists()){
+            for(Song song1: songList.getSongList()){
+                Log.d("Playlist " + songList.getTitle() + " " + time + ": ", song1.toString());
+            }
+        }
     }
 
     public SongList getSongListWithKey(int key){

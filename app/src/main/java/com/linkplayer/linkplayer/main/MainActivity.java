@@ -106,25 +106,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    //    @Override
-//    public void onBackPressed() {
-//        new AlertDialog.Builder(this)
-//                .setTitle("Really Exit?")
-//                .setMessage("Are you sure you want to exit?")
-//                .setNegativeButton(android.R.string.no, null)
-//                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-//
-//                    public void onClick(DialogInterface arg0, int arg1) {
-//                        finish();
-//                    }
-//                }).create().show();
-//    }
-
-    @Override
     protected void onDestroy() {
         stopService(playIntent);
         musicService = null;
@@ -282,6 +263,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             mainPresenter.saveRepeatReferences(repeat);
         }
     };
+
+    public MediaPlayerService getMusicService(){
+        return musicService;
+    }
 
     @Override
     public void showRandomIsChosed(){

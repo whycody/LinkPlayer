@@ -57,4 +57,14 @@ public class SongRealm extends RealmObject{
     public int getKey(){
         return key;
     }
+
+    @Override
+    public String toString() {
+        return "SongRealm{" +
+                "title='" + title + '\'' +
+                ", artist='" + artist + '\'' +
+                ", id=" + id +
+                ", key=" + key +
+                '}';
+    }
 }

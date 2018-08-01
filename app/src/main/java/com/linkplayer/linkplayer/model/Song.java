@@ -65,4 +65,14 @@ public class Song {
     public void setPath(String path){
         this.path = path;
     }
+
+    @Override
+    public String toString() {
+        return "Song{" +
+                "title='" + title + '\'' +
+                ", artist='" + artist + '\'' +
+                ", choosed=" + choosed +
+                ", id=" + id +
+                '}';
+    }
 }

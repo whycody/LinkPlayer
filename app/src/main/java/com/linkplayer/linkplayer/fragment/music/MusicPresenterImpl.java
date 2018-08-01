@@ -84,7 +84,6 @@ public class MusicPresenterImpl{
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
                                 songListDao.insertSongToListWithKey(songList.getKey(), songArrayList.get(position));
-                                Toast.makeText(activity, "Song added", Toast.LENGTH_SHORT).show();
 
                                 return true;
                             }
