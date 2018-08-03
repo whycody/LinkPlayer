@@ -15,7 +15,7 @@ public class ArtistRecyclerHolder extends RecyclerView.ViewHolder implements Art
     private TextView artistTitleText, songsNumberText;
     private ImageView singerPhoto;
     private Context context;
-    private View itemView, backgroundView;
+    private View itemView;
 
     public ArtistRecyclerHolder(View itemView, Context context) {
         super(itemView);
@@ -24,7 +24,6 @@ public class ArtistRecyclerHolder extends RecyclerView.ViewHolder implements Art
         artistTitleText = itemView.findViewById(R.id.title_text);
         songsNumberText = itemView.findViewById(R.id.songs_number_text);
         singerPhoto = itemView.findViewById(R.id.singer_photo);
-        backgroundView = itemView.findViewById(R.id.background_view);
         Glide.with(context).load(R.drawable.singer_white).into(singerPhoto);
     }
 
@@ -41,10 +40,5 @@ public class ArtistRecyclerHolder extends RecyclerView.ViewHolder implements Art
     @Override
     public void setOnClick(View.OnClickListener onClick) {
         itemView.setOnClickListener(onClick);
-    }
-
-    @Override
-    public void setBackground(Drawable drawable) {
-        backgroundView.setBackgroundDrawable(drawable);
     }
 }

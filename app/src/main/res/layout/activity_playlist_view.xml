@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_gray"
+    tools:context=".playlist.view.PlaylistViewActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/playlist_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Playlist"
+        app:titleTextColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/playlist_top_btn"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:background="@color/colorPrimaryDark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playlist_toolbar" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/playlist_songs_recycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playlist_top_btn" />
+
+    <Button
+        android:id="@+id/delete_playlist_btn"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:text="@string/delete_playlist"
+        android:textAllCaps="false"
+        android:background="#a2ffffff"
+        android:textColor="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</android.support.constraint.ConstraintLayout>

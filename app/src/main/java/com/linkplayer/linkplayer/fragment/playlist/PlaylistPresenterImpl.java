@@ -1,6 +1,7 @@
 package com.linkplayer.linkplayer.fragment.playlist;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -15,6 +16,7 @@ import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenterIm
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsRecyclerAdapter;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
+import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 
 import java.util.ArrayList;
 
@@ -42,6 +44,7 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
             @Override
             public void onClick(View v) {
                 songListDao.changeLatestSongList(songListArrayList.get(position));
+                sendToNextActivity();
             }
         });
         playlistRecyclerHolder.setOnThreeDotesClick(new View.OnClickListener() {
@@ -50,6 +53,12 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
                 showPopupMenu(v, position);
             }
         });
+    }
+
+    private void sendToNextActivity(){
+        Intent intent = new Intent(activity, PlaylistViewActivity.class);
+        intent.putExtra("type", PlaylistViewActivity.PLAYLIST_TYPE);
+        activity.startActivityForResult(intent, 1);
     }
 
     private void showPopupMenu(View view, final int position){

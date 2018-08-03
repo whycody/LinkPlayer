@@ -41,7 +41,7 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
     }
 
     @Override
-    public void playMusic(int position) {
+    public void onItemClick(int position) {
         ((MainActivity)getActivity()).playSong(position);
     }
 

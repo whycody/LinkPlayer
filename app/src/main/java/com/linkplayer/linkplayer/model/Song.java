@@ -6,6 +6,7 @@ public class Song {
     private String title, artist, path, duration;
     private boolean choosed = false;
     private long id;
+    private int key;
 
     public Song() {
     }
@@ -64,6 +65,14 @@ public class Song {
 
     public void setPath(String path){
         this.path = path;
+    }
+
+    public int getKey() {
+        return key;
+    }
+
+    public void setKey(int key) {
+        this.key = key;
     }
 
     @Override

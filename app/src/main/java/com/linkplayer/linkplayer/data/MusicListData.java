@@ -63,4 +63,12 @@ public class MusicListData {
         }
         return addSongItems;
     }
+
+    public Song getSongListByPath(String path){
+        for(Song song: getSongList()){
+            if(song.getPath().equals(path))
+                return song;
+        }
+        return null;
+    }
 }

@@ -1,12 +1,12 @@
 package com.linkplayer.linkplayer.fragment.music;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.dialog.fragments.AddNewPlaylistDialogFragment;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongDialogFragment;
@@ -44,7 +44,7 @@ public class MusicPresenterImpl{
         musicRecyclerHolder.setOnClickItemView(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               fragmentView.playMusic(position);
+               fragmentView.onItemClick(position);
             }
         });
         musicRecyclerHolder.setOnClickPopupMenu(new View.OnClickListener() {
@@ -53,7 +53,6 @@ public class MusicPresenterImpl{
                 showPopupMenu(v, position);
             }
         });
-       // musicRecyclerHolder.setGradientDrawable(getGradientDrawable());
     }
 
     private String getMinutes(int duration){
@@ -72,8 +71,6 @@ public class MusicPresenterImpl{
     private void showPopupMenu(View view, final int position){
         PopupMenu popupMenu = new PopupMenu(activity, view);
         popupMenu.getMenuInflater().inflate(R.menu.music_popup_menu, popupMenu.getMenu());
-
-
         Menu menu = popupMenu.getMenu();
         SubMenu subMenu = menu.getItem(1).getSubMenu();
 

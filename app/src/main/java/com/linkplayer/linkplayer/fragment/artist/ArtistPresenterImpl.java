@@ -1,15 +1,13 @@
 package com.linkplayer.linkplayer.fragment.artist;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongListDao;
-import com.linkplayer.linkplayer.fragment.artist.activity.ArtistActivity;
-import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.model.SongList;
+import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 
 import java.util.ArrayList;
 
@@ -30,22 +28,22 @@ public class ArtistPresenterImpl {
 
     public void onBindSongRowViewAtPosition(ArtistRecyclerHolder artistRecyclerHolder, final int position){
         final SongList songList = songListArrayList.get(position);
-        if(songListDao.getLatestSongList().getTitle().equals(songList.getTitle())
-                && songListDao.getLatestSongList().getSongList().size() == songList.getSongList().size()) {
-            artistRecyclerHolder.setBackground(activity.getResources().getDrawable(R.drawable.gray_color));
-            this.lastSong = position;
-        } else {
-            artistRecyclerHolder.setBackground(activity.getResources().getDrawable(R.drawable.gray_row_color));
-        }
         artistRecyclerHolder.setArtistTitle(songList.getTitle());
         artistRecyclerHolder.setSongsNumber("Songs: " + songList.getSongList().size());
         artistRecyclerHolder.setOnClick(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragmentView.notifyItemChanged(lastSong, position);
                 songListDao.changeLatestSongList(songList);
+                sendToNextActivity();
             }
         });
+    }
+
+    private void sendToNextActivity(){
+        Intent intent = new Intent(activity, PlaylistViewActivity.class);
+        intent.putExtra("type", PlaylistViewActivity.ARTIST_TYPE);
+        activity.startActivityForResult(intent, 1);
+
     }
 
     public int getArtistRowsCount(){

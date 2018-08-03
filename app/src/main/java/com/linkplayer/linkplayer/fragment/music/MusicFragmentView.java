@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public interface MusicFragmentView {
 
-    void playMusic(int position);
+    void onItemClick(int position);
 
     void notifyItemChanged(int lastPosition, int position);
 

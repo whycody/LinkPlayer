@@ -1,5 +1,6 @@
 package com.linkplayer.linkplayer.main;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.linkplayer.linkplayer.MediaPlayerService;
@@ -112,6 +114,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onDestroy();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1){
+            if(resultCode == Activity.RESULT_OK){
+                Toast.makeText(this, data.getStringExtra("songPath"), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
         @Override

@@ -8,5 +8,7 @@ public interface AddSongsPresenter {
 
     void addSongsToPlaylist(SongList songList);
 
+    void setAddSongsInformator(AddSongsInformator addSongsInformator);
+
     int getAddSongsRowsCount();
 }

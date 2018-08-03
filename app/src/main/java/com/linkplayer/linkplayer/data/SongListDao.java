@@ -93,6 +93,7 @@ public class SongListDao {
         songRealmNew.setTitle(song.getTitle());
         songRealmNew.setPath(song.getPath());
         songRealmNew.setArtist(song.getArtist());
+        songRealmNew.setDuration(song.getDuration());
         return songRealmNew;
     }
 
@@ -132,34 +133,36 @@ public class SongListDao {
     public SongList getLatestSongList(){
         SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", idLastSongListValue).findFirst();
         SongListMapper songListMapper = new SongListMapper();
-        SongList songList = songListMapper.fromRealm(songListRealm);
+        SongList songList = new SongList(new ArrayList<Song>(), "Title", 0);
+        if(songListRealm!=null)
+            songList = songListMapper.fromRealm(songListRealm);
         return songList;
     }
 
     public void changeLatestSongList(SongList songList){
         deleteLatestSongList();
-        realm.beginTransaction();
         createLatestSongList(songList);
-        realm.commitTransaction();
     }
 
     private void deleteLatestSongList(){
-        if(realm.where(SongListRealm.class).equalTo("key", idLastSongListValue).findFirst()!=null) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                if(realm.where(SongListRealm.class).equalTo("key", idLastSongListValue).findFirst()!=null) {
                     realm.where(SongListRealm.class).equalTo("key", idLastSongListValue).findFirst().deleteFromRealm();
                 }
-            });
-        }
+            }
+        });
     }
 
     private void createLatestSongList(SongList songList) {
+        realm.beginTransaction();
         SongListRealm songListRealm = realm.createObject(SongListRealm.class, idLastSongListValue);
-        for(Song song : songList.getSongList()) {
-            songListRealm.addSong(songMapper.toRealm(song));
-        }
         songListRealm.setTitle(songList.getTitle());
+        realm.commitTransaction();
+        for(Song song : songList.getSongList()) {
+            insertSongToListWithKey(songListRealm.getKey(), song);
+        }
     }
 
     private int generateIdForList() {

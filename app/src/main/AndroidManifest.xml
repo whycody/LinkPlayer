@@ -39,7 +39,7 @@
                 android:resource="@xml/fileaccess_paths" />
         </provider>
 
-        <activity android:name=".fragment.artist.activity.ArtistActivity"></activity>
+        <activity android:name=".playlist.view.PlaylistViewActivity"></activity>
     </application>
 
 </manifest>

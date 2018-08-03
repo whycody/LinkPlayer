@@ -70,6 +70,7 @@ public class SongDao {
         songRealm.setId(song.getId());
         songRealm.setPath(song.getPath());
         songRealm.setTitle(song.getTitle());
+        songRealm.setDuration(song.getDuration());
     }
 
     public Song getLatestMusic(){

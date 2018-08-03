@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
+import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
 import com.linkplayer.linkplayer.model.SongList;
 
 import java.util.ArrayList;

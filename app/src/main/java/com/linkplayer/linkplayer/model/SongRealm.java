@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey;
 
 public class SongRealm extends RealmObject{
 
-    private String title, artist, path;
+    private String title, artist, path, duration;
     private long id;
     @PrimaryKey
     private int key;
@@ -15,7 +15,7 @@ public class SongRealm extends RealmObject{
 
     }
 
-    public SongRealm(String title, String artist, String path, long id) {
+    public SongRealm(String title, String artist, String path, String duration, long id) {
         this.title = title;
         this.artist = artist;
         this.path = path;
@@ -56,6 +56,18 @@ public class SongRealm extends RealmObject{
 
     public int getKey(){
         return key;
+    }
+
+    public void setKey(int key){
+        this.key = key;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     @Override

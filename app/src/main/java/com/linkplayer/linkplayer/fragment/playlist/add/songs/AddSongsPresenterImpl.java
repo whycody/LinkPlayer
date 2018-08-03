@@ -18,10 +18,7 @@ public class AddSongsPresenterImpl implements AddSongsPresenter {
     private ArrayList<Song> markedSongs = new ArrayList<>();
     private boolean[] songsChecked;
     private Context context;
-
-    public AddSongsPresenterImpl() {
-
-    }
+    private AddSongsInformator addSongsInformator;
 
     public AddSongsPresenterImpl(ArrayList<AddSongItem> addSongItems, Context context) {
         this.addSongItems = addSongItems;
@@ -62,6 +59,13 @@ public class AddSongsPresenterImpl implements AddSongsPresenter {
         for(Song song: markedSongs){
             songListDao.insertSongToListWithKey(songList.getKey(), song);
         }
+        songListDao.changeLatestSongList(songListDao.getSongListWithKey(songList.getKey()));
+        addSongsInformator.notifyItemsAdded(songListDao.getLatestSongList());
+    }
+
+    @Override
+    public void setAddSongsInformator(AddSongsInformator addSongsInformator) {
+        this.addSongsInformator = addSongsInformator;
     }
 
     @Override

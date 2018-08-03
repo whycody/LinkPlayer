@@ -11,6 +11,8 @@ public class SongMapper {
         song.setId(songRealm.getId());
         song.setPath(songRealm.getPath());
         song.setTitle(songRealm.getTitle());
+        song.setDuration(songRealm.getDuration());
+        song.setKey(songRealm.getKey());
         return song;
     }
 
@@ -20,6 +22,8 @@ public class SongMapper {
         songRealm.setId(song.getId());
         songRealm.setPath(song.getPath());
         songRealm.setTitle(song.getTitle());
+        songRealm.setDuration(song.getDuration());
+        songRealm.setKey(song.getKey());
         return songRealm;
     }
 }
