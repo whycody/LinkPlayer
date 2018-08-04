@@ -4,6 +4,7 @@
     <string name="music">music</string>
     <string name="artist">artist</string>
     <string name="playlist">playlist</string>
+    <string name="now">playing now</string>
     <string name="download_music_from_youtube">Download music from Youtube</string>
     <string name="delete_song">Delete song</string>
     <string name="add_to_playlist">Add to playlist</string>

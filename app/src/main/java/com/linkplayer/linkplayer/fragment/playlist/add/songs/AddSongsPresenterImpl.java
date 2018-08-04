@@ -59,8 +59,7 @@ public class AddSongsPresenterImpl implements AddSongsPresenter {
         for(Song song: markedSongs){
             songListDao.insertSongToListWithKey(songList.getKey(), song);
         }
-        songListDao.changeLatestSongList(songListDao.getSongListWithKey(songList.getKey()));
-        addSongsInformator.notifyItemsAdded(songListDao.getLatestSongList());
+        addSongsInformator.notifyItemsAdded(songListDao.getSongListWithKey(songList.getKey()));
     }
 
     @Override

@@ -34,14 +34,15 @@ public class ArtistPresenterImpl {
             @Override
             public void onClick(View v) {
                 songListDao.changeLatestSongList(songList);
-                sendToNextActivity();
+                sendToNextActivity(position);
             }
         });
     }
 
-    private void sendToNextActivity(){
+    private void sendToNextActivity(int position){
         Intent intent = new Intent(activity, PlaylistViewActivity.class);
         intent.putExtra("type", PlaylistViewActivity.ARTIST_TYPE);
+        intent.putExtra("artist", songListArrayList.get(position).getTitle());
         activity.startActivityForResult(intent, 1);
 
     }

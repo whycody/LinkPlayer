@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -32,6 +33,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
     private Button playlistTopBtn;
     private RecyclerView playlistSongsRecycler;
     private Button deletePlaylistBtn;
+    private MusicPresenterImpl musicPresenter;
 
     private PlaylistViewPresenter viewPresenter;
     private MusicRecyclerAdapter musicRecyclerAdapter;
@@ -48,15 +50,22 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
         playlistSongsRecycler = findViewById(R.id.playlist_songs_recycler);
         deletePlaylistBtn = findViewById(R.id.delete_playlist_btn);
         viewPresenter = new PlaylistViewPresenterImpl(this, this, this);
-        songList = getSongList().getSongList();
-        musicRecyclerAdapter = new MusicRecyclerAdapter(new MusicPresenterImpl(songList, this, this), this);
+        songList = viewPresenter.getSongList().getSongList();
+        musicPresenter = new MusicPresenterImpl(songList, this, this);
+        musicRecyclerAdapter = new MusicRecyclerAdapter(musicPresenter, this);
         playlistSongsRecycler.setAdapter(musicRecyclerAdapter);
         playlistSongsRecycler.setLayoutManager(new LinearLayoutManager(this));
         playlistSongsRecycler.addItemDecoration(new LinearVerticalSpacing(6));
 
         setSupportActionBar(playlistToolbar);
-        playlistToolbar.setTitle(getSongList().getTitle());
+        playlistToolbar.setTitle(viewPresenter.getSongList().getTitle());
         viewPresenter.onCreate();
+    }
+
+    @Override
+    protected void onDestroy() {
+        returnResult(Activity.RESULT_CANCELED);
+        super.onDestroy();
     }
 
     @Override
@@ -75,18 +84,17 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
     }
 
     @Override
-    public SongList getSongList() {
-        return new SongListDao(this).getLatestSongList();
-    }
-
-    @Override
     public void onItemClick(int position) {
         returnResult(position);
     }
 
     private void returnResult(int position){
         Intent intent = new Intent();
-        intent.putExtra("songPath", getSongList().getSongList().get(position).getPath());
+        intent.putExtra("songPath", viewPresenter.getSongList().getSongList().get(position).getPath());
+        intent.putExtra("type", viewPresenter.getType());
+        intent.putExtra("key", viewPresenter.getKey());
+        intent.putExtra("artist", viewPresenter.getArtist());
+        intent.putExtra("position", position);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }
@@ -98,16 +106,13 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
 
     @Override
     public void notifyItemDeleted(int position) {
-        getSongList().getSongList().remove(position);
+        viewPresenter.getSongList().getSongList().remove(position);
         musicRecyclerAdapter.notifyItemRemoved(position);
     }
 
     @Override
     public void notifyItemsAdded(SongList songList) {
-        this.songList = songList.getSongList();
-//        for(Song song: songList.getSongList()) {
-//            Toast.makeText(this, song.getTitle(), Toast.LENGTH_SHORT).show();
-//        }
+        musicPresenter.setSongArrayList(songList.getSongList());
         musicRecyclerAdapter.notifyDataSetChanged();
     }
 }

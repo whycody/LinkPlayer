@@ -252,6 +252,10 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         player.setOnErrorListener(this);
     }
 
+    public ArrayList<Song> getSongList() {
+        return songList;
+    }
+
     public void setList(ArrayList<Song> songList){
         this.songList = songList;
     }

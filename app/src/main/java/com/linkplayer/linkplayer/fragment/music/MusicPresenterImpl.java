@@ -81,7 +81,6 @@ public class MusicPresenterImpl{
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
                                 songListDao.insertSongToListWithKey(songList.getKey(), songArrayList.get(position));
-
                                 return true;
                             }
                         });
@@ -118,4 +117,11 @@ public class MusicPresenterImpl{
         return songArrayList.size();
     }
 
+    public void setSongArrayList(ArrayList<Song> songArrayList){
+        this.songArrayList = songArrayList;
+    }
+
+    public ArrayList<Song> getSongArrayList() {
+        return songArrayList;
+    }
 }

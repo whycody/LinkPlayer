@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.linkplayer.linkplayer.R;
-import com.linkplayer.linkplayer.data.SongListData;
+import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
 
 
@@ -27,7 +27,7 @@ public class ArtistFragment extends Fragment implements ArtistFragmentView{
         View view = inflater.inflate(R.layout.fragment_artist, container, false);
 
         artistRecycler = view.findViewById(R.id.artist_recycler);
-        artistPresenter = new ArtistPresenterImpl(new SongListData(getActivity()).getArtistList(), this, getActivity());
+        artistPresenter = new ArtistPresenterImpl(new MusicListData(getActivity()).getArtistList(), this, getActivity());
         recyclerAdapter = new ArtistRecyclerAdapter(getActivity(), artistPresenter);
         artistRecycler.setAdapter(recyclerAdapter);
         artistRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));

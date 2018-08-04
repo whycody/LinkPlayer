@@ -11,6 +11,7 @@ import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.dialog.fragments.DeletePlaylistDialogFragment;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsDialogFragment;
+import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenter;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenterImpl;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsRecyclerAdapter;
@@ -26,6 +27,7 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
     private Activity activity;
     private SongListDao songListDao;
     private PlaylistView playlistView;
+    private AddSongsInformator addSongsInformator;
 
     public PlaylistPresenterImpl(ArrayList<SongList> songListArrayList, PlaylistView playlistView, Activity activity){
         this.songListArrayList = songListArrayList;
@@ -44,7 +46,7 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
             @Override
             public void onClick(View v) {
                 songListDao.changeLatestSongList(songListArrayList.get(position));
-                sendToNextActivity();
+                sendToNextActivity(position);
             }
         });
         playlistRecyclerHolder.setOnThreeDotesClick(new View.OnClickListener() {
@@ -55,9 +57,10 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
         });
     }
 
-    private void sendToNextActivity(){
+    private void sendToNextActivity(int position){
         Intent intent = new Intent(activity, PlaylistViewActivity.class);
         intent.putExtra("type", PlaylistViewActivity.PLAYLIST_TYPE);
+        intent.putExtra("songList", songListArrayList.get(position).getKey());
         activity.startActivityForResult(intent, 1);
     }
 
@@ -82,6 +85,7 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
                         addSongsDialogFragment.setAddSongsPresenter(addSongsPresenter);
                         addSongsDialogFragment.setSongList(songListArrayList.get(position));
                         addSongsDialogFragment.setRecyclerAdapter(new AddSongsRecyclerAdapter(addSongsPresenter, activity));
+                        addSongsDialogFragment.setAddSongInformator(addSongsInformator);
                         addSongsDialogFragment.show(activity.getFragmentManager(), "AddSongsDialogFragment");
                         return true;
                         default:
@@ -115,5 +119,10 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
     @Override
     public int getPlaylistRowCount() {
         return songListArrayList.size();
+    }
+
+    @Override
+    public void setAddSongsInformator(AddSongsInformator addSongsInformator) {
+        this.addSongsInformator = addSongsInformator;
     }
 }

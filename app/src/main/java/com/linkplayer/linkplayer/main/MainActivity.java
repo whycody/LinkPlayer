@@ -24,7 +24,17 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.data.MusicListData;
+import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.fragment.music.MusicFragment;
+import com.linkplayer.linkplayer.fragment.now.NowFragment;
+import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
+import com.linkplayer.linkplayer.model.Song;
+import com.linkplayer.linkplayer.model.SongList;
+import com.linkplayer.linkplayer.playlist.view.PlaylistView;
+import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView{
@@ -44,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private boolean repeat = false;
     private boolean random = false;
     private MusicFragment musicFragment;
+    private NowFragment nowFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +87,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         Glide.with(this).load(R.drawable.replay_white).into(repeatMusicBtn);
         Glide.with(this).load(R.drawable.shuffle_white).into(randomMusicBtn);
 
-        final String MUSIC = getResources().getString(R.string.music);
-        final String ARTIST = getResources().getString(R.string.artist);
-        final String PLAYLIST = getResources().getString(R.string.playlist);
+        final String MUSIC = getString(R.string.music);
+        final String ARTIST = getString(R.string.artist);
+        final String PLAYLIST = getString(R.string.playlist);
+        final String NOW = getString(R.string.now);
 
         mainTabLayout.addTab(mainTabLayout.newTab().setText(MUSIC));
         mainTabLayout.addTab(mainTabLayout.newTab().setText(ARTIST));
         mainTabLayout.addTab(mainTabLayout.newTab().setText(PLAYLIST));
+        mainTabLayout.addTab(mainTabLayout.newTab().setText(NOW));
 
         tabsPagerAdapter = new MainTabsPagerAdapter(getSupportFragmentManager(), mainTabLayout.getTabCount());
         mainViewPager.setAdapter(tabsPagerAdapter);
@@ -119,9 +133,42 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==1){
             if(resultCode == Activity.RESULT_OK){
-                Toast.makeText(this, data.getStringExtra("songPath"), Toast.LENGTH_SHORT).show();
+                String type = data.getStringExtra("type");
+                SongList songList = null;
+                switch(type){
+                    case(PlaylistViewActivity.ARTIST_TYPE):
+                        songList = new MusicListData(this)
+                                .getArtistSongList(data.getStringExtra("artist"));
+                        break;
+                    case(PlaylistViewActivity.PLAYLIST_TYPE):
+                        songList = new SongListDao(this)
+                                .getSongListWithKey(data.getIntExtra("key", 0));
+                        break;
+                }
+                mainViewPager.setCurrentItem(3);
+                nowFragment = tabsPagerAdapter.getNowFragment();
+                if(nowFragment!=null) {
+                    nowFragment.refresh(songList);
+                    nowFragment.notifyItemChanged(0, data.getIntExtra("position", 0));
+                }
+                musicService.setList(songList.getSongList());
+                musicService.setSong(data.getIntExtra("position", 0));
+                musicService.playSong();
+                setViewsOnPlaying();
+            }
+
+            PlaylistFragment playlistFragment = tabsPagerAdapter.getPlaylistFragment();
+            if(playlistFragment!=null) {
+                for (SongList songList : new SongListDao(this).getAllTheSongLists()) {
+                    playlistFragment.notifyItemsAdded(songList);
+                }
             }
         }
+    }
+
+    public void setSongList(SongList songList){
+        musicService.setList(songList.getSongList());
+        musicService.setNotShuffledList(songList.getSongList());
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
@@ -160,8 +207,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void onTabSelected(TabLayout.Tab tab) {
         mainViewPager.setCurrentItem(tab.getPosition());
         mainToolbar.setTitle(firstCharToUpperCase(String.valueOf(tab.getText())));
-        if(tab.getPosition()==0)
+        if(tab.getPosition()==0 || tab.getPosition()==3)
             musicService.setSong(musicService.getSong());
+
     }
 
     @Override
@@ -192,8 +240,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void notifyItemChanged(int lastPosition, int position) {
         musicFragment = tabsPagerAdapter.getMusicFragment();
+        nowFragment = tabsPagerAdapter.getNowFragment();
         if(musicFragment!=null)
             musicFragment.notifyItemChanged(lastPosition, position);
+        if(nowFragment!=null)
+            nowFragment.notifyItemChanged(lastPosition, position);
     }
 
     private void setTitle() {
@@ -274,10 +325,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             mainPresenter.saveRepeatReferences(repeat);
         }
     };
-
-    public MediaPlayerService getMusicService(){
-        return musicService;
-    }
 
     @Override
     public void showRandomIsChosed(){

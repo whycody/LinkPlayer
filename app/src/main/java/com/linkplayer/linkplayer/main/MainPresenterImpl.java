@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongDao;
+import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.model.Song;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class MainPresenterImpl implements MainPresenter{
     private SharedPreferences.Editor preferencesEditor;
     private MusicListData musicListData;
     private SongDao songDao;
+    private SongListDao songListDao;
     private ArrayList<Song> songList;
     private ArrayList<Song> shuffledSongList;
 
@@ -32,9 +34,10 @@ public class MainPresenterImpl implements MainPresenter{
         this.context = context;
         this.mainView = mainView;
         songDao = new SongDao(context);
+        songListDao = new SongListDao(context);
         sharedPreferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         musicListData = new MusicListData(context);
-        songList = musicListData.getSongList();
+        songList = songListDao.getLatestSongList().getSongList();
         shuffledSongList = (ArrayList<Song>)songList.clone();
         Collections.shuffle(shuffledSongList);
 

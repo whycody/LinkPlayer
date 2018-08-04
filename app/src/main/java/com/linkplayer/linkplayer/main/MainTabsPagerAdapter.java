@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.linkplayer.linkplayer.fragment.artist.ArtistFragment;
 import com.linkplayer.linkplayer.fragment.music.MusicFragment;
+import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
 
 public class MainTabsPagerAdapter extends FragmentStatePagerAdapter {
@@ -17,6 +18,7 @@ public class MainTabsPagerAdapter extends FragmentStatePagerAdapter {
     private MusicFragment musicFragment;
     private ArtistFragment artistFragment;
     private PlaylistFragment playlistFragment;
+    private NowFragment nowFragment;
 
     public MainTabsPagerAdapter(FragmentManager fm, int numberOfTabs) {
         super(fm);
@@ -32,6 +34,8 @@ public class MainTabsPagerAdapter extends FragmentStatePagerAdapter {
                 return new ArtistFragment();
             case 2:
                 return new PlaylistFragment();
+            case 3:
+                return new NowFragment();
         }
         return null;
     }
@@ -49,6 +53,9 @@ public class MainTabsPagerAdapter extends FragmentStatePagerAdapter {
             case(2):
                 playlistFragment = (PlaylistFragment) createdFragment;
                 break;
+            case(3):
+                nowFragment = (NowFragment) createdFragment;
+                break;
         }
         return createdFragment;
     }
@@ -63,6 +70,10 @@ public class MainTabsPagerAdapter extends FragmentStatePagerAdapter {
 
     public PlaylistFragment getPlaylistFragment() {
         return playlistFragment;
+    }
+
+    public NowFragment getNowFragment() {
+        return nowFragment;
     }
 
     @Override

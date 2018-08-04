@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongListDao;
@@ -18,7 +19,7 @@ import com.linkplayer.linkplayer.model.SongList;
 import java.util.ArrayList;
 
 
-public class PlaylistFragment extends Fragment implements PlaylistView{
+public class PlaylistFragment extends Fragment implements PlaylistView, AddSongsInformator{
 
     private RecyclerView playlistRecycler;
     private PlaylistPresenter playlistPresenter;
@@ -33,6 +34,7 @@ public class PlaylistFragment extends Fragment implements PlaylistView{
 
         songListArrayList = new SongListDao(getActivity()).getAllTheSongLists();
         playlistPresenter = new PlaylistPresenterImpl(songListArrayList, this, getActivity());
+        playlistPresenter.setAddSongsInformator(this);
         recyclerAdapter = new PlaylistRecyclerAdapter(playlistPresenter, getActivity());
         playlistRecycler.setAdapter(recyclerAdapter);
         playlistRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -45,5 +47,16 @@ public class PlaylistFragment extends Fragment implements PlaylistView{
     public void notifyItemDeleted(int position) {
         songListArrayList.remove(position);
         recyclerAdapter.notifyItemRemoved(position);
+    }
+
+    @Override
+    public void notifyItemsAdded(SongList songList) {
+        for(int i =0; i<songListArrayList.size(); i++){
+            SongList songList1 = songListArrayList.get(i);
+            if(songList1.getKey()==songList.getKey()){
+                songListArrayList.set(i, songList);
+                recyclerAdapter.notifyItemChanged(i);
+            }
+        }
     }
 }

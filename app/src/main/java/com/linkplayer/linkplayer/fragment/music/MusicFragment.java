@@ -22,6 +22,7 @@ import java.util.ArrayList;
 public class MusicFragment extends Fragment implements MusicFragmentView{
 
     private RecyclerView musicListRecycler;
+    private MusicPresenterImpl musicPresenter;
     private MusicRecyclerAdapter recyclerAdapter;
     private ArrayList<Song> songList;
 
@@ -31,6 +32,7 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         View view = inflater.inflate(R.layout.fragment_music, container, false);
         musicListRecycler = view.findViewById(R.id.music_list_recycler);
         songList = new MusicListData(getActivity()).getSongList();
+        musicPresenter = new MusicPresenterImpl(songList, this, getActivity());
         recyclerAdapter = new MusicRecyclerAdapter(new MusicPresenterImpl(songList,this,
                 getActivity()), getActivity());
         musicListRecycler.setAdapter(recyclerAdapter);
@@ -51,6 +53,7 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         song.setChoosed(false);
         Song newSong = songList.get(position);
         newSong.setChoosed(true);
+        musicPresenter.setSongArrayList(songList);
         recyclerAdapter.notifyItemChanged(position);
         recyclerAdapter.notifyItemChanged(lastPosition);
     }

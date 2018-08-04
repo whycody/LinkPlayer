@@ -10,7 +10,5 @@ public interface PlaylistView {
 
     void setTopButtonOnClickListener(View.OnClickListener onClick);
 
-    void setTopButtonText(String text);
-
-    SongList getSongList();
+    void setTopButtonText(String text);;
 }
