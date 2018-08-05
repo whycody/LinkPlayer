@@ -19,7 +19,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.linkplayer.linkplayer.MediaPlayerService;
@@ -31,10 +30,9 @@ import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
-import com.linkplayer.linkplayer.playlist.view.PlaylistView;
 import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 
-import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView{
@@ -135,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             if(resultCode == Activity.RESULT_OK){
                 String type = data.getStringExtra("type");
                 SongList songList = null;
+                SongList notShuffledList = new SongList();
                 switch(type){
                     case(PlaylistViewActivity.ARTIST_TYPE):
                         songList = new MusicListData(this)
@@ -145,15 +144,30 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                                 .getSongListWithKey(data.getIntExtra("key", 0));
                         break;
                 }
-                mainViewPager.setCurrentItem(3);
+                notShuffledList.setTitle(songList.getTitle());
+                notShuffledList.setSongList(songList.getSongList());
+                notShuffledList.setKey(songList.getKey());
+                if(random) {
+                    Collections.shuffle(songList.getSongList());
+                    musicService.setList(songList.getSongList());
+                }else
+                    musicService.setList(songList.getSongList());
+                musicService.setNotShuffledList(new SongListDao(this).getLatestSongList().getSongList());
                 nowFragment = tabsPagerAdapter.getNowFragment();
                 if(nowFragment!=null) {
-                    nowFragment.refresh(songList);
+                    nowFragment.refresh(notShuffledList);
                     nowFragment.notifyItemChanged(0, data.getIntExtra("position", 0));
+                    nowFragment.notifyItemChanged(songList.getSongList().get(0),
+                            songList.getSongList().get(data.getIntExtra("position", 0)));
                 }
-                musicService.setList(songList.getSongList());
-                musicService.setSong(data.getIntExtra("position", 0));
+                for(Song song: musicService.getSongList())
+                    Log.d("SongTag", data.getIntExtra("position", 0) + "");
+                if(random)
+                    musicService.setTargetRandomSong(data.getIntExtra("position", 0));
+                else
+                    musicService.setSongPosAndNotify(data.getIntExtra("position", 0));
                 musicService.playSong();
+                mainViewPager.setCurrentItem(3);
                 setViewsOnPlaying();
             }
 
@@ -180,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             mainPresenter.setMusicService(musicService);
             mainPresenter.getPreferencesAndSetButtons();
             if(!random)
-                musicService.setSong(mainPresenter.getLatestSong());
+                musicService.setSongPosAndNotify(mainPresenter.getLatestSong());
             else
                 musicService.setTargetRandomSong(mainPresenter.getLatestSong());
             musicBound = true;
@@ -208,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mainViewPager.setCurrentItem(tab.getPosition());
         mainToolbar.setTitle(firstCharToUpperCase(String.valueOf(tab.getText())));
         if(tab.getPosition()==0 || tab.getPosition()==3)
-            musicService.setSong(musicService.getSong());
+            musicService.setSongPosAndNotify(musicService.getSong());
 
     }
 
@@ -231,20 +245,34 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         if(random)
             musicService.setTargetRandomSong(position);
         else
-            musicService.setSong(position);
+            musicService.setSongPosAndNotify(position);
         musicService.playSong();
         setViewsOnPlaying();
         setTitle();
+    }
+
+    public void refresh(){
+        SongList songList = new SongListDao(this).getLatestSongList();
+        musicService.setNotShuffledList(songList.getSongList());
+        if(random)
+            Collections.shuffle(songList.getSongList());
+        musicService.setList(songList.getSongList());
     }
 
     @Override
     public void notifyItemChanged(int lastPosition, int position) {
         musicFragment = tabsPagerAdapter.getMusicFragment();
         nowFragment = tabsPagerAdapter.getNowFragment();
-        if(musicFragment!=null)
+        if(musicFragment!=null) {
             musicFragment.notifyItemChanged(lastPosition, position);
-        if(nowFragment!=null)
+            musicFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
+                    musicService.getSongList().get(position));
+        }
+        if(nowFragment!=null) {
             nowFragment.notifyItemChanged(lastPosition, position);
+            nowFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
+                    musicService.getSongList().get(position));
+        }
     }
 
     private void setTitle() {

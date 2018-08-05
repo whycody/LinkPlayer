@@ -21,6 +21,8 @@ import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
+import java.util.ArrayList;
+
 
 public class NowFragment extends Fragment implements MusicFragmentView, NowView{
 
@@ -49,7 +51,7 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView{
     }
 
     public void refresh(SongList songList){
-        recyclerAdapter.setSongArrayList(songList.getSongList());
+        recyclerAdapter.setSongArrayList(new SongListDao(getActivity()).getLatestSongList().getSongList());
     }
 
     @Override
@@ -59,17 +61,41 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView{
 
     @Override
     public void notifyItemChanged(int lastPosition, int position) {
-        recyclerAdapter.getSongArrayList().get(lastPosition).setChoosed(false);
-        recyclerAdapter.getSongArrayList().get(position).setChoosed(true);
-        recyclerAdapter.notifyItemChanged(position);
-        recyclerAdapter.notifyItemChanged(lastPosition);
-        linearLayoutManager.scrollToPosition(position);
+//        recyclerAdapter.getSongArrayList().get(lastPosition).setChoosed(false);
+//        recyclerAdapter.getSongArrayList().get(position).setChoosed(true);
+//        recyclerAdapter.notifyItemChanged(position);
+//        recyclerAdapter.notifyItemChanged(lastPosition);
+//        linearLayoutManager.scrollToPosition(position);
     }
 
     @Override
     public void notifyItemDeleted(int position) {
         songList.getSongList().remove(position);
         recyclerAdapter.notifyItemRemoved(position);
+    }
+
+    @Override
+    public void notifyItemChanged(Song lastSong, Song song) {
+        ArrayList<Song> songList = recyclerAdapter.getSongArrayList();
+
+        int lastPosition = 0;
+        int position = 0;
+        for(int i = 0; i<songList.size(); i++){
+            Song songFromList = songList.get(i);
+            if(songFromList.getPath().equals(lastSong.getPath())) {
+                recyclerAdapter.getSongArrayList().get(i).setChoosed(false);
+                lastPosition = i;
+            }
+
+            if(songFromList.getPath().equals(song.getPath())){
+                recyclerAdapter.getSongArrayList().get(i).setChoosed(true);
+                position = i;
+            }
+        }
+        recyclerAdapter.notifyItemChanged(position);
+        recyclerAdapter.notifyItemChanged(lastPosition);
+        linearLayoutManager.scrollToPosition(position);
+
     }
 
     @Override

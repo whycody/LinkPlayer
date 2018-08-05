@@ -12,6 +12,6 @@ public interface MusicFragmentView {
 
     void notifyItemDeleted(int position);
 
-
+    void notifyItemChanged(Song lastSong, Song song);
 
 }

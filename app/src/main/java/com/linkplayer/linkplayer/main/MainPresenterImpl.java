@@ -38,7 +38,7 @@ public class MainPresenterImpl implements MainPresenter{
         sharedPreferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         musicListData = new MusicListData(context);
         songList = songListDao.getLatestSongList().getSongList();
-        shuffledSongList = (ArrayList<Song>)songList.clone();
+        shuffledSongList = songListDao.getLatestSongList().getSongList();
         Collections.shuffle(shuffledSongList);
 
     }
@@ -56,10 +56,17 @@ public class MainPresenterImpl implements MainPresenter{
 
     @Override
     public void saveRandomPreferences(boolean random){
+        songList = songListDao.getLatestSongList().getSongList();
+        shuffledSongList = songListDao.getLatestSongList().getSongList();
+        Collections.shuffle(shuffledSongList);
+        if(musicService.getSongList()==null)
+            musicService.setList(shuffledSongList);
         if(random) {
             musicService.setList(shuffledSongList);
+            musicService.setSongPos(musicService.getTargetRandomSongTruePosition(musicService.getSong()));
             mainView.showRandomIsChosed();
         }else {
+            musicService.setSongPos(musicService.getRandomSongTruePosition(musicService.getSong()));
             musicService.setList(songList);
             mainView.showRandomIsNotChosed();
         }
@@ -117,7 +124,7 @@ public class MainPresenterImpl implements MainPresenter{
     public void setClickedSongIfRandom(int position) {
         for (int i = 0; i < shuffledSongList.size(); i++) {
             if (shuffledSongList.get(position).getPath().equals(songList.get(i).getPath())) {
-                musicService.setSong(i);
+                musicService.setSongPosAndNotify(i);
             }
         }
     }

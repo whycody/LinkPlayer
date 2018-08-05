@@ -13,7 +13,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
-import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongDao;
 import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.main.RefreshView;
@@ -81,9 +80,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     private void playNextSongAutomatically(){
         if(songPos == songList.size()-1 && repeat){
-            setSong(0);
+            setSongPosAndNotify(0);
         }else
-            setSong(songPos + 1);
+            setSongPosAndNotify(songPos + 1);
         playSong();
     }
 
@@ -131,32 +130,48 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     private int lastSongPoisition;
 
-    public void setSong(int songPos){
+    public void setSongPosAndNotify(int songPos){
         this.songPos = songPos;
         if(songList!=null && refreshView !=null) {
-            if(random) {
-                refreshView.notifyItemChanged(lastSongPoisition, getRandomSongTruePosition(songPos));
-                lastSongPoisition = getRandomSongTruePosition(songPos);
-            } else {
-                refreshView.notifyItemChanged(lastSongPoisition, songPos);
-                lastSongPoisition = songPos;
-            }
-
+            notifyItemChanged(songPos);
         }
     }
 
-    public void setTargetRandomSong(int songPos){
-        this.songPos = getTargetRandomSongTruePosition(songPos);
-        if(songList!=null && refreshView !=null) {
-            if(random) {
-                refreshView.notifyItemChanged(lastSongPoisition, songPos);
-                lastSongPoisition = songPos;
-            } else {
-                refreshView.notifyItemChanged(lastSongPoisition, songPos);
-                lastSongPoisition = songPos;
-            }
+    public void setSongPos(int songPos){
+        this.songPos = songPos;
+        this.lastSongPoisition = songPos;
+    }
 
-        }
+    public void notifyItemChanged(int position){
+//        if(random){
+//            refreshView.notifyItemChanged(lastSongPoisition, getRandomSongTruePosition(songPos));
+//            lastSongPoisition = getRandomSongTruePosition(songPos);
+//        }else {
+            if (lastSongPoisition < getSongList().size())
+                refreshView.notifyItemChanged(lastSongPoisition, position);
+            else
+                refreshView.notifyItemChanged(0, position);
+            lastSongPoisition = songPos;
+//        }
+    }
+
+    public void setLastSongPoisition(int position){
+        this.lastSongPoisition = position;
+    }
+
+    public void setTargetRandomSong(int songPos){
+        setSongPosAndNotify(getTargetRandomSongTruePosition(songPos));
+//        this.songPos = getTargetRandomSongTruePosition(songPos);
+//        if(songList!=null && refreshView !=null) {
+//            if(random) {
+//                refreshView.notifyItemChanged(lastSongPoisition, songPos);
+//                lastSongPoisition = songPos;
+//            } else {
+//                refreshView.notifyItemChanged(lastSongPoisition, songPos);
+//                lastSongPoisition = songPos;
+//            }
+//
+//        }
     }
 
     public int getRandomSongTruePosition(int position) {
@@ -198,6 +213,10 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         player.prepareAsync();
     }
 
+    public int getLatestSongPosition(){
+        return lastSongPoisition;
+    }
+
     public void setRefreshView(RefreshView refreshView){
         this.refreshView = refreshView;
     }
@@ -215,7 +234,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     public void playNextSong(){
         if(songPos < songList.size()-1) {
-            setSong(songPos+1);
+            setSongPosAndNotify(songPos+1);
             setLastSong();
         }
         if(player.isPlaying())
@@ -224,7 +243,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     public void playPreviousSong(){
         if(songPos!=0) {
-            setSong(songPos-1);
+            setSongPosAndNotify(songPos-1);
             setLastSong();
         }
         if(player.isPlaying())
@@ -239,7 +258,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     @Override
     public void onCreate() {
         super.onCreate();
-        setSong(0);
+        setSongPosAndNotify(0);
         player = new MediaPlayer();
         initMediaPlayer();
     }
