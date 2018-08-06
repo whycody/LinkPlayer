@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,13 +51,8 @@ public class PlaylistFragment extends Fragment implements PlaylistView, AddSongs
     }
 
     @Override
-    public void notifyItemsAdded(SongList songList) {
-        for(int i =0; i<songListArrayList.size(); i++){
-            SongList songList1 = songListArrayList.get(i);
-            if(songList1.getKey()==songList.getKey()){
-                songListArrayList.set(i, songList);
-                recyclerAdapter.notifyItemChanged(i);
-            }
-        }
+    public void notifyItemChanged(SongList songList, int position) {
+        songListArrayList.set(position, songList);
+        recyclerAdapter.notifyItemChanged(position);
     }
 }

@@ -1,6 +1,9 @@
 package com.linkplayer.linkplayer.main;
 
 
+import com.linkplayer.linkplayer.fragment.artist.ArtistFragment;
+import com.linkplayer.linkplayer.fragment.now.NowFragment;
+import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
 
 public interface MainView {
 
@@ -15,4 +18,16 @@ public interface MainView {
     void showRepeatIsChosed();
 
     void showRepeatIsNotChosed();
+
+    void showIsPlaying();
+
+    void showIsStopped();
+
+    void setPagerCurrentItem(int position);
+
+    NowFragment getNowFragment();
+
+    PlaylistFragment getPlaylistFragment();
+
+    ArtistFragment getArtistFragment();
 }

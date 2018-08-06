@@ -1,6 +1,5 @@
 package com.linkplayer.linkplayer.main;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,14 +22,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.R;
-import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongListDao;
+import com.linkplayer.linkplayer.fragment.artist.ArtistFragment;
 import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
-import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
-import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 
 import java.util.Collections;
 
@@ -53,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private boolean random = false;
     private MusicFragment musicFragment;
     private NowFragment nowFragment;
+    private SongListDao songListDao;
 
 
     @Override
@@ -72,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         randomMusicBtn = findViewById(R.id.random_music_btn);
         repeatMusicBtn = findViewById(R.id.repeat_music_btn);
         mainPresenter = new MainPresenterImpl(MainActivity.this, MainActivity.this);
+        songListDao = new SongListDao(this);
 
         playSongBtn.setOnClickListener(playLatestSongOnClick);
         backSongBtn.setOnClickListener(playPreviousSongOnClick);
@@ -129,55 +128,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1){
-            if(resultCode == Activity.RESULT_OK){
-                String type = data.getStringExtra("type");
-                SongList songList = null;
-                SongList notShuffledList = new SongList();
-                switch(type){
-                    case(PlaylistViewActivity.ARTIST_TYPE):
-                        songList = new MusicListData(this)
-                                .getArtistSongList(data.getStringExtra("artist"));
-                        break;
-                    case(PlaylistViewActivity.PLAYLIST_TYPE):
-                        songList = new SongListDao(this)
-                                .getSongListWithKey(data.getIntExtra("key", 0));
-                        break;
-                }
-                notShuffledList.setTitle(songList.getTitle());
-                notShuffledList.setSongList(songList.getSongList());
-                notShuffledList.setKey(songList.getKey());
-                if(random) {
-                    Collections.shuffle(songList.getSongList());
-                    musicService.setList(songList.getSongList());
-                }else
-                    musicService.setList(songList.getSongList());
-                musicService.setNotShuffledList(new SongListDao(this).getLatestSongList().getSongList());
-                nowFragment = tabsPagerAdapter.getNowFragment();
-                if(nowFragment!=null) {
-                    nowFragment.refresh(notShuffledList);
-                    nowFragment.notifyItemChanged(0, data.getIntExtra("position", 0));
-                    nowFragment.notifyItemChanged(songList.getSongList().get(0),
-                            songList.getSongList().get(data.getIntExtra("position", 0)));
-                }
-                for(Song song: musicService.getSongList())
-                    Log.d("SongTag", data.getIntExtra("position", 0) + "");
-                if(random)
-                    musicService.setTargetRandomSong(data.getIntExtra("position", 0));
-                else
-                    musicService.setSongPosAndNotify(data.getIntExtra("position", 0));
-                musicService.playSong();
-                mainViewPager.setCurrentItem(3);
-                setViewsOnPlaying();
-            }
-
-            PlaylistFragment playlistFragment = tabsPagerAdapter.getPlaylistFragment();
-            if(playlistFragment!=null) {
-                for (SongList songList : new SongListDao(this).getAllTheSongLists()) {
-                    playlistFragment.notifyItemsAdded(songList);
-                }
-            }
-        }
+        mainPresenter.onActivityResult(requestCode, resultCode, data);
     }
 
     public void setSongList(SongList songList){
@@ -242,32 +193,45 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public void playSong(int position) {
+        setSongPosIfRandom(position);
+        musicService.playSong();
+        showIsPlaying();
+        setTitle();
+    }
+
+    private void setSongPosIfRandom(int position){
         if(random)
             musicService.setTargetRandomSong(position);
         else
             musicService.setSongPosAndNotify(position);
-        musicService.playSong();
-        setViewsOnPlaying();
-        setTitle();
     }
 
     public void refresh(){
-        SongList songList = new SongListDao(this).getLatestSongList();
+        SongList songList = songListDao.getLatestSongList();
         musicService.setNotShuffledList(songList.getSongList());
         if(random)
             Collections.shuffle(songList.getSongList());
         musicService.setList(songList.getSongList());
+        musicService.setSongPosAndNotify(musicService.getSong());
     }
 
     @Override
     public void notifyItemChanged(int lastPosition, int position) {
         musicFragment = tabsPagerAdapter.getMusicFragment();
         nowFragment = tabsPagerAdapter.getNowFragment();
+        notifyMusicFragmentIfNotNull(lastPosition, position);
+        notifyNowFragmentIfNotNull(lastPosition, position);
+    }
+
+    private void notifyMusicFragmentIfNotNull(int lastPosition, int position){
         if(musicFragment!=null) {
             musicFragment.notifyItemChanged(lastPosition, position);
             musicFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
                     musicService.getSongList().get(position));
         }
+    }
+
+    private void notifyNowFragmentIfNotNull(int lastPosition, int position){
         if(nowFragment!=null) {
             nowFragment.notifyItemChanged(lastPosition, position);
             nowFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
@@ -279,21 +243,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         musicTitleView.setText(mainPresenter.getTitle());
     }
 
-    private void setViewsOnPlaying() {
-        playSongBtn.setOnClickListener(pauseOnClick);
-        Glide.with(this).load(R.drawable.pause_white).into(playSongBtn);
-    }
-
-    private void setViewsOnStopped() {
-        playSongBtn.setOnClickListener(resumeOnClick);
-        Glide.with(this).load(R.drawable.play_button_white).into(playSongBtn);
-    }
-
     private View.OnClickListener pauseOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             musicService.pauseSong();
-            setViewsOnStopped();
+            showIsStopped();
         }
     };
 
@@ -301,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         @Override
         public void onClick(View v) {
             musicService.playSong();
-            setViewsOnPlaying();
+            showIsPlaying();
         }
     };
 
@@ -309,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         @Override
         public void onClick(View v) {
             musicService.resumeSong();
-            setViewsOnPlaying();
+            showIsPlaying();
         }
     };
 
@@ -383,7 +337,34 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    public void showIsPlaying() {
+        playSongBtn.setOnClickListener(pauseOnClick);
+        Glide.with(this).load(R.drawable.pause_white).into(playSongBtn);
+    }
+
+    @Override
+    public void showIsStopped() {
+        playSongBtn.setOnClickListener(resumeOnClick);
+        Glide.with(this).load(R.drawable.play_button_white).into(playSongBtn);
+    }
+
+    @Override
+    public void setPagerCurrentItem(int position) {
+        mainViewPager.setCurrentItem(position);
+    }
+
+    @Override
+    public NowFragment getNowFragment(){
+        return tabsPagerAdapter.getNowFragment();
+    }
+
+    @Override
+    public PlaylistFragment getPlaylistFragment() {
+        return tabsPagerAdapter.getPlaylistFragment();
+    }
+
+    @Override
+    public ArtistFragment getArtistFragment() {
+        return tabsPagerAdapter.getArtistFragment();
     }
 }

@@ -10,5 +10,7 @@ public interface AddSongsPresenter {
 
     void setAddSongsInformator(AddSongsInformator addSongsInformator);
 
+    void setPosition(int position);
+
     int getAddSongsRowsCount();
 }

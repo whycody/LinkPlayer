@@ -21,13 +21,13 @@ public class AddSongsDialogFragment extends DialogFragment{
     private AddSongsRecyclerAdapter recyclerAdapter;
     private AddSongsPresenter addSongsPresenter;
     private SongList songList;
+    private int position;
     private AddSongsInformator addSongsInformator;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        String title = "Choose songs";
         addSongsPresenter.setAddSongsInformator(addSongsInformator);
+        addSongsPresenter.setPosition(position);
 
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.add_songs_dialog, null);
@@ -40,7 +40,6 @@ public class AddSongsDialogFragment extends DialogFragment{
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setView(view)
-                .setTitle(title)
                 .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -63,6 +62,10 @@ public class AddSongsDialogFragment extends DialogFragment{
 
     public void setSongList(SongList songList){
         this.songList = songList;
+    }
+
+    public void setPosition(int position){
+        this.position = position;
     }
 
     public void setAddSongInformator(AddSongsInformator addSongInformator){

@@ -1,5 +1,7 @@
 package com.linkplayer.linkplayer.main;
 
+import android.content.Intent;
+
 import com.linkplayer.linkplayer.MediaPlayerService;
 
 public interface MainPresenter {
@@ -14,7 +16,7 @@ public interface MainPresenter {
 
     void setMusicService(MediaPlayerService musicService);
 
-    void setClickedSongIfRandom(int position);
+    void onActivityResult(int requestCode, int resultCode, Intent data);
 
     String getTitle();
 

@@ -1,9 +1,7 @@
 package com.linkplayer.linkplayer.fragment.playlist.add.songs;
 
 import android.content.Context;
-import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.model.AddSongItem;
@@ -18,6 +16,7 @@ public class AddSongsPresenterImpl implements AddSongsPresenter {
     private ArrayList<Song> markedSongs = new ArrayList<>();
     private boolean[] songsChecked;
     private Context context;
+    private int position;
     private AddSongsInformator addSongsInformator;
 
     public AddSongsPresenterImpl(ArrayList<AddSongItem> addSongItems, Context context) {
@@ -59,12 +58,17 @@ public class AddSongsPresenterImpl implements AddSongsPresenter {
         for(Song song: markedSongs){
             songListDao.insertSongToListWithKey(songList.getKey(), song);
         }
-        addSongsInformator.notifyItemsAdded(songListDao.getSongListWithKey(songList.getKey()));
+        addSongsInformator.notifyItemChanged(songListDao.getSongListWithKey(songList.getKey()), position);
     }
 
     @Override
     public void setAddSongsInformator(AddSongsInformator addSongsInformator) {
         this.addSongsInformator = addSongsInformator;
+    }
+
+    @Override
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     @Override

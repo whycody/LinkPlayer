@@ -98,6 +98,17 @@ public class MusicListData {
         return addSongItems;
     }
 
+    public ArrayList<AddSongItem> getAddSongItems(ArrayList<Song> songList){
+        ArrayList<AddSongItem> addSongItems = new ArrayList<>();
+        for(Song song: songList){
+            AddSongItem addSongItem = new AddSongItem();
+            addSongItem.setSong(song);
+            addSongItem.setChecked(false);
+            addSongItems.add(addSongItem);
+        }
+        return addSongItems;
+    }
+
     public Song getSongListByPath(String path){
         for(Song song: getSongList()){
             if(song.getPath().equals(path))

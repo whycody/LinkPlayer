@@ -1,6 +1,9 @@
 package com.linkplayer.linkplayer.fragment.playlist;
 
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
+import com.linkplayer.linkplayer.model.SongList;
+
+import java.util.ArrayList;
 
 public interface PlaylistPresenter {
 

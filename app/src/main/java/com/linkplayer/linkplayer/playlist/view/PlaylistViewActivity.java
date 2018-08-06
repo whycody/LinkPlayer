@@ -116,7 +116,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
     }
 
     @Override
-    public void notifyItemsAdded(SongList songList) {
+    public void notifyItemChanged(SongList songList, int position) {
         musicPresenter.setSongArrayList(songList.getSongList());
         musicRecyclerAdapter.notifyDataSetChanged();
     }

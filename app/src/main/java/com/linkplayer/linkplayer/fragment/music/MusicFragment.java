@@ -26,6 +26,7 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
     private RecyclerView musicListRecycler;
     private MusicPresenterImpl musicPresenter;
     private MusicRecyclerAdapter recyclerAdapter;
+    private SongListDao songListDao;
     private ArrayList<Song> songList;
 
     @Override
@@ -35,6 +36,7 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         musicListRecycler = view.findViewById(R.id.music_list_recycler);
         songList = new MusicListData(getActivity()).getSongList();
         musicPresenter = new MusicPresenterImpl(songList, this, getActivity());
+        songListDao = new SongListDao(getActivity());
         recyclerAdapter = new MusicRecyclerAdapter(new MusicPresenterImpl(songList,this,
                 getActivity()), getActivity());
         musicListRecycler.setAdapter(recyclerAdapter);
@@ -46,31 +48,44 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
 
     @Override
     public void onItemClick(int position) {
-        SongListDao songListDao = new SongListDao(getActivity());
         if(!songListDao.getLatestSongList().getTitle().equals("All music")) {
-            SongList songList = new SongList();
-            songList.setSongList(new MusicListData(getActivity()).getSongList());
-            songList.setTitle("All music");
-            songListDao.changeLatestSongList(songList);
+            uncheckItem();
+            songListDao.changeLatestSongList(getAllMusicSongList());
             ((MainActivity)getActivity()).refresh();        }
         ((MainActivity)getActivity()).playSong(position);
     }
 
+    private SongList getAllMusicSongList(){
+        SongList songList = new SongList();
+        songList.setSongList(this.songList);
+        songList.setTitle("All music");
+        return songList;
+    }
+
+    private void uncheckItem(){
+        int choosed = getSongChoosed();
+        recyclerAdapter.getSongArrayList().get(choosed).setChoosed(false);
+        recyclerAdapter.notifyItemChanged(choosed);
+    }
+
+    private int getSongChoosed(){
+        for(int i =0; i<songList.size(); i++){
+            if(songList.get(i).isChoosed()) {
+                Toast.makeText(getActivity(), i + "", Toast.LENGTH_SHORT).show();
+                return i;
+            }
+        }
+        return 0;
+    }
+
     @Override
     public void notifyItemChanged(int lastPosition, int position){
-//        Song song = songList.get(lastPosition);
-//        song.setChoosed(false);
-//        Song newSong = songList.get(position);
-//        newSong.setChoosed(true);
-//        musicPresenter.setSongArrayList(songList);
-//        recyclerAdapter.notifyItemChanged(position);
-//        recyclerAdapter.notifyItemChanged(lastPosition);
+
     }
 
     @Override
     public void notifyItemChanged(Song lastSong, Song song){
-        int lastPosition = 0;
-        int position = 0;
+        int lastPosition =0, position = 0;
         for(int i = 0; i<songList.size(); i++){
             Song songFromList = songList.get(i);
             if(songFromList.getPath().equals(lastSong.getPath())) {

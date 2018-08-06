@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
+import com.linkplayer.linkplayer.model.SongList;
 
 
 public class ArtistFragment extends Fragment implements ArtistFragmentView{
@@ -36,16 +37,9 @@ public class ArtistFragment extends Fragment implements ArtistFragmentView{
         return view;
     }
 
-    @Override
-    public void notifyItemChanged(int lastSong, int position) {
-        recyclerAdapter.notifyItemChanged(lastSong);
-        recyclerAdapter.notifyItemChanged(position);
-    }
 
     @Override
-    public void setLatestSong(int latestSong) {
-        this.latestSong = latestSong;
+    public void notifyItemChanged(int position, SongList songList) {
+        artistPresenter.getArtistSongList().set(position, songList);
     }
-
-
 }

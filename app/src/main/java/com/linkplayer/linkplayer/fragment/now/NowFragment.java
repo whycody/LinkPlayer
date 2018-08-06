@@ -50,7 +50,7 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView{
         return view;
     }
 
-    public void refresh(SongList songList){
+    public void refresh(){
         recyclerAdapter.setSongArrayList(new SongListDao(getActivity()).getLatestSongList().getSongList());
     }
 

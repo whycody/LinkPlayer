@@ -12,6 +12,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.linkplayer.linkplayer.data.SongDao;
 import com.linkplayer.linkplayer.main.MainActivity;
@@ -143,35 +144,16 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     public void notifyItemChanged(int position){
-//        if(random){
-//            refreshView.notifyItemChanged(lastSongPoisition, getRandomSongTruePosition(songPos));
-//            lastSongPoisition = getRandomSongTruePosition(songPos);
-//        }else {
-            if (lastSongPoisition < getSongList().size())
-                refreshView.notifyItemChanged(lastSongPoisition, position);
-            else
-                refreshView.notifyItemChanged(0, position);
-            lastSongPoisition = songPos;
-//        }
-    }
+        if (lastSongPoisition < getSongList().size())
+            refreshView.notifyItemChanged(lastSongPoisition, position);
+        else
+            refreshView.notifyItemChanged(0, position);
 
-    public void setLastSongPoisition(int position){
-        this.lastSongPoisition = position;
+        lastSongPoisition = songPos;
     }
 
     public void setTargetRandomSong(int songPos){
         setSongPosAndNotify(getTargetRandomSongTruePosition(songPos));
-//        this.songPos = getTargetRandomSongTruePosition(songPos);
-//        if(songList!=null && refreshView !=null) {
-//            if(random) {
-//                refreshView.notifyItemChanged(lastSongPoisition, songPos);
-//                lastSongPoisition = songPos;
-//            } else {
-//                refreshView.notifyItemChanged(lastSongPoisition, songPos);
-//                lastSongPoisition = songPos;
-//            }
-//
-//        }
     }
 
     public int getRandomSongTruePosition(int position) {
@@ -236,9 +218,28 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         if(songPos < songList.size()-1) {
             setSongPosAndNotify(songPos+1);
             setLastSong();
+        }else if(songPos == songList.size()-1){
+            setSongPosAndNotify(0);
+            if(random) {
+                Song song = songList.get(0);
+                Collections.shuffle(songList);
+                int position = getPositionOfSong(song);
+                if (position > 1)
+                    Collections.swap(songList, getPositionOfSong(song), 0);
+            }
+            setLastSong();
         }
         if(player.isPlaying())
             playSong();
+    }
+
+    private int getPositionOfSong(Song song){
+        for(int i =0; i<songList.size(); i++){
+            Song songFromList = songList.get(i);
+            if(songFromList.getPath().equals(song.getPath()))
+                return i;
+        }
+        return 0;
     }
 
     public void playPreviousSong(){
