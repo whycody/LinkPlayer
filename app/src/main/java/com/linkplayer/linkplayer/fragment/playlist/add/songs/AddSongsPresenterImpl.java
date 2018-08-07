@@ -4,7 +4,6 @@ import android.content.Context;
 import android.widget.CompoundButton;
 
 import com.linkplayer.linkplayer.data.SongListDao;
-import com.linkplayer.linkplayer.model.AddSongItem;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
@@ -12,25 +11,25 @@ import java.util.ArrayList;
 
 public class AddSongsPresenterImpl implements AddSongsPresenter {
 
-    private ArrayList<AddSongItem> addSongItems;
+    private ArrayList<Song> songItems;
     private ArrayList<Song> markedSongs = new ArrayList<>();
     private boolean[] songsChecked;
     private Context context;
     private int position;
     private AddSongsInformator addSongsInformator;
 
-    public AddSongsPresenterImpl(ArrayList<AddSongItem> addSongItems, Context context) {
-        this.addSongItems = addSongItems;
+    public AddSongsPresenterImpl(ArrayList<Song> songItems, Context context) {
+        this.songItems = songItems;
         this.context = context;
-        songsChecked = new boolean[addSongItems.size()];
+        songsChecked = new boolean[songItems.size()];
     }
 
     @Override
     public void onBindSongRowViewAtPosition(AddSongsRecyclerHolder holder, final int position) {
-        holder.setTitle(addSongItems.get(position).getSong().getTitle());
-        holder.setArtist(addSongItems.get(position).getSong().getArtist());
+        holder.setTitle(songItems.get(position).getTitle());
+        holder.setArtist(songItems.get(position).getArtist());
         holder.setOnCheckedListener(null);
-        holder.setChecked(addSongItems.get(position).isChecked());
+        holder.setChoosed(songItems.get(position).isChoosed());
         holder.setOnCheckedListener(getCheckedChangeListener(position));
 
     }
@@ -40,12 +39,12 @@ public class AddSongsPresenterImpl implements AddSongsPresenter {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    markedSongs.add(addSongItems.get(position).getSong());
-                    addSongItems.get(position).setChecked(true);
+                    markedSongs.add(songItems.get(position));
+                    songItems.get(position).setChoosed(true);
 
                 } else {
-                    markedSongs.remove(addSongItems.get(position).getSong());
-                    addSongItems.get(position).setChecked(false);
+                    markedSongs.remove(songItems.get(position));
+                    songItems.get(position).setChoosed(false);
                 }
             }
         };
@@ -73,6 +72,6 @@ public class AddSongsPresenterImpl implements AddSongsPresenter {
 
     @Override
     public int getAddSongsRowsCount() {
-        return addSongItems.size();
+        return songItems.size();
     }
 }

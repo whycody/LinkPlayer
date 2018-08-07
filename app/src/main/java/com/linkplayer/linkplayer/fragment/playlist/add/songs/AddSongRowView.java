@@ -10,7 +10,7 @@ public interface AddSongRowView {
 
     void setArtist(String artist);
 
-    void setChecked(boolean checked);
+    void setChoosed(boolean checked);
 
     void setOnCheckedListener(CompoundButton.OnCheckedChangeListener onCheckedListener);
 }

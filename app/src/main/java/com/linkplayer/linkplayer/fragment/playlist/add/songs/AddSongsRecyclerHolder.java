@@ -42,7 +42,7 @@ public class AddSongsRecyclerHolder extends RecyclerView.ViewHolder implements A
     }
 
     @Override
-    public void setChecked(boolean checked) {
+    public void setChoosed(boolean checked) {
         addSongBox.setChecked(checked);
     }
 

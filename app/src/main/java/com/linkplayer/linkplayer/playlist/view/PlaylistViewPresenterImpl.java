@@ -1,10 +1,7 @@
 package com.linkplayer.linkplayer.playlist.view;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.view.View;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongListDao;
@@ -14,7 +11,7 @@ import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenter;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenterImpl;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsRecyclerAdapter;
-import com.linkplayer.linkplayer.model.AddSongItem;
+import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
 import java.util.ArrayList;
@@ -44,6 +41,20 @@ public class PlaylistViewPresenterImpl implements PlaylistViewPresenter{
         }
     }
 
+    private View.OnClickListener addSongsOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            AddSongsDialogFragment dialogFragment = new AddSongsDialogFragment();
+            ArrayList<Song> songItems = new MusicListData(activity).getSongsAvailableToAdd(getSongList()).getSongList();
+            AddSongsPresenter addSongsPresenter = new AddSongsPresenterImpl(songItems, activity);
+            dialogFragment.setAddSongsPresenter(addSongsPresenter);
+            dialogFragment.setRecyclerAdapter(new AddSongsRecyclerAdapter(addSongsPresenter, activity));
+            dialogFragment.setSongList(getSongList());
+            dialogFragment.setAddSongInformator(addSongsInformator);
+            dialogFragment.show(activity.getFragmentManager(), "AddSongsDialogFragment");
+        }
+    };
+
     @Override
     public SongList getSongList() {
         int key = getKey();
@@ -54,20 +65,6 @@ public class PlaylistViewPresenterImpl implements PlaylistViewPresenter{
         else
             return new MusicListData(activity).getArtistSongList(artist);
     }
-
-    private View.OnClickListener addSongsOnClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            AddSongsDialogFragment dialogFragment = new AddSongsDialogFragment();
-            ArrayList<AddSongItem> addSongItems = new MusicListData(activity).getAddSongItems();
-            AddSongsPresenter addSongsPresenter = new AddSongsPresenterImpl(addSongItems, activity);
-            dialogFragment.setAddSongsPresenter(addSongsPresenter);
-            dialogFragment.setRecyclerAdapter(new AddSongsRecyclerAdapter(addSongsPresenter, activity));
-            dialogFragment.setSongList(getSongList());
-            dialogFragment.setAddSongInformator(addSongsInformator);
-            dialogFragment.show(activity.getFragmentManager(), "AddSongsDialogFragment");
-        }
-    };
 
     private View.OnClickListener downloadSongsOnClick = new View.OnClickListener() {
         @Override

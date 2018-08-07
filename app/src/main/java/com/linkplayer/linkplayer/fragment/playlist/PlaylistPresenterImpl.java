@@ -29,12 +29,14 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
     private SongListDao songListDao;
     private PlaylistView playlistView;
     private AddSongsInformator addSongsInformator;
+    private MusicListData musicListData;
 
     public PlaylistPresenterImpl(ArrayList<SongList> songListArrayList, PlaylistView playlistView, Activity activity){
         this.songListArrayList = songListArrayList;
         this.activity = activity;
         this.playlistView = playlistView;
         songListDao = new SongListDao(activity);
+        musicListData = new MusicListData(activity);
     }
 
 
@@ -80,8 +82,8 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
                         dialogFragment.show(activity.getFragmentManager(), "DeletePlaylistDialogFragment");
                         return true;
                     case R.id.add_song_to_playlist_item:
-                        AddSongsPresenter addSongsPresenter = new AddSongsPresenterImpl(new MusicListData(activity)
-                                .getAddSongItems(getSongsAvailable(position).getSongList()), activity);
+                        AddSongsPresenter addSongsPresenter = new AddSongsPresenterImpl
+                                (musicListData.getSongsAvailableToAdd(songListArrayList.get(position)).getSongList(), activity);
                         AddSongsDialogFragment addSongsDialogFragment = new AddSongsDialogFragment();
                         addSongsDialogFragment.setAddSongsPresenter(addSongsPresenter);
                         addSongsDialogFragment.setSongList(songListArrayList.get(position));
@@ -98,29 +100,6 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
 
 
         popupMenu.show();
-    }
-
-    private SongList getSongsAvailable(int position){
-        SongList songList = songListArrayList.get(position);
-        ArrayList<Song> songArrayList = new MusicListData(activity).getSongList();
-        ArrayList<Song> songsAvailable = new ArrayList<>();
-        boolean available;
-        for(Song song: songArrayList){
-            available = true;
-            for(int i =0; i<songList.getSongList().size(); i++){
-                if(song.getPath().equals(songList.getSongList().get(i).getPath())){
-                    available = false;
-                }
-            }
-            Log.d("available", available + "");
-            if(available)
-                songsAvailable.add(song);
-        }
-        SongList newSongList = new SongList();
-        newSongList.setTitle(songList.getTitle());
-        newSongList.setKey(songList.getKey());
-        newSongList.setSongList(songsAvailable);
-        return newSongList;
     }
 
     @Override

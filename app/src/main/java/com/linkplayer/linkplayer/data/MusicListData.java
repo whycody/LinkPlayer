@@ -3,13 +3,11 @@ package com.linkplayer.linkplayer.data;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
-import com.linkplayer.linkplayer.model.AddSongItem;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
@@ -58,7 +56,7 @@ public class MusicListData {
     public ArrayList<SongList> getArtistList(){
         ArrayList<SongList> songListArrayList = new ArrayList<>();
         ArrayList<Song> songArrayList = getSongList();
-        boolean added = false;
+        boolean added;
 
         for(Song song: songArrayList){
             added = false;
@@ -87,34 +85,25 @@ public class MusicListData {
         return songListArrayList;
     }
 
-    public ArrayList<AddSongItem> getAddSongItems(){
-        ArrayList<AddSongItem> addSongItems = new ArrayList<>();
+    public SongList getSongsAvailableToAdd(SongList songList){
+        ArrayList<Song> songsAvailable = new ArrayList<>();
+        boolean available;
         for(Song song: getSongList()){
-            AddSongItem addSongItem = new AddSongItem();
-            addSongItem.setSong(song);
-            addSongItem.setChecked(false);
-            addSongItems.add(addSongItem);
+            available = true;
+            for(int i =0; i<songList.getSongList().size(); i++){
+                if(song.getPath().equals(songList.getSongList().get(i).getPath())){
+                    available = false;
+                }
+            }
+            Log.d("available", available + "");
+            if(available)
+                songsAvailable.add(song);
         }
-        return addSongItems;
-    }
-
-    public ArrayList<AddSongItem> getAddSongItems(ArrayList<Song> songList){
-        ArrayList<AddSongItem> addSongItems = new ArrayList<>();
-        for(Song song: songList){
-            AddSongItem addSongItem = new AddSongItem();
-            addSongItem.setSong(song);
-            addSongItem.setChecked(false);
-            addSongItems.add(addSongItem);
-        }
-        return addSongItems;
-    }
-
-    public Song getSongListByPath(String path){
-        for(Song song: getSongList()){
-            if(song.getPath().equals(path))
-                return song;
-        }
-        return null;
+        SongList newSongList = new SongList();
+        newSongList.setTitle(songList.getTitle());
+        newSongList.setKey(songList.getKey());
+        newSongList.setSongList(songsAvailable);
+        return newSongList;
     }
 
     public SongList getArtistSongList(String artist){

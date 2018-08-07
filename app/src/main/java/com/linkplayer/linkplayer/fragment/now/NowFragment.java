@@ -61,11 +61,6 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView{
 
     @Override
     public void notifyItemChanged(int lastPosition, int position) {
-//        recyclerAdapter.getSongArrayList().get(lastPosition).setChoosed(false);
-//        recyclerAdapter.getSongArrayList().get(position).setChoosed(true);
-//        recyclerAdapter.notifyItemChanged(position);
-//        recyclerAdapter.notifyItemChanged(lastPosition);
-//        linearLayoutManager.scrollToPosition(position);
     }
 
     @Override
