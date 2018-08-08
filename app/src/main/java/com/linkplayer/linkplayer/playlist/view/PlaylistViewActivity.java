@@ -19,6 +19,7 @@ import com.linkplayer.linkplayer.fragment.music.MusicFragmentView;
 import com.linkplayer.linkplayer.fragment.music.MusicPresenterImpl;
 import com.linkplayer.linkplayer.fragment.music.MusicRecyclerAdapter;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
+import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
@@ -64,7 +65,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
 
     @Override
     protected void onDestroy() {
-        returnResult(Activity.RESULT_CANCELED);
+        setResult(Activity.RESULT_CANCELED);
         super.onDestroy();
     }
 

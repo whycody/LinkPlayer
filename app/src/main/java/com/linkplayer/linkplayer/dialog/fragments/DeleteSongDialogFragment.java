@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
+import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.fragment.music.MusicFragmentView;
 import com.linkplayer.linkplayer.model.Song;
 
@@ -49,8 +50,9 @@ public class DeleteSongDialogFragment extends DialogFragment {
     private void deleteSong(){
         boolean deleted;
         Uri uri = null;
+        String path = song.getPath();
         String authority = "com.linkplayer.linkplayer.fileprovider";
-        File file = new File(song.getPath());
+        File file = new File(path);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
@@ -65,9 +67,11 @@ public class DeleteSongDialogFragment extends DialogFragment {
         }
 
         if(deleted) {
-            fragmentView.notifyItemDeleted(position);
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
             getActivity().sendBroadcast(intent);
+            SongListDao songListDao = new SongListDao(getActivity());
+            songListDao.deleteAllSongsByPath(path);
+            fragmentView.notifyItemDeleted(position);
         }else
             Toast.makeText(getActivity(), "Cannot delete", Toast.LENGTH_SHORT).show();
     }

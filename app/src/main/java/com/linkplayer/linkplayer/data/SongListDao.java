@@ -46,6 +46,26 @@ public class SongListDao {
         return songs;
     }
 
+//    private void checkSongListFiles(SongListRealm songListRealm){
+//        if(songListRealm.getSongList().size()!=0) {
+//            for (SongRealm songRealm : songListRealm.getSongList()) {
+//                File file = new File(songRealm.getPath());
+//                if (!file.exists())
+//                    deleteSongFromSonglist(songRealm.getKey(), songListRealm.getKey());
+//            }
+//        }
+//    }
+
+    public void deleteAllSongsByPath(final String path){
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<SongRealm> realms = realm.where(SongRealm.class).equalTo("path", path).findAll();
+                realms.deleteAllFromRealm();
+            }
+        });
+    }
+
     public void deleteSongFromSonglist(int songKey, int songListKey){
         realm.beginTransaction();
 
@@ -59,6 +79,7 @@ public class SongListDao {
         }
 
         realm.commitTransaction();
+        Log.d("SongListDao", "Deleted, size: " + songListRealm.getSongList().size());
     }
 
     public boolean songListContainsSong(int key, Song song){
@@ -133,9 +154,10 @@ public class SongListDao {
     public SongList getLatestSongList(){
         SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", idLastSongListValue).findFirst();
         SongListMapper songListMapper = new SongListMapper();
-        SongList songList = new SongList(new ArrayList<Song>(), "Title", 0);
-        if(songListRealm!=null)
+        SongList songList = new SongList(new MusicListData(context).getSongList(), "All music", 0);
+        if(songListRealm!=null && songListRealm.getSongList().size()>0){
             songList = songListMapper.fromRealm(songListRealm);
+        }
         return songList;
     }
 

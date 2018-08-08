@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.linkplayer.linkplayer.data.SongListDao;
+import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.MusicListData;
@@ -50,8 +51,10 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
     public void onItemClick(int position) {
         if(!songListDao.getLatestSongList().getTitle().equals("All music")) {
             uncheckItem();
-            songListDao.changeLatestSongList(getAllMusicSongList());
-            ((MainActivity)getActivity()).refresh();        }
+            SongList songList = getAllMusicSongList();
+            songListDao.changeLatestSongList(songList);
+            ((MainActivity)getActivity()).refreshService(songList);
+        }
         ((MainActivity)getActivity()).playSong(position);
     }
 
@@ -70,10 +73,8 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
 
     private int getSongChoosed(){
         for(int i =0; i<songList.size(); i++){
-            if(songList.get(i).isChoosed()) {
-                Toast.makeText(getActivity(), i + "", Toast.LENGTH_SHORT).show();
+            if(songList.get(i).isChoosed())
                 return i;
-            }
         }
         return 0;
     }
@@ -105,8 +106,14 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
 
     @Override
     public void notifyItemDeleted(int position) {
+        NowFragment nowFragment = ((MainActivity)getActivity()).getNowFragment();
+        if(nowFragment!=null)
+            ((MainActivity)getActivity()).notifyAllData(nowFragment.getPosition(), songList.get(position));
+        else
+            ((MainActivity)getActivity()).notifyAllData(position, songList.get(position));
         songList.remove(position);
         recyclerAdapter.notifyItemRemoved(position);
+        recyclerAdapter.notifyItemRangeChanged(position, songList.size());
     }
 
 }

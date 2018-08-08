@@ -22,13 +22,16 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.fragment.artist.ArtistFragment;
 import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
+import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 
@@ -109,8 +112,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         playIntent = new Intent(this, MediaPlayerService.class);
         bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
         startService(playIntent);
-
     }
+
 
     @Override
     protected void onResume() {
@@ -173,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mainViewPager.setCurrentItem(tab.getPosition());
         mainToolbar.setTitle(firstCharToUpperCase(String.valueOf(tab.getText())));
         if(tab.getPosition()==0 || tab.getPosition()==3)
-            musicService.setSongPosAndNotify(musicService.getSong());
+            musicService.setSongPosAndNotify(musicService.getSongPos());
 
     }
 
@@ -206,13 +209,51 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             musicService.setSongPosAndNotify(position);
     }
 
-    public void refresh(){
-        SongList songList = songListDao.getLatestSongList();
+    public void refreshService(SongList songList){
         musicService.setNotShuffledList(songList.getSongList());
         if(random)
             Collections.shuffle(songList.getSongList());
         musicService.setList(songList.getSongList());
-        musicService.setSongPosAndNotify(musicService.getSong());
+        musicService.setSongPosAndNotify(musicService.getSongPos());
+    }
+
+    public void notifyAllData(int position, Song song){
+        ArrayList<Song> songList = getSongListAvailable();
+        checkIsMusicServiceIsPlayingDeletedSong(position, song);
+        musicService.setNotShuffledList(songList);
+        if(random)
+            Collections.shuffle(songList);
+        musicService.setList(songList);
+        mainPresenter.notifyAllData();
+    }
+
+    private ArrayList<Song> getSongListAvailable(){
+        ArrayList<Song> songList = songListDao.getLatestSongList().getSongList();
+        if(songList.size()>0)
+            return songList;
+        else
+            return new MusicListData(this).getSongList();
+    }
+
+    private void checkIsMusicServiceIsPlayingDeletedSong(int position, Song song){
+        if(musicService.getSong().getPath().equals(song.getPath())) {
+            showIsStopped();
+            musicService.pauseSong();
+            if (musicService.getSongList().size() > 0) {
+                setPositionIfItIsPossible(position);
+                setTitle();
+            }
+        }else{
+            musicService.setSongPosAndNotify(musicService.getSongPos());
+        }
+    }
+
+    private void setPositionIfItIsPossible(int position){
+        if (position > 0) {
+            musicService.setSongPosAndNotify(position - 1);
+        } else if (musicService.getSongList().size() - 1 > position) {
+            musicService.setSongPosAndNotify(position + 1);
+        }
     }
 
     @Override

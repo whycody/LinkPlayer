@@ -174,7 +174,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         return 0;
     }
 
-    public int getSong(){
+    public int getSongPos(){
         return songPos;
     }
 
@@ -274,6 +274,10 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     public ArrayList<Song> getSongList() {
         return songList;
+    }
+
+    public Song getSong(){
+        return songList.get(songPos);
     }
 
     public void setList(ArrayList<Song> songList){

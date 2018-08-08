@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.data.MusicListData;
@@ -76,10 +75,10 @@ public class MainPresenterImpl implements MainPresenter{
             musicService.setList(shuffledSongList);
         if(random) {
             musicService.setList(shuffledSongList);
-            musicService.setSongPos(musicService.getTargetRandomSongTruePosition(musicService.getSong()));
+            musicService.setSongPos(musicService.getTargetRandomSongTruePosition(musicService.getSongPos()));
             mainView.showRandomIsChosed();
         }else {
-            musicService.setSongPos(musicService.getRandomSongTruePosition(musicService.getSong()));
+            musicService.setSongPos(musicService.getRandomSongTruePosition(musicService.getSongPos()));
             musicService.setList(songList);
             mainView.showRandomIsNotChosed();
         }
@@ -198,7 +197,8 @@ public class MainPresenterImpl implements MainPresenter{
         }
     }
 
-    private void notifyAllData() {
+    @Override
+    public void notifyAllData() {
         notifyArtistFragmentWithoutPosition();
         notifyPlaylistFragmentWithoutPosition();
     }

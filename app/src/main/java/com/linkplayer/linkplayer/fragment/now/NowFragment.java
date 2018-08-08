@@ -32,6 +32,7 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView{
     private SongList songList;
     private SongListDao songListDao;
     private LinearLayoutManager linearLayoutManager;
+    private int position;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,8 +66,14 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView{
 
     @Override
     public void notifyItemDeleted(int position) {
-        songList.getSongList().remove(position);
+        presenter.getSongArrayList().remove(position);
         recyclerAdapter.notifyItemRemoved(position);
+        recyclerAdapter.notifyItemRangeChanged(position, presenter.getSongArrayList().size());
+        ((MainActivity)getActivity()).notifyAllData(position, songList.getSongList().get(position));
+    }
+
+    public int getPosition(){
+        return position;
     }
 
     @Override
@@ -87,6 +94,7 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView{
                 position = i;
             }
         }
+        this.position = position;
         recyclerAdapter.notifyItemChanged(position);
         recyclerAdapter.notifyItemChanged(lastPosition);
         linearLayoutManager.scrollToPosition(position);
