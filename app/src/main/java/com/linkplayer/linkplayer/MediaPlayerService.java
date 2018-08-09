@@ -101,22 +101,22 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
-        Intent notIntent = new Intent(this, MainActivity.class);
-        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendInt = PendingIntent.getActivity(this, 0,
-                notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification.Builder builder = new Notification.Builder(this);
-
-        builder.setContentIntent(pendInt)
-                .setSmallIcon(R.drawable.play_button_white)
-                .setTicker(songList.get(songPos).getTitle())
-                .setOngoing(true)
+        Notification myNotification  = new Notification.Builder(getApplicationContext())
                 .setContentTitle(songList.get(songPos).getTitle())
-                .setContentText(songList.get(songPos).getTitle());
-        Notification not = builder.build();
+                .setContentText(getNextSong().getTitle())
+                .setColor(getResources().getColor(R.color.colorPrimary))
+                .setSmallIcon(R.drawable.play_icon_white)
+                .setContentIntent(pendInt)
+                .setAutoCancel(false)
+                .build();
 
-        startForeground(NOTIFY_ID, not);
+        startForeground(NOTIFY_ID, myNotification);
     }
 
     @Override
@@ -212,6 +212,13 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             player.start();
         }else
             playSong();
+    }
+
+    public Song getNextSong(){
+        if(songPos < songList.size()-1)
+            return songList.get(songPos+1);
+        else
+            return songList.get(0);
     }
 
     public void playNextSong(){
