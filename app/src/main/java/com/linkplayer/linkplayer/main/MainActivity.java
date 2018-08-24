@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mainViewPager.setAdapter(tabsPagerAdapter);
         mainViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mainTabLayout));
         mainTabLayout.addOnTabSelectedListener(this);
+        mainViewPager.setOffscreenPageLimit(5);
 
         setSupportActionBar(mainToolbar);
         startAnimation();
@@ -184,8 +185,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void onTabSelected(TabLayout.Tab tab) {
         mainViewPager.setCurrentItem(tab.getPosition());
         mainToolbar.setTitle(firstCharToUpperCase(String.valueOf(tab.getText())));
-        if(tab.getPosition()==0 || tab.getPosition()==3)
-            musicService.setSongPosAndNotify(musicService.getSongPos());
+//        if(tab.getPosition()==0 || tab.getPosition()==3) {
+//            musicService.setSongPosAndNotify(musicService.getSongPos());
+//            if(tab.getPosition()==3){
+//                NowFragment nowFragment = getNowFragment();
+//                nowFragment.refresh();
+//            }
+//        }
 
     }
 
@@ -219,10 +225,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     public void refreshService(SongList songList){
-        musicService.setNotShuffledList(songList.getSongList());
+        if(nowFragment!=null)
+            nowFragment.refresh();
+        SongList sameSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(), songList.getTitle(), songList.getKey());
+        SongList realSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(), songList.getTitle(), songList.getKey());
+        musicService.setNotShuffledList(sameSongList.getSongList());
         if(random)
-            Collections.shuffle(songList.getSongList());
-        musicService.setList(songList.getSongList());
+            Collections.shuffle(realSongList.getSongList());
+        musicService.setList(realSongList.getSongList());
         musicService.setSongPosAndNotify(musicService.getSongPos());
     }
 
@@ -416,5 +426,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public ArtistFragment getArtistFragment() {
         return tabsPagerAdapter.getArtistFragment();
+    }
+
+    @Override
+    public MusicFragment getMusicFragment() {
+        return tabsPagerAdapter.getMusicFragment();
     }
 }

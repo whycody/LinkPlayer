@@ -2,6 +2,7 @@ package com.linkplayer.linkplayer.main;
 
 
 import com.linkplayer.linkplayer.fragment.artist.ArtistFragment;
+import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
 
@@ -30,4 +31,6 @@ public interface MainView {
     PlaylistFragment getPlaylistFragment();
 
     ArtistFragment getArtistFragment();
+
+    MusicFragment getMusicFragment();
 }

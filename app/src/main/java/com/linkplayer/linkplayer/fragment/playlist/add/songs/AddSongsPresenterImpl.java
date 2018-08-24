@@ -54,9 +54,7 @@ public class AddSongsPresenterImpl implements AddSongsPresenter {
     @Override
     public void addSongsToPlaylist(SongList songList) {
         SongListDao songListDao = new SongListDao(context);
-        for(Song song: markedSongs){
-            songListDao.insertSongToListWithKey(songList.getKey(), song);
-        }
+        songListDao.insertSongsToListWithKey(songList.getKey(), markedSongs);
         addSongsInformator.notifyItemChanged(songListDao.getSongListWithKey(songList.getKey()), position);
     }
 

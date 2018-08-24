@@ -11,6 +11,7 @@ import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongDao;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.fragment.artist.ArtistFragment;
+import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
 import com.linkplayer.linkplayer.model.Song;
@@ -137,14 +138,17 @@ public class MainPresenterImpl implements MainPresenter{
         if(requestCode==1){
             String type = "none";
             SongList songList = null;
+            SongList notShuffledList;
             if(resultCode == Activity.RESULT_OK){
+                notifyMusicFragment();
                 type = data.getStringExtra("type");
                 songList = getSongListByType(type, data);
+                notShuffledList = getSongListByType(type, data);
                 songListDao.changeLatestSongList(songList);
-                musicService.setNotShuffledList(songList.getSongList());
+                musicService.setNotShuffledList(notShuffledList.getSongList());
 
-                setMusicListIfRandom(songList);
                 refreshNowFragment(data.getIntExtra("position", 0), songList);
+                setMusicListIfRandom(songList);
 
                 if(random)
                     musicService.setTargetRandomSong(data.getIntExtra("position", 0));
@@ -157,6 +161,11 @@ public class MainPresenterImpl implements MainPresenter{
 
             notifyFragments(type, songList);
         }
+    }
+
+    private void notifyMusicFragment() {
+        MusicFragment musicFragment = mainView.getMusicFragment();
+        musicFragment.recreateList();
     }
 
     private void notifyFragments(String type, SongList songList){
@@ -228,11 +237,9 @@ public class MainPresenterImpl implements MainPresenter{
         switch(type){
             case(PlaylistViewActivity.ARTIST_TYPE):
                 songList = getArtistSongList(data.getStringExtra("artist"));
-                Log.d("tagSize", songList.getSongList().size() + "");
                 break;
             case(PlaylistViewActivity.PLAYLIST_TYPE):
                 songList = getPlaylistSongList(data.getIntExtra("key", 0));
-                Log.d("tagSizePlaylist", songList.getSongList().size() + "");
                 break;
         }
         return songList;
@@ -258,9 +265,8 @@ public class MainPresenterImpl implements MainPresenter{
         NowFragment nowFragment = mainView.getNowFragment();
         if(nowFragment!=null) {
             nowFragment.refresh();
-            nowFragment.notifyItemChanged(0, position);
-            nowFragment.notifyItemChanged(songList.getSongList().get(0),
-                    songList.getSongList().get(position));
+//            nowFragment.notifyItemChanged(songList.getSongList().get(0),
+//                    songList.getSongList().get(position));
         }
     }
 

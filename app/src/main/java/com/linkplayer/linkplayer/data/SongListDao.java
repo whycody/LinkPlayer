@@ -79,7 +79,6 @@ public class SongListDao {
         }
 
         realm.commitTransaction();
-        Log.d("SongListDao", "Deleted, size: " + songListRealm.getSongList().size());
     }
 
     public boolean songListContainsSong(int key, Song song){
@@ -102,6 +101,26 @@ public class SongListDao {
                     RealmList<SongRealm> songs = songListRealm.getSongList();
                     if(!songs.contains(savedSongRealm)) {
                         songs.add(savedSongRealm);
+                    }
+                }
+            }
+        });
+    }
+
+    public void insertSongsToListWithKey(final int key, final ArrayList<Song> songList){
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm r) {
+                ArrayList<Song> songListRealmNew = (ArrayList<Song>)songList.clone();
+                SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", key).findFirst();
+                if (songListRealm != null) {
+                    RealmList<SongRealm> songs = songListRealm.getSongList();
+                    for(Song song: songListRealmNew) {
+                        SongRealm songRealm = createSongRealm(song);
+                        SongRealm savedSongRealm = realm.copyToRealmOrUpdate(songRealm);
+                        if (!songs.contains(savedSongRealm)) {
+                            songs.add(savedSongRealm);
+                        }
                     }
                 }
             }
@@ -152,12 +171,13 @@ public class SongListDao {
     private int idLastSongListValue = 1999999999;
 
     public SongList getLatestSongList(){
+        SongList songList;
         SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", idLastSongListValue).findFirst();
         SongListMapper songListMapper = new SongListMapper();
-        SongList songList = new SongList(new MusicListData(context).getSongList(), "All music", 0);
         if(songListRealm!=null && songListRealm.getSongList().size()>0){
             songList = songListMapper.fromRealm(songListRealm);
-        }
+        }else
+            songList = new SongList(new MusicListData(context).getSongList(), "All music", 0);
         return songList;
     }
 
@@ -182,9 +202,7 @@ public class SongListDao {
         SongListRealm songListRealm = realm.createObject(SongListRealm.class, idLastSongListValue);
         songListRealm.setTitle(songList.getTitle());
         realm.commitTransaction();
-        for(Song song : songList.getSongList()) {
-            insertSongToListWithKey(songListRealm.getKey(), song);
-        }
+        insertSongsToListWithKey(songListRealm.getKey(), songList.getSongList());
     }
 
     private int generateIdForList() {

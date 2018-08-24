@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,19 +30,23 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
     private MusicRecyclerAdapter recyclerAdapter;
     private SongListDao songListDao;
     private ArrayList<Song> songList;
+    private MusicListData musicListData;
+    private LinearLayoutManager linearLayoutManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_music, container, false);
         musicListRecycler = view.findViewById(R.id.music_list_recycler);
-        songList = new MusicListData(getActivity()).getSongList();
+        musicListData = new MusicListData(getActivity());
+        songList = musicListData.getSongList();
         musicPresenter = new MusicPresenterImpl(songList, this, getActivity());
         songListDao = new SongListDao(getActivity());
+        linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerAdapter = new MusicRecyclerAdapter(new MusicPresenterImpl(songList,this,
                 getActivity()), getActivity());
         musicListRecycler.setAdapter(recyclerAdapter);
-        musicListRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        musicListRecycler.setLayoutManager(linearLayoutManager);
         musicListRecycler.addItemDecoration(new LinearVerticalSpacing(6));
 
         return view;
@@ -90,18 +95,18 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         for(int i = 0; i<songList.size(); i++){
             Song songFromList = songList.get(i);
             if(songFromList.getPath().equals(lastSong.getPath())) {
-                songList.get(i).setChoosed(false);
+                recyclerAdapter.getSongArrayList().get(i).setChoosed(false);
                 lastPosition = i;
             }
 
             if(songFromList.getPath().equals(song.getPath())){
-                songList.get(i).setChoosed(true);
+                recyclerAdapter.getSongArrayList().get(i).setChoosed(true);
                 position = i;
             }
         }
-        musicPresenter.setSongArrayList(songList);
         recyclerAdapter.notifyItemChanged(position);
         recyclerAdapter.notifyItemChanged(lastPosition);
+        linearLayoutManager.scrollToPosition(position);
     }
 
     @Override
@@ -116,4 +121,9 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         recyclerAdapter.notifyItemRangeChanged(position, songList.size());
     }
 
+    public void recreateList(){
+        songList = musicListData.getSongList();
+        recyclerAdapter.setSongArrayList(songList);
+        recyclerAdapter.notifyDataSetChanged();
+    }
 }

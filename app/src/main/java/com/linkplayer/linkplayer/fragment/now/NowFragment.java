@@ -52,7 +52,7 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView{
     }
 
     public void refresh(){
-        recyclerAdapter.setSongArrayList(new SongListDao(getActivity()).getLatestSongList().getSongList());
+        recyclerAdapter.setSongArrayList(songListDao.getLatestSongList().getSongList());
     }
 
     @Override
@@ -62,6 +62,7 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView{
 
     @Override
     public void notifyItemChanged(int lastPosition, int position) {
+
     }
 
     @Override
