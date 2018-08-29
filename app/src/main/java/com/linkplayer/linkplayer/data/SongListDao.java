@@ -1,8 +1,8 @@
 package com.linkplayer.linkplayer.data;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.mappers.SongListMapper;
 import com.linkplayer.linkplayer.mappers.SongMapper;
@@ -10,10 +10,9 @@ import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 import com.linkplayer.linkplayer.model.SongListRealm;
 import com.linkplayer.linkplayer.model.SongRealm;
+import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -22,16 +21,23 @@ import io.realm.RealmResults;
 public class SongListDao {
 
     private Realm realm;
-    private Context context;
-    private SongMapper songMapper;
     private SongListMapper songListMapper;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor preferencesEditor;
+    private MusicListData musicListData;
+
+    public static final String LATEST_SONGLIST_TYPE = "latestSonglistType";
+    public static final String LATEST_SONGLIST_KEY = "latestSonglistKey";
+    public static final String LATEST_SONGLIST_TITLE = "latestSonglistTitle";
+    public static final String UNASSIGNED = "unassigned";
 
     public SongListDao(Context context){
-        this.context = context;
         Realm.init(context);
         realm = Realm.getDefaultInstance();
-        songMapper = new SongMapper();
         songListMapper = new SongListMapper();
+        sharedPreferences = context.getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
+        preferencesEditor = sharedPreferences.edit();
+        musicListData = new MusicListData(context);
     }
 
     public ArrayList<SongList> getAllTheSongLists() {
@@ -39,22 +45,10 @@ public class SongListDao {
         SongListMapper songListMapper = new SongListMapper();
         RealmResults<SongListRealm> all = realm.where(SongListRealm.class).findAll().sort("key");
         for (SongListRealm songListRealm : all) {
-            if(songListRealm.getKey()==idLastSongListValue)
-                continue;
             songs.add(songListMapper.fromRealm(songListRealm));
         }
         return songs;
     }
-
-//    private void checkSongListFiles(SongListRealm songListRealm){
-//        if(songListRealm.getSongList().size()!=0) {
-//            for (SongRealm songRealm : songListRealm.getSongList()) {
-//                File file = new File(songRealm.getPath());
-//                if (!file.exists())
-//                    deleteSongFromSonglist(songRealm.getKey(), songListRealm.getKey());
-//            }
-//        }
-//    }
 
     public void deleteAllSongsByPath(final String path){
         realm.executeTransaction(new Realm.Transaction() {
@@ -151,7 +145,7 @@ public class SongListDao {
         return songListMapper.fromRealm(songListRealm);
     }
 
-    public void editSongListTitle(int key, String title){
+    public void editSonglistTitle(int key, String title){
         realm.beginTransaction();
         realm.where(SongListRealm.class).equalTo("key", key).findFirst().setTitle(title);
         realm.commitTransaction();
@@ -168,41 +162,32 @@ public class SongListDao {
         }
     }
 
-    private int idLastSongListValue = 1999999999;
-
     public SongList getLatestSongList(){
         SongList songList;
-        SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", idLastSongListValue).findFirst();
-        SongListMapper songListMapper = new SongListMapper();
-        if(songListRealm!=null && songListRealm.getSongList().size()>0){
-            songList = songListMapper.fromRealm(songListRealm);
-        }else
-            songList = new SongList(new MusicListData(context).getSongList(), "All music", 0);
-        return songList;
+
+        String type = sharedPreferences.getString(LATEST_SONGLIST_TYPE, UNASSIGNED);
+        String title = sharedPreferences.getString(LATEST_SONGLIST_TITLE, UNASSIGNED);
+        int key = sharedPreferences.getInt(LATEST_SONGLIST_KEY, 0);
+
+        if(type.equals(UNASSIGNED) || type.equals(PlaylistViewActivity.ALL_SONGS_TYPE))
+            return musicListData.getAllMusicSongList();
+
+        songList = type.equals(PlaylistViewActivity.PLAYLIST_TYPE) ? getSongListWithKey(key) :
+                musicListData.getArtistSongList(title);
+        return songList.getSongList().size()>0 ? songList : musicListData.getAllMusicSongList();
     }
 
     public void changeLatestSongList(SongList songList){
-        deleteLatestSongList();
-        createLatestSongList(songList);
-    }
-
-    private void deleteLatestSongList(){
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                if(realm.where(SongListRealm.class).equalTo("key", idLastSongListValue).findFirst()!=null) {
-                    realm.where(SongListRealm.class).equalTo("key", idLastSongListValue).findFirst().deleteFromRealm();
-                }
-            }
-        });
-    }
-
-    private void createLatestSongList(SongList songList) {
-        realm.beginTransaction();
-        SongListRealm songListRealm = realm.createObject(SongListRealm.class, idLastSongListValue);
-        songListRealm.setTitle(songList.getTitle());
-        realm.commitTransaction();
-        insertSongsToListWithKey(songListRealm.getKey(), songList.getSongList());
+        if(songList.getKey()!=0) {
+            preferencesEditor.putString(LATEST_SONGLIST_TYPE, PlaylistViewActivity.PLAYLIST_TYPE);
+            preferencesEditor.putInt(LATEST_SONGLIST_KEY, songList.getKey());
+        }else if(!songList.getTitle().equals(MusicListData.ALL_MUSIC_SONGLIST)){
+            preferencesEditor.putString(LATEST_SONGLIST_TYPE, PlaylistViewActivity.ARTIST_TYPE);
+            preferencesEditor.putString(LATEST_SONGLIST_TITLE, songList.getTitle());
+        }else{
+            preferencesEditor.putString(LATEST_SONGLIST_TYPE, PlaylistViewActivity.ALL_SONGS_TYPE);
+        }
+        preferencesEditor.apply();
     }
 
     private int generateIdForList() {

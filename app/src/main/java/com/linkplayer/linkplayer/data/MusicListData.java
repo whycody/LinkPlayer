@@ -18,6 +18,7 @@ public class MusicListData {
 
     private Context context;
     private MediaMetadataRetriever metaRetriver = new MediaMetadataRetriever();
+    public static final String ALL_MUSIC_SONGLIST = "allMusicPlaylist18";
 
     public MusicListData(Context context){
         this.context = context;
@@ -50,6 +51,11 @@ public class MusicListData {
 
             } while (musicCursor.moveToNext());
         }
+        return songList;
+    }
+
+    public SongList getAllMusicSongList(){
+        SongList songList = new SongList(getSongList(), ALL_MUSIC_SONGLIST, 0);
         return songList;
     }
 

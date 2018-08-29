@@ -14,4 +14,6 @@ public interface MusicFragmentView {
 
     void notifyItemChanged(Song lastSong, Song song);
 
+    void notifySongAddedToPlaylist();
+
 }

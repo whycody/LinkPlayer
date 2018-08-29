@@ -81,6 +81,7 @@ public class MusicPresenterImpl{
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
                                 songListDao.insertSongToListWithKey(songList.getKey(), songArrayList.get(position));
+                                fragmentView.notifySongAddedToPlaylist();
                                 return true;
                             }
                         });

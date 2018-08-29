@@ -103,6 +103,11 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView{
     }
 
     @Override
+    public void notifySongAddedToPlaylist() {
+        ((MainActivity)getActivity()).notifySongAddedToPlaylist();
+    }
+
+    @Override
     public void setSongList(SongList songList) {
         this.songList = songList;
     }

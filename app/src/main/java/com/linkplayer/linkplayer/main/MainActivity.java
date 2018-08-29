@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private boolean random = false;
     private MusicFragment musicFragment;
     private NowFragment nowFragment;
+    private PlaylistFragment playlistFragment;
     private SongListDao songListDao;
 
 
@@ -246,6 +247,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mainPresenter.notifyAllData();
     }
 
+    public void notifySongAddedToPlaylist(){
+        if(nowFragment!=null && playlistFragment!=null) {
+            nowFragment.refresh();
+            playlistFragment.refresh();
+        }
+        refreshService(songListDao.getLatestSongList());
+    }
+
     private ArrayList<Song> getSongListAvailable(){
         ArrayList<Song> songList = songListDao.getLatestSongList().getSongList();
         if(songList.size()>0)
@@ -279,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void notifyItemChanged(int lastPosition, int position) {
         musicFragment = tabsPagerAdapter.getMusicFragment();
         nowFragment = tabsPagerAdapter.getNowFragment();
+        playlistFragment = tabsPagerAdapter.getPlaylistFragment();
         notifyMusicFragmentIfNotNull(lastPosition, position);
         notifyNowFragmentIfNotNull(lastPosition, position);
     }

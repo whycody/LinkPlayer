@@ -12,4 +12,6 @@ public interface PlaylistPresenter {
     int getPlaylistRowCount();
 
     void setAddSongsInformator(AddSongsInformator addSongsInformator);
+
+    void setSongListArrayList(ArrayList<SongList> songListArrayList);
 }

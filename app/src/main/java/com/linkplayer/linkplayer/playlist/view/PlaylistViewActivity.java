@@ -29,6 +29,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
 
     public static final String ARTIST_TYPE = "artist";
     public static final String PLAYLIST_TYPE = "playlist";
+    public static final String ALL_SONGS_TYPE = "all";
 
     private Toolbar playlistToolbar;
     private Button playlistTopBtn;
@@ -113,6 +114,11 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
 
     @Override
     public void notifyItemChanged(Song lastSong, Song song) {
+
+    }
+
+    @Override
+    public void notifySongAddedToPlaylist() {
 
     }
 

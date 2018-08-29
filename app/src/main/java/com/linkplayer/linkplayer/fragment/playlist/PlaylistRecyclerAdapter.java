@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.model.SongList;
 
+import java.util.ArrayList;
+
 public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistRecyclerHolder> {
 
     private PlaylistPresenter playlistPresenter;
@@ -38,6 +40,11 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistRecycl
     @Override
     public int getItemCount() {
         return playlistPresenter.getPlaylistRowCount();
+    }
+
+    public void setSongListArrayList(ArrayList<SongList> songListArrayList){
+        playlistPresenter.setSongListArrayList(songListArrayList);
+        this.notifyDataSetChanged();
     }
 
 }

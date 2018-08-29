@@ -111,4 +111,9 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
     public void setAddSongsInformator(AddSongsInformator addSongsInformator) {
         this.addSongsInformator = addSongsInformator;
     }
+
+    @Override
+    public void setSongListArrayList(ArrayList<SongList> songListArrayList) {
+        this.songListArrayList = songListArrayList;
+    }
 }

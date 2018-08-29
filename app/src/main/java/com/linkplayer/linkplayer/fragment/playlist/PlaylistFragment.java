@@ -51,6 +51,11 @@ public class PlaylistFragment extends Fragment implements PlaylistView, AddSongs
     }
 
     @Override
+    public void refresh() {
+        recyclerAdapter.setSongListArrayList(new SongListDao(getActivity()).getAllTheSongLists());
+    }
+
+    @Override
     public void notifyItemChanged(SongList songList, int position) {
         songListArrayList.set(position, songList);
         recyclerAdapter.notifyItemChanged(position);

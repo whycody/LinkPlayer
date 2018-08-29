@@ -19,6 +19,7 @@ import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
+import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 
 import java.util.ArrayList;
 
@@ -54,20 +55,13 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
 
     @Override
     public void onItemClick(int position) {
-        if(!songListDao.getLatestSongList().getTitle().equals("All music")) {
+        if(!songListDao.getLatestSongList().getTitle().equals(MusicListData.ALL_MUSIC_SONGLIST)) {
             uncheckItem();
-            SongList songList = getAllMusicSongList();
+            SongList songList = musicListData.getAllMusicSongList();
             songListDao.changeLatestSongList(songList);
             ((MainActivity)getActivity()).refreshService(songList);
         }
         ((MainActivity)getActivity()).playSong(position);
-    }
-
-    private SongList getAllMusicSongList(){
-        SongList songList = new SongList();
-        songList.setSongList(this.songList);
-        songList.setTitle("All music");
-        return songList;
     }
 
     private void uncheckItem(){
@@ -107,6 +101,11 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         recyclerAdapter.notifyItemChanged(position);
         recyclerAdapter.notifyItemChanged(lastPosition);
         linearLayoutManager.scrollToPosition(position);
+    }
+
+    @Override
+    public void notifySongAddedToPlaylist() {
+        ((MainActivity)getActivity()).notifySongAddedToPlaylist();
     }
 
     @Override
