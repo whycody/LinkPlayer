@@ -21,6 +21,8 @@ import io.realm.RealmResults;
 public class SongListDao {
 
     private Realm realm;
+    private Context context;
+    private SongMapper songMapper;
     private SongListMapper songListMapper;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor preferencesEditor;
@@ -32,8 +34,10 @@ public class SongListDao {
     public static final String UNASSIGNED = "unassigned";
 
     public SongListDao(Context context){
+        this.context = context;
         Realm.init(context);
         realm = Realm.getDefaultInstance();
+        songMapper = new SongMapper();
         songListMapper = new SongListMapper();
         sharedPreferences = context.getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
         preferencesEditor = sharedPreferences.edit();
@@ -145,7 +149,7 @@ public class SongListDao {
         return songListMapper.fromRealm(songListRealm);
     }
 
-    public void editSonglistTitle(int key, String title){
+    public void editSongListTitle(int key, String title){
         realm.beginTransaction();
         realm.where(SongListRealm.class).equalTo("key", key).findFirst().setTitle(title);
         realm.commitTransaction();

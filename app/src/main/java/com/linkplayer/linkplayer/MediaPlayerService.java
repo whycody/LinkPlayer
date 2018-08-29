@@ -12,7 +12,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.data.SongDao;
 import com.linkplayer.linkplayer.main.MainActivity;
@@ -29,7 +28,8 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     private final IBinder iBinder = new LocalBinder();
     private MediaPlayer player;
     private ArrayList<Song> songList;
-    private ArrayList<Song> notShuffled;
+    private ArrayList<Song> notShuffledList;
+    private ArrayList<Song> shuffledList;
     private SongDao songDao = new SongDao(getBaseContext());
     boolean repeat = false;
     boolean random = false;
@@ -158,7 +158,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     public int getRandomSongTruePosition(int position) {
         for(int i =0; i<songList.size(); i++){
-            if(songList.get(position).getId()==notShuffled.get(i).getId()){
+            if(songList.get(position).getId()== notShuffledList.get(i).getId()){
                 return i;
             }
         }
@@ -167,7 +167,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     public int getTargetRandomSongTruePosition(int position) {
         for(int i =0; i<songList.size(); i++){
-            if(songList.get(i).getId()==notShuffled.get(position).getId()){
+            if(songList.get(i).getId()== notShuffledList.get(position).getId()){
                 return i;
             }
         }
@@ -287,12 +287,17 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         return songList.get(songPos);
     }
 
-    public void setList(ArrayList<Song> songList){
-        this.songList = songList;
-    }
+    public void setLists(ArrayList<Song> songList, boolean random){
+        ArrayList<Song> notShuffledList = (ArrayList<Song>)songList.clone();
+        ArrayList<Song> shuffledList = (ArrayList<Song>)songList.clone();
+        Collections.shuffle(shuffledList);
+        this.notShuffledList = notShuffledList;
+        this.shuffledList = shuffledList;
 
-    public void setNotShuffledList(ArrayList<Song> notShuffled){
-        this.notShuffled = notShuffled;
+        if(random)
+            this.songList = shuffledList;
+        else
+            this.songList = notShuffledList;
     }
 
     public void setOptionsRandomRepeat(boolean random, boolean repeat){

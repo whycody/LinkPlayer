@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.data.MusicListData;
@@ -62,7 +61,6 @@ public class MainPresenterImpl implements MainPresenter{
         repeat = sharedPreferences.getBoolean("repeat", false);
 
         mainView.setSettings(random, repeat);
-        musicService.setNotShuffledList(songList);
         saveRandomPreferences(random);
         saveRepeatReferences(repeat);
     }
@@ -70,17 +68,15 @@ public class MainPresenterImpl implements MainPresenter{
     @Override
     public void saveRandomPreferences(boolean random){
         songList = songListDao.getLatestSongList().getSongList();
-        shuffledSongList = songListDao.getLatestSongList().getSongList();
-        Collections.shuffle(shuffledSongList);
         if(musicService.getSongList()==null)
-            musicService.setList(shuffledSongList);
+            musicService.setLists(songList, true);
         if(random) {
-            musicService.setList(shuffledSongList);
+            musicService.setLists(songList, true);
             musicService.setSongPos(musicService.getTargetRandomSongTruePosition(musicService.getSongPos()));
             mainView.showRandomIsChosed();
         }else {
             musicService.setSongPos(musicService.getRandomSongTruePosition(musicService.getSongPos()));
-            musicService.setList(songList);
+            musicService.setLists(songList, false);
             mainView.showRandomIsNotChosed();
         }
         musicService.setOptionsRandomRepeat(random, repeat);
@@ -138,17 +134,14 @@ public class MainPresenterImpl implements MainPresenter{
         if(requestCode==1){
             String type = "none";
             SongList songList = null;
-            SongList notShuffledList;
             if(resultCode == Activity.RESULT_OK){
                 notifyMusicFragment();
                 type = data.getStringExtra("type");
                 songList = getSongListByType(type, data);
-                notShuffledList = getSongListByType(type, data);
                 songListDao.changeLatestSongList(songList);
-                musicService.setNotShuffledList(notShuffledList.getSongList());
 
                 refreshNowFragment(data.getIntExtra("position", 0), songList);
-                setMusicListIfRandom(songList);
+                musicService.setLists(songList.getSongList(), random);
 
                 if(random)
                     musicService.setTargetRandomSong(data.getIntExtra("position", 0));
@@ -253,20 +246,10 @@ public class MainPresenterImpl implements MainPresenter{
         return songListDao.getSongListWithKey(key);
     }
 
-    private void setMusicListIfRandom(SongList songList){
-        if(random) {
-            Collections.shuffle(songList.getSongList());
-            musicService.setList(songList.getSongList());
-        }else
-            musicService.setList(songList.getSongList());
-    }
-
     private void refreshNowFragment(int position, SongList songList){
         NowFragment nowFragment = mainView.getNowFragment();
         if(nowFragment!=null) {
             nowFragment.refresh();
-//            nowFragment.notifyItemChanged(songList.getSongList().get(0),
-//                    songList.getSongList().get(position));
         }
     }
 

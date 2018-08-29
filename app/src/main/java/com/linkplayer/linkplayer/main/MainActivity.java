@@ -12,14 +12,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.linkplayer.linkplayer.MediaPlayerService;
@@ -34,7 +32,6 @@ import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView{
@@ -145,11 +142,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         return super.onKeyDown(keyCode, event);
     }
 
-    public void setSongList(SongList songList){
-        musicService.setList(songList.getSongList());
-        musicService.setNotShuffledList(songList.getSongList());
-    }
-
     private ServiceConnection musicConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -186,14 +178,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void onTabSelected(TabLayout.Tab tab) {
         mainViewPager.setCurrentItem(tab.getPosition());
         mainToolbar.setTitle(firstCharToUpperCase(String.valueOf(tab.getText())));
-//        if(tab.getPosition()==0 || tab.getPosition()==3) {
-//            musicService.setSongPosAndNotify(musicService.getSongPos());
-//            if(tab.getPosition()==3){
-//                NowFragment nowFragment = getNowFragment();
-//                nowFragment.refresh();
-//            }
-//        }
-
     }
 
     @Override
@@ -228,22 +212,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void refreshService(SongList songList){
         if(nowFragment!=null)
             nowFragment.refresh();
-        SongList sameSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(), songList.getTitle(), songList.getKey());
         SongList realSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(), songList.getTitle(), songList.getKey());
-        musicService.setNotShuffledList(sameSongList.getSongList());
-        if(random)
-            Collections.shuffle(realSongList.getSongList());
-        musicService.setList(realSongList.getSongList());
+        musicService.setLists(realSongList.getSongList(), random);
         musicService.setSongPosAndNotify(musicService.getSongPos());
     }
 
     public void notifyAllData(int position, Song song){
         ArrayList<Song> songList = getSongListAvailable();
         checkIsMusicServiceIsPlayingDeletedSong(position, song);
-        musicService.setNotShuffledList(songList);
-        if(random)
-            Collections.shuffle(songList);
-        musicService.setList(songList);
+        musicService.setLists(songList, random);
         mainPresenter.notifyAllData();
     }
 
