@@ -1,4 +1,4 @@
-package com.linkplayer.linkplayer.fragment.music;
+package com.linkplayer.linkplayer.fragment.now;
 
 import android.app.Activity;
 import android.view.Menu;
@@ -7,55 +7,58 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.PopupMenu;
 
-import com.linkplayer.linkplayer.dialog.fragments.AddNewPlaylistDialogFragment;
-import com.linkplayer.linkplayer.dialog.fragments.DeleteSongDialogFragment;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongListDao;
+import com.linkplayer.linkplayer.dialog.fragments.AddNewPlaylistDialogFragment;
+import com.linkplayer.linkplayer.dialog.fragments.DeleteSongDialogFragment;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
+import com.linkplayer.linkplayer.fragment.music.MusicFragmentView;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
-import java.util.ArrayList;
+public class NowPresenterImpl {
 
-public class MusicPresenterImpl{
-
-    private ArrayList<Song> songArrayList;
+    private SongList songList;
     private Activity activity;
-    private MusicFragmentView fragmentView;
+    private MusicFragmentView musicFragmentView;
     private DeleteSongInformator deleteSongInformator;
     private SongListDao songListDao;
 
-    public MusicPresenterImpl(ArrayList<Song> songArrayList, MusicFragmentView fragmentView,
-                              DeleteSongInformator deleteSongInformator, Activity activity){
-        this.songArrayList = songArrayList;
+    public NowPresenterImpl(SongList songList, Activity activity,
+                            MusicFragmentView musicFragmentView, DeleteSongInformator deleteSongInformator){
+        this.songList = songList;
         this.activity = activity;
-        this.fragmentView = fragmentView;
+        this.musicFragmentView = musicFragmentView;
         this.deleteSongInformator = deleteSongInformator;
         this.songListDao = new SongListDao(activity);
     }
 
-    public void onBindSongRowViewAtPosition(MusicRecyclerHolder musicRecyclerHolder, final int position){
-        Song song = songArrayList.get(position);
+    public void onBindSongRowViewAtPosition(NowRecyclerHolder nowRecyclerHolder, final int position) {
+        Song song = songList.getSongList().get(position);
+
+        nowRecyclerHolder.setTitle(song.getTitle());
+        nowRecyclerHolder.setTime(getTime(Integer.parseInt(song.getDuration())));
         if(song.isChoosed()){
-            musicRecyclerHolder.setBackground(activity.getResources().getDrawable(R.drawable.gray_color));
+            nowRecyclerHolder.setTextColor(activity.getResources().getColor(R.color.colorYellow));
         }else
-            musicRecyclerHolder.setBackground(activity.getResources().getDrawable(R.drawable.gray_row_color));
-        musicRecyclerHolder.setTitle(song.getTitle());
-        musicRecyclerHolder.setAuthor(song.getArtist());
-        musicRecyclerHolder.setMinutes(getMinutes(Integer.parseInt(song.getDuration())));
-        musicRecyclerHolder.setSeconds(getSeconds(Integer.parseInt(song.getDuration())));
-        musicRecyclerHolder.setOnClickItemView(new View.OnClickListener() {
+            nowRecyclerHolder.setTextColor(activity.getResources().getColor(R.color.colorLightWhite));
+        nowRecyclerHolder.setOnClickItemView(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               fragmentView.onItemClick(position);
+                musicFragmentView.onItemClick(position);
             }
         });
-        musicRecyclerHolder.setOnClickPopupMenu(new View.OnClickListener() {
+        nowRecyclerHolder.setOnClickPopupMenu(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPopupMenu(v, position);
             }
         });
+
+    }
+
+    private String getTime(int time){
+        return getMinutes(time)+":"+getSeconds(time);
     }
 
     private String getMinutes(int duration){
@@ -78,13 +81,13 @@ public class MusicPresenterImpl{
         SubMenu subMenu = menu.getItem(1).getSubMenu();
 
         for(final SongList songList: songListDao.getAllTheSongLists()){
-            if(!songListDao.songListContainsSong(songList.getKey(), songArrayList.get(position))) {
+            if(!songListDao.songListContainsSong(songList.getKey(), this.songList.getSongList().get(position))) {
                 subMenu.add(0, songList.getKey(), Menu.NONE, songList.getTitle())
                         .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
-                                songListDao.insertSongToListWithKey(songList.getKey(), songArrayList.get(position));
-                                fragmentView.notifySongAddedToPlaylist();
+                                songListDao.insertSongToListWithKey(songList.getKey(), songList.getSongList().get(position));
+                                musicFragmentView.notifySongAddedToPlaylist();
                                 return true;
                             }
                         });
@@ -99,16 +102,16 @@ public class MusicPresenterImpl{
                         DeleteSongDialogFragment dialogFragment = new DeleteSongDialogFragment();
                         dialogFragment.setInformator(deleteSongInformator);
                         dialogFragment.setPosition(position);
-                        dialogFragment.setSong(songArrayList.get(position));
+                        dialogFragment.setSong(songList.getSongList().get(position));
                         dialogFragment.show(activity.getFragmentManager(), "DeleteSongDialogFragment");
                         return true;
                     case(R.id.new_playlist_item):
                         AddNewPlaylistDialogFragment playlistDialogFragment = new AddNewPlaylistDialogFragment();
-                        playlistDialogFragment.setSong(songArrayList.get(position));
+                        playlistDialogFragment.setSong(songList.getSongList().get(position));
                         playlistDialogFragment.show(activity.getFragmentManager(), "AddNewPlaylistDialogFragment");
                         return true;
-                        default:
-                            return false;
+                    default:
+                        return false;
                 }
             }
         });
@@ -117,14 +120,14 @@ public class MusicPresenterImpl{
     }
 
     public int getSongRowsCount(){
-        return songArrayList.size();
+        return songList.getSongList().size();
     }
 
-    public void setSongArrayList(ArrayList<Song> songArrayList){
-        this.songArrayList = songArrayList;
+    public void setSongList(SongList songList){
+        this.songList = songList;
     }
 
-    public ArrayList<Song> getSongArrayList() {
-        return songArrayList;
+    public SongList getSongList() {
+        return songList;
     }
 }

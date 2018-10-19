@@ -8,6 +8,7 @@
     <color name="colorGrayRow">#4c4c4c</color>
     <color name="colorLight">#5E5E5E</color>
     <color name="colorPink">#FF00F5</color>
-    <color name="colorYellow">#ffc400</color>
+    <color name="colorYellow">#fff200</color>
     <color name="colorGray">#A5A5A5</color>
+    <color name="colorLightWhite">#EEEEEE</color>
 </resources>

@@ -20,7 +20,7 @@ import java.io.File;
 public class DeleteSongDialogFragment extends DialogFragment {
 
     private Song song;
-    private MusicFragmentView fragmentView;
+    private DeleteSongInformator deleteSongInformator;
     private int position;
 
     @Override
@@ -66,14 +66,16 @@ public class DeleteSongDialogFragment extends DialogFragment {
             deleted = file.getAbsoluteFile().delete();
         }
 
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
+        getActivity().sendBroadcast(intent);
         if(deleted) {
-            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
-            getActivity().sendBroadcast(intent);
             SongListDao songListDao = new SongListDao(getActivity());
             songListDao.deleteAllSongsByPath(path);
-            fragmentView.notifyItemDeleted(position);
-        }else
+            deleteSongInformator.notifySongDeleted(position, true);
+        }else {
             Toast.makeText(getActivity(), "Cannot delete", Toast.LENGTH_SHORT).show();
+            deleteSongInformator.notifySongDeleted(position, false);
+        }
     }
 
     public void setSong(Song song){
@@ -84,7 +86,7 @@ public class DeleteSongDialogFragment extends DialogFragment {
         this.position = position;
     }
 
-    public void setFragmentView(MusicFragmentView fragmentView){
-        this.fragmentView = fragmentView;
+    public void setInformator(DeleteSongInformator deleteSongInformator){
+        this.deleteSongInformator = deleteSongInformator;
     }
 }

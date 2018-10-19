@@ -1,6 +1,7 @@
 package com.linkplayer.linkplayer.playlist.view;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.View;
 
 import com.linkplayer.linkplayer.data.MusicListData;
@@ -39,6 +40,23 @@ public class PlaylistViewPresenterImpl implements PlaylistViewPresenter{
             playlistView.setTopButtonOnClickListener(downloadSongsOnClick);
             playlistView.setDeletePlaylistButtonVisiblity(View.GONE);
         }
+    }
+
+    @Override
+    public void returnOKResult(int position) {
+        Intent intent = new Intent();
+        intent.putExtra("songPath", getSongList().getSongList().get(position).getPath());
+        intent.putExtra("type", getType());
+        intent.putExtra("key", getKey());
+        intent.putExtra("artist", getArtist());
+        intent.putExtra("position", position);
+        activity.setResult(Activity.RESULT_OK, intent);
+        activity.finish();
+    }
+
+    @Override
+    public void returnCanceledResult() {
+        activity.setResult(Activity.RESULT_CANCELED);
     }
 
     private View.OnClickListener addSongsOnClick = new View.OnClickListener() {

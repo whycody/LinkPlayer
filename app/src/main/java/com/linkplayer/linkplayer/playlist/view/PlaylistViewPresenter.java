@@ -6,6 +6,10 @@ public interface PlaylistViewPresenter {
 
     void onCreate();
 
+    void returnOKResult(int position);
+
+    void returnCanceledResult();
+
     SongList getSongList();
 
     String getType();

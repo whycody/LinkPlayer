@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.linkplayer.linkplayer.data.SongDao;
@@ -284,7 +285,10 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     public Song getSong(){
+        if(songList!=null)
         return songList.get(songPos);
+        else
+            return new Song();
     }
 
     public void setLists(ArrayList<Song> songList, boolean random){

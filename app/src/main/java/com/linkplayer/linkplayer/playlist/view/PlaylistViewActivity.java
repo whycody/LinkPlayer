@@ -1,40 +1,35 @@
 package com.linkplayer.linkplayer.playlist.view;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.R;
-import com.linkplayer.linkplayer.data.SongListDao;
+import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
 import com.linkplayer.linkplayer.fragment.music.MusicFragmentView;
 import com.linkplayer.linkplayer.fragment.music.MusicPresenterImpl;
 import com.linkplayer.linkplayer.fragment.music.MusicRecyclerAdapter;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
-import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
 import java.util.ArrayList;
 
-public class PlaylistViewActivity extends AppCompatActivity implements PlaylistView, MusicFragmentView, AddSongsInformator{
+public class PlaylistViewActivity extends AppCompatActivity implements PlaylistView,
+        MusicFragmentView, AddSongsInformator, DeleteSongInformator{
 
     public static final String ARTIST_TYPE = "artist";
     public static final String PLAYLIST_TYPE = "playlist";
     public static final String ALL_SONGS_TYPE = "all";
 
     private Toolbar playlistToolbar;
-    private Button playlistTopBtn;
+    private Button playlistTopBtn, deletePlaylistBtn;
     private RecyclerView playlistSongsRecycler;
-    private Button deletePlaylistBtn;
     private MusicPresenterImpl musicPresenter;
 
     private PlaylistViewPresenter viewPresenter;
@@ -53,7 +48,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
         deletePlaylistBtn = findViewById(R.id.delete_playlist_btn);
         viewPresenter = new PlaylistViewPresenterImpl(this, this, this);
         songList = viewPresenter.getSongList().getSongList();
-        musicPresenter = new MusicPresenterImpl(songList, this, this);
+        musicPresenter = new MusicPresenterImpl(songList, this, this, this);
         musicRecyclerAdapter = new MusicRecyclerAdapter(musicPresenter, this);
         playlistSongsRecycler.setAdapter(musicRecyclerAdapter);
         playlistSongsRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -66,7 +61,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
 
     @Override
     protected void onDestroy() {
-        setResult(Activity.RESULT_CANCELED);
+        viewPresenter.returnCanceledResult();
         super.onDestroy();
     }
 
@@ -87,18 +82,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
 
     @Override
     public void onItemClick(int position) {
-        returnResult(position);
-    }
-
-    private void returnResult(int position){
-        Intent intent = new Intent();
-        intent.putExtra("songPath", viewPresenter.getSongList().getSongList().get(position).getPath());
-        intent.putExtra("type", viewPresenter.getType());
-        intent.putExtra("key", viewPresenter.getKey());
-        intent.putExtra("artist", viewPresenter.getArtist());
-        intent.putExtra("position", position);
-        setResult(Activity.RESULT_OK, intent);
-        finish();
+        viewPresenter.returnOKResult(position);
     }
 
     @Override
@@ -126,5 +110,11 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
     public void notifyItemChanged(SongList songList, int position) {
         musicPresenter.setSongArrayList(songList.getSongList());
         musicRecyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifySongDeleted(int position, boolean deleted) {
+        if(deleted)
+            notifyItemDeleted(position);
     }
 }

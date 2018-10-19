@@ -57,7 +57,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tab_background_view" />
+        app:layout_constraintTop_toBottomOf="@+id/tab_background_view" >
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Switch" />
+    </android.support.v4.view.ViewPager>
 
     </android.support.constraint.ConstraintLayout>
 
@@ -69,10 +76,10 @@
         app:layout_anchor="@+id/linearLayout3"
         app:layout_anchorGravity="top|center" />
 
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="160dp"
         android:background="@drawable/gradient_dark_gray"
         android:orientation="vertical"
         app:behavior_peekHeight="80dp"
@@ -158,17 +165,69 @@
 
         <TextView
             android:id="@+id/music_title_view"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
             android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="11dp"
+            android:orientation="horizontal"
+            android:background="@android:color/black"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/music_title_view">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/playlist_circle"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:alpha="0.7"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/bell_circle"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:alpha="0.7"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/share_circle"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:alpha="0.7"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/trash_circle"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:alpha="0.7"/>
+
+
+        </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
 
 
 </android.support.design.widget.CoordinatorLayout>

@@ -33,6 +33,8 @@ import com.linkplayer.linkplayer.model.SongList;
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView{
 
@@ -42,11 +44,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private MainTabsPagerAdapter tabsPagerAdapter;
     private TextView musicTitleView;
     private ImageButton playSongBtn, backSongBtn, nextSongBtn, randomMusicBtn, repeatMusicBtn;
+    private CircleImageView playlistCircle, bellCircle, shareCircle, trashCircle;
     private MainPresenter mainPresenter;
 
     private MediaPlayerService musicService;
 
     private Intent playIntent;
+    private Song showedSong;
     private boolean musicBound = false;
     private boolean repeat = false;
     private boolean random = false;
@@ -70,6 +74,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         nextSongBtn = findViewById(R.id.next_song_btn);
         randomMusicBtn = findViewById(R.id.random_music_btn);
         repeatMusicBtn = findViewById(R.id.repeat_music_btn);
+        playlistCircle = findViewById(R.id.playlist_circle);
+        bellCircle = findViewById(R.id.bell_circle);
+        shareCircle = findViewById(R.id.share_circle);
+        trashCircle = findViewById(R.id.trash_circle);
         mainPresenter = new MainPresenterImpl(MainActivity.this, MainActivity.this);
         songListDao = new SongListDao(this);
 
@@ -79,11 +87,16 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         randomMusicBtn.setOnClickListener(setRandomMusicModeOnClick);
         repeatMusicBtn.setOnClickListener(setRepeatMusicModeOnClick);
 
-        Glide.with(this).load(R.drawable.back_white).into(backSongBtn);
-        Glide.with(this).load(R.drawable.back_white).into(nextSongBtn);
-        Glide.with(this).load(R.drawable.play_button_white).into(playSongBtn);
-        Glide.with(this).load(R.drawable.replay_white).into(repeatMusicBtn);
-        Glide.with(this).load(R.drawable.shuffle_white).into(randomMusicBtn);
+        Glide.with(this).load(R.drawable.back2_white).into(backSongBtn);
+        Glide.with(this).load(R.drawable.back2_white).into(nextSongBtn);
+        Glide.with(this).load(R.drawable.play2_button_white).into(playSongBtn);
+        Glide.with(this).load(R.drawable.replay2_white).into(repeatMusicBtn);
+        Glide.with(this).load(R.drawable.shuffle2_white).into(randomMusicBtn);
+        Glide.with(this).load(R.drawable.add_to_playlist_icon).into(playlistCircle);
+        Glide.with(this).load(R.drawable.bell_icon).into(bellCircle);
+        Glide.with(this).load(R.drawable.share_icon).into(shareCircle);
+        Glide.with(this).load(R.drawable.trash_can_icon).into(trashCircle);
+
 
         final String MUSIC = getString(R.string.music);
         final String ARTIST = getString(R.string.artist);
@@ -117,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     protected void onResume() {
         super.onResume();
-        setTitle();
+        setTitleAndSong();
     }
 
     @Override
@@ -199,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setSongPosIfRandom(position);
         musicService.playSong();
         showIsPlaying();
-        setTitle();
+        setTitleAndSong();
     }
 
     private void setSongPosIfRandom(int position){
@@ -212,7 +225,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void refreshService(SongList songList){
         if(nowFragment!=null)
             nowFragment.refresh();
-        SongList realSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(), songList.getTitle(), songList.getKey());
+        SongList realSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(),
+                songList.getTitle(), songList.getKey());
         musicService.setLists(realSongList.getSongList(), random);
         musicService.setSongPosAndNotify(musicService.getSongPos());
     }
@@ -246,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             musicService.pauseSong();
             if (musicService.getSongList().size() > 0) {
                 setPositionIfItIsPossible(position);
-                setTitle();
+                setTitleAndSong();
             }
         }else{
             musicService.setSongPosAndNotify(musicService.getSongPos());
@@ -286,8 +300,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         }
     }
 
-    private void setTitle() {
+    private void setTitleAndSong() {
         musicTitleView.setText(mainPresenter.getTitle());
+        showedSong = musicService.getSong();
     }
 
     private View.OnClickListener pauseOnClick = new View.OnClickListener() {
@@ -323,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private void playNextSong(){
         musicService.playNextSong();
-        setTitle();
+        setTitleAndSong();
 
     }
 
@@ -336,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private void playPreviousSong(){
         musicService.playPreviousSong();
-        setTitle();
+        setTitleAndSong();
     }
 
     private View.OnClickListener setRandomMusicModeOnClick = new View.OnClickListener() {
@@ -386,13 +401,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void showIsPlaying() {
         playSongBtn.setOnClickListener(pauseOnClick);
-        Glide.with(this).load(R.drawable.pause_white).into(playSongBtn);
+        Glide.with(this).load(R.drawable.pause2_white).into(playSongBtn);
     }
 
     @Override
     public void showIsStopped() {
         playSongBtn.setOnClickListener(resumeOnClick);
-        Glide.with(this).load(R.drawable.play_button_white).into(playSongBtn);
+        Glide.with(this).load(R.drawable.play2_button_white).into(playSongBtn);
     }
 
     @Override

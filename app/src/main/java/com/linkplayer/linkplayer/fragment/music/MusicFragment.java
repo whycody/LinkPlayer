@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.linkplayer.linkplayer.data.SongListDao;
+import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
 import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.R;
@@ -24,7 +25,7 @@ import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 import java.util.ArrayList;
 
 
-public class MusicFragment extends Fragment implements MusicFragmentView{
+public class MusicFragment extends Fragment implements MusicFragmentView, DeleteSongInformator{
 
     private RecyclerView musicListRecycler;
     private MusicPresenterImpl musicPresenter;
@@ -41,10 +42,10 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         musicListRecycler = view.findViewById(R.id.music_list_recycler);
         musicListData = new MusicListData(getActivity());
         songList = musicListData.getSongList();
-        musicPresenter = new MusicPresenterImpl(songList, this, getActivity());
+        musicPresenter = new MusicPresenterImpl(songList, this, this, getActivity());
         songListDao = new SongListDao(getActivity());
         linearLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerAdapter = new MusicRecyclerAdapter(new MusicPresenterImpl(songList,this,
+        recyclerAdapter = new MusicRecyclerAdapter(new MusicPresenterImpl(songList,this, this,
                 getActivity()), getActivity());
         musicListRecycler.setAdapter(recyclerAdapter);
         musicListRecycler.setLayoutManager(linearLayoutManager);
@@ -124,5 +125,12 @@ public class MusicFragment extends Fragment implements MusicFragmentView{
         songList = musicListData.getSongList();
         recyclerAdapter.setSongArrayList(songList);
         recyclerAdapter.notifyDataSetChanged();
+    }
+
+
+    @Override
+    public void notifySongDeleted(int position, boolean deleted) {
+        if(deleted)
+            notifyItemDeleted(position);
     }
 }
