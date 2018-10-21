@@ -15,6 +15,7 @@ import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
+import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 import com.linkplayer.linkplayer.fragment.music.MusicFragmentView;
 import com.linkplayer.linkplayer.fragment.music.MusicPresenterImpl;
 import com.linkplayer.linkplayer.fragment.music.MusicRecyclerAdapter;
@@ -68,6 +69,8 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView,
 
     @Override
     public void notifyItemDeleted(int position) {
+        MusicFragment musicFragment = ((MainActivity)getActivity()).getMusicFragment();
+        musicFragment.recreateList();
         nowPresenter.getSongList().getSongList().remove(position);
         nowRecyclerAdapter.notifyItemRemoved(position);
         nowRecyclerAdapter.notifyItemRangeChanged(position, nowPresenter.getSongList().getSongList().size());

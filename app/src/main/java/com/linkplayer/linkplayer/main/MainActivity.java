@@ -247,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     private ArrayList<Song> getSongListAvailable(){
+        SongListDao songListDao = new SongListDao(this);
         ArrayList<Song> songList = songListDao.getLatestSongList().getSongList();
         if(songList.size()>0)
             return songList;
@@ -302,7 +303,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private void setTitleAndSong() {
         musicTitleView.setText(mainPresenter.getTitle());
-        showedSong = musicService.getSong();
+        if(musicService!=null)
+            showedSong = musicService.getSong();
     }
 
     private View.OnClickListener pauseOnClick = new View.OnClickListener() {

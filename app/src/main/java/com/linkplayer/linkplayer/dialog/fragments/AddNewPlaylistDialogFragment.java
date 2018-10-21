@@ -20,6 +20,7 @@ public class AddNewPlaylistDialogFragment extends DialogFragment {
 
     private SongListDao songListDao;
     private Song song;
+    private NewPlaylistInformator newPlaylistInformator;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -42,6 +43,7 @@ public class AddNewPlaylistDialogFragment extends DialogFragment {
                             songListDao = new SongListDao(getActivity());
                             SongList songList = songListDao.insertSongList(edittext.getText().toString());
                             songListDao.insertSongToListWithKey(songList.getKey(), song);
+                            newPlaylistInformator.notifyNewPlaylistAdded(true);
                             Toast.makeText(getActivity(), "Playlist added", Toast.LENGTH_SHORT).show();
                         }else
                             Toast.makeText(getActivity(), "Add a playlist title", Toast.LENGTH_SHORT).show();
@@ -54,5 +56,9 @@ public class AddNewPlaylistDialogFragment extends DialogFragment {
 
     public void setSong(Song song){
         this.song = song;
+    }
+
+    public void setNewPlaylistInformator(NewPlaylistInformator newPlaylistInformator){
+        this.newPlaylistInformator = newPlaylistInformator;
     }
 }

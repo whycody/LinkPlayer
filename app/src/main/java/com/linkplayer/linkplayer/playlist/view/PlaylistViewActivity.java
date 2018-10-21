@@ -10,11 +10,13 @@ import android.widget.Button;
 
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
+import com.linkplayer.linkplayer.dialog.fragments.NewPlaylistInformator;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
 import com.linkplayer.linkplayer.fragment.music.MusicFragmentView;
 import com.linkplayer.linkplayer.fragment.music.MusicPresenterImpl;
 import com.linkplayer.linkplayer.fragment.music.MusicRecyclerAdapter;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
+import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
@@ -48,7 +50,8 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
         deletePlaylistBtn = findViewById(R.id.delete_playlist_btn);
         viewPresenter = new PlaylistViewPresenterImpl(this, this, this);
         songList = viewPresenter.getSongList().getSongList();
-        musicPresenter = new MusicPresenterImpl(songList, this, this, this);
+        musicPresenter = new MusicPresenterImpl(songList, this, this);
+        musicPresenter.setDeleteSongInformator(this);
         musicRecyclerAdapter = new MusicRecyclerAdapter(musicPresenter, this);
         playlistSongsRecycler.setAdapter(musicRecyclerAdapter);
         playlistSongsRecycler.setLayoutManager(new LinearLayoutManager(this));

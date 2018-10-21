@@ -46,8 +46,10 @@ public class MusicListData {
                 String artist = musicCursor.getString(artistColumn);
                 String duration = musicCursor.getString(durationColumn);
 
-                metaRetriver.setDataSource(path);
-                songList.add(new Song(id, title, artist, path, duration));
+                try {
+                    metaRetriver.setDataSource(path);
+                    songList.add(new Song(id, title, artist, path, duration));
+                }catch (Exception exc){}
 
             } while (musicCursor.moveToNext());
         }

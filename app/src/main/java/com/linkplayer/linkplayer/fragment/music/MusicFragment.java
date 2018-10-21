@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
+import com.linkplayer.linkplayer.dialog.fragments.NewPlaylistInformator;
 import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.R;
@@ -25,7 +26,7 @@ import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 import java.util.ArrayList;
 
 
-public class MusicFragment extends Fragment implements MusicFragmentView, DeleteSongInformator{
+public class MusicFragment extends Fragment implements MusicFragmentView, DeleteSongInformator, NewPlaylistInformator{
 
     private RecyclerView musicListRecycler;
     private MusicPresenterImpl musicPresenter;
@@ -42,11 +43,11 @@ public class MusicFragment extends Fragment implements MusicFragmentView, Delete
         musicListRecycler = view.findViewById(R.id.music_list_recycler);
         musicListData = new MusicListData(getActivity());
         songList = musicListData.getSongList();
-        musicPresenter = new MusicPresenterImpl(songList, this, this, getActivity());
+        musicPresenter = new MusicPresenterImpl(songList, this, getActivity());
+        musicPresenter.setInformators(this, this);
         songListDao = new SongListDao(getActivity());
         linearLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerAdapter = new MusicRecyclerAdapter(new MusicPresenterImpl(songList,this, this,
-                getActivity()), getActivity());
+        recyclerAdapter = new MusicRecyclerAdapter(musicPresenter, getActivity());
         musicListRecycler.setAdapter(recyclerAdapter);
         musicListRecycler.setLayoutManager(linearLayoutManager);
         musicListRecycler.addItemDecoration(new LinearVerticalSpacing(6));
@@ -101,7 +102,6 @@ public class MusicFragment extends Fragment implements MusicFragmentView, Delete
         }
         recyclerAdapter.notifyItemChanged(position);
         recyclerAdapter.notifyItemChanged(lastPosition);
-        linearLayoutManager.scrollToPosition(position);
     }
 
     @Override
@@ -112,10 +112,8 @@ public class MusicFragment extends Fragment implements MusicFragmentView, Delete
     @Override
     public void notifyItemDeleted(int position) {
         NowFragment nowFragment = ((MainActivity)getActivity()).getNowFragment();
-        if(nowFragment!=null)
-            ((MainActivity)getActivity()).notifyAllData(nowFragment.getPosition(), songList.get(position));
-        else
-            ((MainActivity)getActivity()).notifyAllData(position, songList.get(position));
+        nowFragment.refresh();
+        ((MainActivity)getActivity()).notifyAllData(nowFragment.getPosition(), songList.get(position));
         songList.remove(position);
         recyclerAdapter.notifyItemRemoved(position);
         recyclerAdapter.notifyItemRangeChanged(position, songList.size());
@@ -132,5 +130,11 @@ public class MusicFragment extends Fragment implements MusicFragmentView, Delete
     public void notifySongDeleted(int position, boolean deleted) {
         if(deleted)
             notifyItemDeleted(position);
+    }
+
+    @Override
+    public void notifyNewPlaylistAdded(boolean added) {
+        if(added)
+            ((MainActivity)getActivity()).notifySongAddedToPlaylist();
     }
 }

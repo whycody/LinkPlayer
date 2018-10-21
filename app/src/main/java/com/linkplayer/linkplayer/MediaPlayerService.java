@@ -285,10 +285,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     public Song getSong(){
-        if(songList!=null)
         return songList.get(songPos);
-        else
-            return new Song();
     }
 
     public void setLists(ArrayList<Song> songList, boolean random){

@@ -12,6 +12,7 @@ import com.linkplayer.linkplayer.dialog.fragments.DeleteSongDialogFragment;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
+import com.linkplayer.linkplayer.dialog.fragments.NewPlaylistInformator;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
@@ -23,15 +24,28 @@ public class MusicPresenterImpl{
     private Activity activity;
     private MusicFragmentView fragmentView;
     private DeleteSongInformator deleteSongInformator;
+    private NewPlaylistInformator newPlaylistInformator;
     private SongListDao songListDao;
 
-    public MusicPresenterImpl(ArrayList<Song> songArrayList, MusicFragmentView fragmentView,
-                              DeleteSongInformator deleteSongInformator, Activity activity){
+    public MusicPresenterImpl(ArrayList<Song> songArrayList, MusicFragmentView fragmentView, Activity activity){
         this.songArrayList = songArrayList;
         this.activity = activity;
         this.fragmentView = fragmentView;
-        this.deleteSongInformator = deleteSongInformator;
         this.songListDao = new SongListDao(activity);
+    }
+
+    public void setInformators(DeleteSongInformator deleteSongInformator,
+                               NewPlaylistInformator newPlaylistInformator){
+        setDeleteSongInformator(deleteSongInformator);
+        setNewPlaylistInformator(newPlaylistInformator);
+    }
+
+    public void setDeleteSongInformator(DeleteSongInformator deleteSongInformator){
+        this.deleteSongInformator = deleteSongInformator;
+    }
+
+    public void setNewPlaylistInformator(NewPlaylistInformator newPlaylistInformator){
+        this.newPlaylistInformator = newPlaylistInformator;
     }
 
     public void onBindSongRowViewAtPosition(MusicRecyclerHolder musicRecyclerHolder, final int position){
@@ -105,6 +119,7 @@ public class MusicPresenterImpl{
                     case(R.id.new_playlist_item):
                         AddNewPlaylistDialogFragment playlistDialogFragment = new AddNewPlaylistDialogFragment();
                         playlistDialogFragment.setSong(songArrayList.get(position));
+                        playlistDialogFragment.setNewPlaylistInformator(newPlaylistInformator);
                         playlistDialogFragment.show(activity.getFragmentManager(), "AddNewPlaylistDialogFragment");
                         return true;
                         default:

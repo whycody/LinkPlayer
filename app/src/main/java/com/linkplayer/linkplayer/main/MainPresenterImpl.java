@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.data.MusicListData;
@@ -243,7 +244,8 @@ public class MainPresenterImpl implements MainPresenter{
     }
 
     private SongList getPlaylistSongList(int key){
-        return songListDao.getSongListWithKey(key);
+        SongList songList = songListDao.getSongListWithKey(key);
+        return songList;
     }
 
     private void refreshNowFragment(int position, SongList songList){
