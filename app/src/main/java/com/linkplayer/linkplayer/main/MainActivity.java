@@ -1,12 +1,19 @@
 package com.linkplayer.linkplayer.main;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
+import android.media.AudioManager;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -58,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private NowFragment nowFragment;
     private PlaylistFragment playlistFragment;
     private SongListDao songListDao;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mainTabLayout.addOnTabSelectedListener(this);
         mainViewPager.setOffscreenPageLimit(5);
 
+        registerBecomingNoisyReceiver();
         setSupportActionBar(mainToolbar);
         startAnimation();
     }
@@ -153,6 +160,18 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void registerBecomingNoisyReceiver(){
+        BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                musicService.pauseSong();
+                showIsStopped();
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        registerReceiver(becomingNoisyReceiver, intentFilter);
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
