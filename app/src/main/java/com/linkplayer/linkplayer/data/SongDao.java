@@ -3,9 +3,6 @@ package com.linkplayer.linkplayer.data;
 import android.content.Context;
 
 import com.linkplayer.linkplayer.model.Song;
-import com.linkplayer.linkplayer.model.SongList;
-import com.linkplayer.linkplayer.mappers.SongListMapper;
-import com.linkplayer.linkplayer.model.SongListRealm;
 import com.linkplayer.linkplayer.mappers.SongMapper;
 import com.linkplayer.linkplayer.model.SongRealm;
 
@@ -19,32 +16,16 @@ public class SongDao {
 
     private Realm realm;
     private Context context;
-    private SongMapper songMapper = new SongMapper();
+    private SongMapper songMapper;
 
     public SongDao(Context context){
-        this.context = context;
         Realm.init(context);
+        this.context = context;
+        songMapper = new SongMapper();
         realm = Realm.getDefaultInstance();
     }
 
-
-    public Song getSongById(int id){
-        SongRealm songRealm = realm.where(SongRealm.class).equalTo("id", id).findFirst();
-        return songMapper.fromRealm(songRealm);
-    }
-
-    public List<Song> getAllSongs() {
-        List<Song> notes = new ArrayList<>();
-
-        RealmResults<SongRealm> all = realm.where(SongRealm.class).findAll().sort("id");
-        for (SongRealm noteRealm : all) {
-            notes.add(songMapper.fromRealm(noteRealm));
-        }
-
-        return notes;
-    }
-
-    private int idLastSongValue = 1999999999;
+    private final int LAST_SONG_VALUE_ID = 3;
 
     public void changeLatestMusic(Song song){
         deleteLatestMusic();
@@ -54,18 +35,18 @@ public class SongDao {
     }
 
     private void deleteLatestMusic(){
-        if(realm.where(SongRealm.class).equalTo("key", idLastSongValue).findFirst()!=null) {
+        if(realm.where(SongRealm.class).equalTo("key", LAST_SONG_VALUE_ID).findFirst()!=null) {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    realm.where(SongRealm.class).equalTo("key", idLastSongValue).findFirst().deleteFromRealm();
+                    realm.where(SongRealm.class).equalTo("key", LAST_SONG_VALUE_ID).findFirst().deleteFromRealm();
                 }
             });
         }
     }
 
     private void createLatestMusic(Song song){
-        SongRealm songRealm = realm.createObject(SongRealm.class, idLastSongValue);
+        SongRealm songRealm = realm.createObject(SongRealm.class, LAST_SONG_VALUE_ID);
         songRealm.setArtist(song.getArtist());
         songRealm.setId(song.getId());
         songRealm.setPath(song.getPath());
@@ -74,7 +55,7 @@ public class SongDao {
     }
 
     public Song getLatestMusic(){
-        SongRealm songRealm = realm.where(SongRealm.class).equalTo("key", idLastSongValue).findFirst();
+        SongRealm songRealm = realm.where(SongRealm.class).equalTo("key", LAST_SONG_VALUE_ID).findFirst();
         if(songRealm==null) {
             return new MusicListData(context).getSongList().get(0);
         }

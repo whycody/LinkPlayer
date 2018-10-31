@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.linkplayer.linkplayer.data.SongDao;
@@ -26,19 +25,33 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
         MediaPlayer.OnInfoListener, MediaPlayer.OnBufferingUpdateListener, AudioManager.OnAudioFocusChangeListener{
 
-    private final IBinder iBinder = new LocalBinder();
-    private MediaPlayer player;
-    private ArrayList<Song> songList;
-    private ArrayList<Song> notShuffledList;
-    private ArrayList<Song> shuffledList;
-    private SongDao songDao = new SongDao(getBaseContext());
-    boolean repeat = false;
-    boolean random = false;
+    private ArrayList<Song> songList, notShuffledList, shuffledList;
+    private MediaPlayer mediaPlayer;
     private RefreshView refreshView;
+    private SongDao songDao;
+    private IBinder iBinder;
 
-    private int songPos;
-    private int currentSong;
-    private static final int NOTIFY_ID=1;
+    private int songPos, currentSong;
+    boolean repeat, random = false;
+    private static final int NOTIFY_ID = 1;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        iBinder = new LocalBinder();
+        mediaPlayer = new MediaPlayer();
+        songDao = new SongDao(getBaseContext());
+        setSongPosAndNotifyActivity(0);
+        initMediaPlayer();
+    }
+
+    public void initMediaPlayer(){
+        mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setOnPreparedListener(this);
+        mediaPlayer.setOnCompletionListener(this);
+        mediaPlayer.setOnErrorListener(this);
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -52,9 +65,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     @Override
     public boolean onUnbind(Intent intent) {
-        player.stop();
-        player.reset();
-        player.release();
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        mediaPlayer.release();
         return false;
     }
 
@@ -70,21 +83,17 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        if(songPos < songList.size()-1 || repeat) {
-            playNextSongAutomatically();
-        }else if(songPos == songList.size()-1 && repeat && !random){
-            playNextSongAutomatically();
-        }else if(songPos == songList.size()-1 && repeat && random){
+        if(songPos == songList.size()-1 && repeat && random)
             Collections.shuffle(songList);
+        if(songPos<songList.size()-1 || repeat)
             playNextSongAutomatically();
-        }
     }
 
     private void playNextSongAutomatically(){
         if(songPos == songList.size()-1 && repeat){
-            setSongPosAndNotify(0);
+            setSongPosAndNotifyActivity(0);
         }else
-            setSongPosAndNotify(songPos + 1);
+            setSongPosAndNotifyActivity(songPos + 1);
         playSong();
     }
 
@@ -102,22 +111,39 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
+        buildNotification();
+    }
+
+    private void buildNotification(){
+        PendingIntent notificationIntent = notificationPendingIntent();
+        Notification musicNotification  = musicNotification(notificationIntent);
+        startForeground(NOTIFY_ID, musicNotification);
+    }
+
+    private PendingIntent notificationPendingIntent(){
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendInt = PendingIntent.getActivity(this, 0,
+        return PendingIntent.getActivity(this, 0,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
 
-        Notification myNotification  = new Notification.Builder(getApplicationContext())
+    private Notification musicNotification(PendingIntent notificationIntent){
+        return new Notification.Builder(getApplicationContext())
                 .setContentTitle(songList.get(songPos).getTitle())
                 .setContentText(getNextSong().getTitle())
                 .setColor(getResources().getColor(R.color.colorPrimary))
                 .setSmallIcon(R.drawable.play_icon_white)
-                .setContentIntent(pendInt)
+                .setContentIntent(notificationIntent)
                 .setAutoCancel(false)
                 .build();
+    }
 
-        startForeground(NOTIFY_ID, myNotification);
+    public Song getNextSong(){
+        if(songPos < songList.size()-1)
+            return songList.get(songPos+1);
+        else
+            return songList.get(0);
     }
 
     @Override
@@ -132,7 +158,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     private int lastSongPoisition;
 
-    public void setSongPosAndNotify(int songPos){
+    public void setSongPosAndNotifyActivity(int songPos){
         this.songPos = songPos;
         if(songList!=null && refreshView !=null) {
             notifyItemChanged(songPos);
@@ -149,12 +175,11 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             refreshView.notifyItemChanged(lastSongPoisition, position);
         else
             refreshView.notifyItemChanged(0, position);
-
         lastSongPoisition = songPos;
     }
 
-    public void setTargetRandomSong(int songPos){
-        setSongPosAndNotify(getTargetRandomSongTruePosition(songPos));
+    public void setTargetRandomSongTruePosition(int songPos){
+        setSongPosAndNotifyActivity(getTargetRandomSongTruePosition(songPos));
     }
 
     public int getRandomSongTruePosition(int position) {
@@ -181,23 +206,19 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     public void playSong(){
         try{
-            player.reset();
-            Song playSong = songList.get(songPos);
+            mediaPlayer.reset();
             currentSong = songPos;
-            setLastSong();
-            long currSong = playSong.getId();
+            Song playSong = songList.get(songPos);
+            long currentSong = playSong.getId();
+            saveSongAsLast();
             Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                currSong);
-            player.setDataSource(getApplicationContext(), trackUri);
+                currentSong);
+            mediaPlayer.setDataSource(getApplicationContext(), trackUri);
         }catch(Exception e){
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
-        player.prepareAsync();
-    }
-
-    public int getLatestSongPosition(){
-        return lastSongPoisition;
+        mediaPlayer.prepareAsync();
     }
 
     public void setRefreshView(RefreshView refreshView){
@@ -205,43 +226,40 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     public void pauseSong(){
-        player.pause();
+        mediaPlayer.pause();
     }
 
     public void resumeSong(){
         if(currentSong == songPos) {
-            player.start();
+            mediaPlayer.start();
         }else
             playSong();
     }
 
-    public Song getNextSong(){
-        if(songPos < songList.size()-1)
-            return songList.get(songPos+1);
-        else
-            return songList.get(0);
-    }
-
     public void playNextSong(){
         if(songPos < songList.size()-1) {
-            setSongPosAndNotify(songPos+1);
-            setLastSong();
+            setSongPosAndNotifyActivity(songPos+1);
+            saveSongAsLast();
         }else if(songPos == songList.size()-1){
-            setSongPosAndNotify(0);
-            if(random) {
-                Song song = songList.get(0);
-                Collections.shuffle(songList);
-                int position = getPositionOfSong(song);
-                if (position > 1)
-                    Collections.swap(songList, getPositionOfSong(song), 0);
-            }
-            setLastSong();
+            setSongPosAndNotifyActivity(0);
+            shuffleListIfRandom();
+            saveSongAsLast();
         }
-        if(player.isPlaying())
+        if(mediaPlayer.isPlaying())
             playSong();
     }
 
-    private int getPositionOfSong(Song song){
+    private void shuffleListIfRandom(){
+        if(random) {
+            Song song = songList.get(0);
+            Collections.shuffle(songList);
+            int position = getRealPositionOfSong(song);
+            if (position > 1)
+                Collections.swap(songList, getRealPositionOfSong(song), 0);
+        }
+    }
+
+    private int getRealPositionOfSong(Song song){
         for(int i =0; i<songList.size(); i++){
             Song songFromList = songList.get(i);
             if(songFromList.getPath().equals(song.getPath()))
@@ -252,32 +270,16 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     public void playPreviousSong(){
         if(songPos!=0) {
-            setSongPosAndNotify(songPos-1);
-            setLastSong();
+            setSongPosAndNotifyActivity(songPos-1);
+            saveSongAsLast();
         }
-        if(player.isPlaying())
+        if(mediaPlayer.isPlaying())
             playSong();
     }
 
-    private void setLastSong(){
+    private void saveSongAsLast(){
         Song playSong = songList.get(songPos);
         songDao.changeLatestMusic(playSong);
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        setSongPosAndNotify(0);
-        player = new MediaPlayer();
-        initMediaPlayer();
-    }
-
-    public void initMediaPlayer(){
-        player.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        player.setOnPreparedListener(this);
-        player.setOnCompletionListener(this);
-        player.setOnErrorListener(this);
     }
 
     public ArrayList<Song> getSongList() {
@@ -289,11 +291,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     public void setLists(ArrayList<Song> songList, boolean random){
-        ArrayList<Song> notShuffledList = (ArrayList<Song>)songList.clone();
-        ArrayList<Song> shuffledList = (ArrayList<Song>)songList.clone();
+        notShuffledList = (ArrayList<Song>)songList.clone();
+        shuffledList = (ArrayList<Song>)songList.clone();
         Collections.shuffle(shuffledList);
-        this.notShuffledList = notShuffledList;
-        this.shuffledList = shuffledList;
 
         if(random)
             this.songList = shuffledList;

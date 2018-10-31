@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
@@ -61,57 +60,71 @@ public class MusicListData {
         return songList;
     }
 
-    public ArrayList<SongList> getArtistList(){
-        ArrayList<SongList> songListArrayList = new ArrayList<>();
-        ArrayList<Song> songArrayList = getSongList();
-        boolean added;
+    private ArrayList<SongList> songListArrayList;
+    private boolean added;
 
-        for(Song song: songArrayList){
-            added = false;
-            if(songListArrayList.size()!=0){
-                for(SongList songList : songListArrayList){
-                    if(songList.getTitle().equals(song.getArtist())){
-                        songList.addSong(song);
-                        added = true;
-                    }
-                }
-                if(!added){
-                    SongList songList = new SongList();
-                    songList.setTitle(song.getArtist());
-                    songList.addSong(song);
-                    songListArrayList.add(songList);
-                }
-            }else{
-                SongList songList = new SongList();
-                songList.setTitle(song.getArtist());
-                songList.addSong(song);
-                songListArrayList.add(songList);
-            }
-        }
+    public ArrayList<SongList> getArtistList(){
+        songListArrayList = new ArrayList<>();
+        fillTheSongListArrayList();
         Collections.sort(songListArrayList);
         Collections.reverse(songListArrayList);
         return songListArrayList;
     }
 
+    private void fillTheSongListArrayList(){
+        for(Song song: getSongList()){
+            added = false;
+            if(songListArrayList.size()!=0){
+                checkSongListExitsAndAddSong(song);
+                if(!added)
+                    addNewSongListToArrayList(song);
+            }else{
+                addNewSongListToArrayList(song);
+            }
+        }
+    }
+
+    private void checkSongListExitsAndAddSong(Song song){
+        for(SongList songList : songListArrayList){
+            if(songList.getTitle().equals(song.getArtist())){
+                songList.addSong(song);
+                added = true;
+            }
+        }
+    }
+
+    private void addNewSongListToArrayList(Song song){
+        SongList songList = new SongList();
+        songList.setTitle(song.getArtist());
+        songList.addSong(song);
+        songListArrayList.add(songList);
+    }
+
+
+    private ArrayList<Song> songsAvailable;
+    private boolean available;
+
     public SongList getSongsAvailableToAdd(SongList songList){
-        ArrayList<Song> songsAvailable = new ArrayList<>();
-        boolean available;
+        songsAvailable = new ArrayList<>();
+        fillTheAvailableSongsList(songList);
+        return new SongList(songsAvailable, songList.getTitle(), songList.getKey());
+    }
+
+    private void fillTheAvailableSongsList(SongList songList){
         for(Song song: getSongList()){
             available = true;
-            for(int i =0; i<songList.getSongList().size(); i++){
-                if(song.getPath().equals(songList.getSongList().get(i).getPath())){
-                    available = false;
-                }
-            }
-            Log.d("available", available + "");
+            checkSongListHasSong(song, songList);
             if(available)
                 songsAvailable.add(song);
         }
-        SongList newSongList = new SongList();
-        newSongList.setTitle(songList.getTitle());
-        newSongList.setKey(songList.getKey());
-        newSongList.setSongList(songsAvailable);
-        return newSongList;
+    }
+
+    private void checkSongListHasSong(Song song, SongList songList){
+        for(int i =0; i<songList.getSongList().size(); i++){
+            if(song.getPath().equals(songList.getSongList().get(i).getPath())){
+                available = false;
+            }
+        }
     }
 
     public SongList getArtistSongList(String artist){

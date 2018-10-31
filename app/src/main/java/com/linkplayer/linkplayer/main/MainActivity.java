@@ -1,19 +1,15 @@
 package com.linkplayer.linkplayer.main;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -183,9 +179,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             mainPresenter.setMusicService(musicService);
             mainPresenter.getPreferencesAndSetButtons();
             if(!random)
-                musicService.setSongPosAndNotify(mainPresenter.getLatestSong());
+                musicService.setSongPosAndNotifyActivity(mainPresenter.getLatestSong());
             else
-                musicService.setTargetRandomSong(mainPresenter.getLatestSong());
+                musicService.setTargetRandomSongTruePosition(mainPresenter.getLatestSong());
             musicBound = true;
         }
 
@@ -236,9 +232,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private void setSongPosIfRandom(int position){
         if(random)
-            musicService.setTargetRandomSong(position);
+            musicService.setTargetRandomSongTruePosition(position);
         else
-            musicService.setSongPosAndNotify(position);
+            musicService.setSongPosAndNotifyActivity(position);
     }
 
     public void refreshService(SongList songList){
@@ -247,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         SongList realSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(),
                 songList.getTitle(), songList.getKey());
         musicService.setLists(realSongList.getSongList(), random);
-        musicService.setSongPosAndNotify(musicService.getSongPos());
+        musicService.setSongPosAndNotifyActivity(musicService.getSongPos());
     }
 
     public void notifyAllData(int position, Song song){
@@ -283,15 +279,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 setTitleAndSong();
             }
         }else{
-            musicService.setSongPosAndNotify(musicService.getSongPos());
+            musicService.setSongPosAndNotifyActivity(musicService.getSongPos());
         }
     }
 
     private void setPositionIfItIsPossible(int position){
         if (position > 0) {
-            musicService.setSongPosAndNotify(position - 1);
+            musicService.setSongPosAndNotifyActivity(position - 1);
         } else if (musicService.getSongList().size() - 1 > position) {
-            musicService.setSongPosAndNotify(position + 1);
+            musicService.setSongPosAndNotifyActivity(position + 1);
         }
     }
 

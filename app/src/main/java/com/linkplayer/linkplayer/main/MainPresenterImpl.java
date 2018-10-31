@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.data.MusicListData;
@@ -145,9 +144,9 @@ public class MainPresenterImpl implements MainPresenter{
                 musicService.setLists(songList.getSongList(), random);
 
                 if(random)
-                    musicService.setTargetRandomSong(data.getIntExtra("position", 0));
+                    musicService.setTargetRandomSongTruePosition(data.getIntExtra("position", 0));
                 else
-                    musicService.setSongPosAndNotify(data.getIntExtra("position", 0));
+                    musicService.setSongPosAndNotifyActivity(data.getIntExtra("position", 0));
                 musicService.playSong();
                 mainView.setPagerCurrentItem(3);
                 mainView.showIsPlaying();
