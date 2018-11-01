@@ -24,7 +24,6 @@ public class MusicListData {
     }
 
     public ArrayList<Song> getSongList() {
-
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         ArrayList<Song> songList = new ArrayList<>();
         ContentResolver musicResolver = context.getContentResolver();
@@ -56,8 +55,7 @@ public class MusicListData {
     }
 
     public SongList getAllMusicSongList(){
-        SongList songList = new SongList(getSongList(), ALL_MUSIC_SONGLIST, 0);
-        return songList;
+        return new SongList(getSongList(), ALL_MUSIC_SONGLIST, 0);
     }
 
     private ArrayList<SongList> songListArrayList;

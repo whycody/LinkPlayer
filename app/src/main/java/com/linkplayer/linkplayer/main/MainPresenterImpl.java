@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.data.MusicListData;
@@ -96,8 +97,8 @@ public class MainPresenterImpl implements MainPresenter{
 
     @Override
     public String getTitle() {
-        String title = songDao.getLatestMusic().getTitle();
-        String author = songDao.getLatestMusic().getArtist();
+        String title = songDao.getLatestSong().getTitle();
+        String author = songDao.getLatestSong().getArtist();
         if (!author.equals("<unknown>")) {
             return author + " - " + title;
         } else {
@@ -108,7 +109,7 @@ public class MainPresenterImpl implements MainPresenter{
     @Override
     public int getLatestSong() {
         for(int i =0; i<songList.size(); i++){
-            if(songList.get(i).getId()==songDao.getLatestMusic().getId()){
+            if(songList.get(i).getId()==songDao.getLatestSong().getId()){
                 return i;
             }
         }

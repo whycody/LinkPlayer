@@ -279,7 +279,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     private void saveSongAsLast(){
         Song playSong = songList.get(songPos);
-        songDao.changeLatestMusic(playSong);
+        songDao.changeLatestSong(playSong);
     }
 
     public ArrayList<Song> getSongList() {
@@ -295,6 +295,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         shuffledList = (ArrayList<Song>)songList.clone();
         Collections.shuffle(shuffledList);
 
+        Log.d("GutenTag", "a");
         if(random)
             this.songList = shuffledList;
         else
