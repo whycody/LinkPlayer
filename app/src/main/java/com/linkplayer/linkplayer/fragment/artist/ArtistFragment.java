@@ -18,28 +18,32 @@ import com.linkplayer.linkplayer.model.SongList;
 public class ArtistFragment extends Fragment implements ArtistFragmentView{
 
     private ArtistPresenterImpl artistPresenter;
-    private ArtistRecyclerAdapter recyclerAdapter;
+    private ArtistRecyclerAdapter artistAdapter;
+    private MusicListData musicListData;
     private RecyclerView artistRecycler;
-    int latestSong;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_artist, container, false);
 
+        musicListData = new MusicListData(getActivity());
         artistRecycler = view.findViewById(R.id.artist_recycler);
         artistPresenter = new ArtistPresenterImpl(new MusicListData(getActivity()).getArtistList(), this, getActivity());
-        recyclerAdapter = new ArtistRecyclerAdapter(getActivity(), artistPresenter);
-        artistRecycler.setAdapter(recyclerAdapter);
+        artistAdapter = new ArtistRecyclerAdapter(getActivity(), artistPresenter);
+        artistRecycler.setAdapter(artistAdapter);
         artistRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         artistRecycler.addItemDecoration(new LinearVerticalSpacing(6));
 
         return view;
     }
 
-
     @Override
     public void notifyItemChanged(int position, SongList songList) {
         artistPresenter.getArtistSongList().set(position, songList);
+    }
+
+    public void refreshData(){
+        artistAdapter.setArtistSongList(new MusicListData(getActivity()).getArtistList());
     }
 }

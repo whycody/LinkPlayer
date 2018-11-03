@@ -73,11 +73,11 @@
         android:layout_width="match_parent"
         android:layout_height="20dp"
         android:background="@drawable/shadow"
-        app:layout_anchor="@+id/linearLayout3"
+        app:layout_anchor="@+id/constraintBottomSheet"
         app:layout_anchorGravity="top|center" />
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/linearLayout3"
+        android:id="@+id/constraintBottomSheet"
         android:layout_width="match_parent"
         android:layout_height="160dp"
         android:background="@drawable/gradient_dark_gray"

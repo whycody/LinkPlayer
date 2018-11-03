@@ -9,12 +9,16 @@ import android.content.ServiceConnection;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.os.IBinder;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -27,6 +31,8 @@ import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongListDao;
+import com.linkplayer.linkplayer.dialog.fragments.DeleteSongDialogFragment;
+import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
 import com.linkplayer.linkplayer.fragment.artist.ArtistFragment;
 import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 import com.linkplayer.linkplayer.fragment.now.NowFragment;
@@ -39,7 +45,8 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView{
+public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView,
+        DeleteSongInformator{
 
     private Toolbar mainToolbar;
     private TabLayout mainTabLayout;
@@ -48,18 +55,20 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private TextView musicTitleView;
     private ImageButton playSongBtn, backSongBtn, nextSongBtn, randomMusicBtn, repeatMusicBtn;
     private CircleImageView playlistCircle, bellCircle, shareCircle, trashCircle;
+    private ConstraintLayout constraintBottomSheet;
+    private BottomSheetBehavior bottomSheetBehavior;
     private MainPresenter mainPresenter;
 
     private MediaPlayerService musicService;
 
     private Intent playIntent;
     private Song showedSong;
-    private boolean musicBound = false;
     private boolean repeat = false;
     private boolean random = false;
     private MusicFragment musicFragment;
     private NowFragment nowFragment;
     private PlaylistFragment playlistFragment;
+    private ArtistFragment artistFragment;
     private SongListDao songListDao;
 
     @Override
@@ -80,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         bellCircle = findViewById(R.id.bell_circle);
         shareCircle = findViewById(R.id.share_circle);
         trashCircle = findViewById(R.id.trash_circle);
+        constraintBottomSheet = findViewById(R.id.constraintBottomSheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(constraintBottomSheet);
         mainPresenter = new MainPresenterImpl(MainActivity.this, MainActivity.this);
         songListDao = new SongListDao(this);
 
@@ -88,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         nextSongBtn.setOnClickListener(playNextSongOnClick);
         randomMusicBtn.setOnClickListener(setRandomMusicModeOnClick);
         repeatMusicBtn.setOnClickListener(setRepeatMusicModeOnClick);
+        trashCircle.setOnClickListener(deleteSongOnClick);
 
         Glide.with(this).load(R.drawable.back2_white).into(backSongBtn);
         Glide.with(this).load(R.drawable.back2_white).into(nextSongBtn);
@@ -152,7 +164,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
-            this.moveTaskToBack(true);
+            if(bottomSheetBehavior.getState()== BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            } else
+                this.moveTaskToBack(true);
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -182,12 +197,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 musicService.setSongPosAndNotifyActivity(mainPresenter.getLatestSong());
             else
                 musicService.setTargetRandomSongTruePosition(mainPresenter.getLatestSong());
-            musicBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            musicBound = false;
+
         }
     };
 
@@ -239,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     public void refreshService(SongList songList){
         if(nowFragment!=null)
-            nowFragment.refresh();
+            nowFragment.refreshData();
         SongList realSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(),
                 songList.getTitle(), songList.getKey());
         musicService.setLists(realSongList.getSongList(), random);
@@ -250,13 +264,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         ArrayList<Song> songList = getSongListAvailable();
         checkIsMusicServiceIsPlayingDeletedSong(position, song);
         musicService.setLists(songList, random);
-        mainPresenter.notifyAllData();
+//        mainPresenter.notifyAllData();
     }
 
     public void notifySongAddedToPlaylist(){
         if(nowFragment!=null && playlistFragment!=null) {
-            nowFragment.refresh();
-            playlistFragment.refresh();
+            nowFragment.refreshData();
+            playlistFragment.refreshData();
         }
         refreshService(songListDao.getLatestSongList());
     }
@@ -296,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         musicFragment = tabsPagerAdapter.getMusicFragment();
         nowFragment = tabsPagerAdapter.getNowFragment();
         playlistFragment = tabsPagerAdapter.getPlaylistFragment();
+        artistFragment = tabsPagerAdapter.getArtistFragment();
         notifyMusicFragmentIfNotNull(lastPosition, position);
         notifyNowFragmentIfNotNull(lastPosition, position);
     }
@@ -387,6 +402,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         }
     };
 
+    private View.OnClickListener deleteSongOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            DeleteSongDialogFragment dialogFragment = new DeleteSongDialogFragment();
+            dialogFragment.setInformator(MainActivity.this);
+            dialogFragment.setSong(showedSong);
+            dialogFragment.setPosition(musicService.getSongPos());
+            dialogFragment.show(getFragmentManager(), "DeleteSongDialogFragment");
+        }
+    };
+
     @Override
     public void showRandomIsChosed(){
         randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorYellow),
@@ -450,5 +476,16 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public MusicFragment getMusicFragment() {
         return tabsPagerAdapter.getMusicFragment();
+    }
+
+    @Override
+    public void notifySongDeleted(int position, boolean deleted) {
+        if(deleted) {
+            notifyAllData(nowFragment.getPosition(), showedSong);
+            nowFragment.refreshData();
+            musicFragment.refreshData();
+            artistFragment.refreshData();
+            playlistFragment.refreshData();
+        }
     }
 }

@@ -49,6 +49,10 @@ public class ArtistPresenterImpl {
         return artistSongList.size();
     }
 
+    public void setArtistSongList(ArrayList<SongList> artistSongList){
+        this.artistSongList = artistSongList;
+    }
+
     public ArrayList<SongList> getArtistSongList() {
         return artistSongList;
     }

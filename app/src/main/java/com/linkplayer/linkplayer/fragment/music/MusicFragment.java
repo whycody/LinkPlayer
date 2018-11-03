@@ -5,11 +5,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
@@ -21,7 +19,6 @@ import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
-import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 
 import java.util.ArrayList;
 
@@ -112,14 +109,14 @@ public class MusicFragment extends Fragment implements MusicFragmentView, Delete
     @Override
     public void notifyItemDeleted(int position) {
         NowFragment nowFragment = ((MainActivity)getActivity()).getNowFragment();
-        nowFragment.refresh();
+        nowFragment.refreshData();
         ((MainActivity)getActivity()).notifyAllData(nowFragment.getPosition(), songList.get(position));
         songList.remove(position);
         recyclerAdapter.notifyItemRemoved(position);
         recyclerAdapter.notifyItemRangeChanged(position, songList.size());
     }
 
-    public void recreateList(){
+    public void refreshData(){
         songList = musicListData.getSongList();
         recyclerAdapter.setSongArrayList(songList);
         recyclerAdapter.notifyDataSetChanged();

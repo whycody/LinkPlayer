@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.data.MusicListData;
@@ -159,7 +158,7 @@ public class MainPresenterImpl implements MainPresenter{
 
     private void notifyMusicFragment() {
         MusicFragment musicFragment = mainView.getMusicFragment();
-        musicFragment.recreateList();
+        musicFragment.refreshData();
     }
 
     private void notifyFragments(String type, SongList songList){
@@ -251,7 +250,7 @@ public class MainPresenterImpl implements MainPresenter{
     private void refreshNowFragment(int position, SongList songList){
         NowFragment nowFragment = mainView.getNowFragment();
         if(nowFragment!=null) {
-            nowFragment.refresh();
+            nowFragment.refreshData();
         }
     }
 

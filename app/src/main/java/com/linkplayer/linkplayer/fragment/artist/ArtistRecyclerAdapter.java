@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.model.SongList;
+
+import java.util.ArrayList;
 
 public class ArtistRecyclerAdapter extends RecyclerView.Adapter<ArtistRecyclerHolder> {
 
@@ -36,5 +39,10 @@ public class ArtistRecyclerAdapter extends RecyclerView.Adapter<ArtistRecyclerHo
     @Override
     public int getItemCount() {
         return artistPresenter.getArtistRowsCount();
+    }
+
+    public void setArtistSongList(ArrayList<SongList> artistSongList){
+        artistPresenter.setArtistSongList(artistSongList);
+        notifyDataSetChanged();
     }
 }

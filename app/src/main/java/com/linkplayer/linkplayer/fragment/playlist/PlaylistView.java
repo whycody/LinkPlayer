@@ -5,5 +5,5 @@ public interface PlaylistView {
 
     void notifyItemDeleted(int position);
 
-    void refresh();
+    void refreshData();
 }
