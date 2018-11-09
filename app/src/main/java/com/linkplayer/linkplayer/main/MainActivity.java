@@ -63,8 +63,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private Intent playIntent;
     private Song showedSong;
-    private boolean repeat = false;
-    private boolean random = false;
+    private boolean repeat, random = false;
     private MusicFragment musicFragment;
     private NowFragment nowFragment;
     private PlaylistFragment playlistFragment;
@@ -264,7 +263,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         ArrayList<Song> songList = getSongListAvailable();
         checkIsMusicServiceIsPlayingDeletedSong(position, song);
         musicService.setLists(songList, random);
-//        mainPresenter.notifyAllData();
+        notifyAllFragments();
+    }
+
+    public void notifyAllFragments(){
+        nowFragment.refreshData();
+        musicFragment.refreshData();
+        artistFragment.refreshData();
+        playlistFragment.refreshData();
     }
 
     public void notifySongAddedToPlaylist(){
@@ -331,7 +337,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         }
     }
 
-    private void setTitleAndSong() {
+    @Override
+    public void setTitleAndSong() {
         musicTitleView.setText(mainPresenter.getTitle());
         if(musicService!=null)
             showedSong = musicService.getSong();
@@ -482,10 +489,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void notifySongDeleted(int position, boolean deleted) {
         if(deleted) {
             notifyAllData(nowFragment.getPosition(), showedSong);
-            nowFragment.refreshData();
-            musicFragment.refreshData();
-            artistFragment.refreshData();
-            playlistFragment.refreshData();
         }
     }
 }

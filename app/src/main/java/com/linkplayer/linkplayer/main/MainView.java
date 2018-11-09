@@ -24,6 +24,8 @@ public interface MainView {
 
     void showIsStopped();
 
+    void setTitleAndSong();
+
     void setPagerCurrentItem(int position);
 
     NowFragment getNowFragment();
