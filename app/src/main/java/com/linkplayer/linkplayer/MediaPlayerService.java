@@ -87,6 +87,8 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             Collections.shuffle(songList);
         if(songPos<songList.size()-1 || repeat)
             playNextSongAutomatically();
+        else
+            refreshView.notifyTheLastSongPlayed();
     }
 
     private void playNextSongAutomatically(){

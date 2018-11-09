@@ -319,6 +319,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         artistFragment = tabsPagerAdapter.getArtistFragment();
         notifyMusicFragmentIfNotNull(lastPosition, position);
         notifyNowFragmentIfNotNull(lastPosition, position);
+    @Override
+    public void notifyTheLastSongPlayed() {
+        showIsStopped();
     }
 
     private void notifyMusicFragmentIfNotNull(int lastPosition, int position){
