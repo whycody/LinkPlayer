@@ -319,6 +319,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         artistFragment = tabsPagerAdapter.getArtistFragment();
         notifyMusicFragmentIfNotNull(lastPosition, position);
         notifyNowFragmentIfNotNull(lastPosition, position);
+        setTitleAndSong();
+    }
+
     @Override
     public void notifyTheLastSongPlayed() {
         showIsStopped();
@@ -342,9 +345,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public void setTitleAndSong() {
-        musicTitleView.setText(mainPresenter.getTitle());
-        if(musicService!=null)
+        if(musicService!=null) {
             showedSong = musicService.getSong();
+            musicTitleView.setText(showedSong.getTitle());
+        }
     }
 
     private View.OnClickListener pauseOnClick = new View.OnClickListener() {
@@ -380,8 +384,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private void playNextSong(){
         musicService.playNextSong();
-        setTitleAndSong();
-
     }
 
     private View.OnClickListener playPreviousSongOnClick = new View.OnClickListener() {
@@ -393,7 +395,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private void playPreviousSong(){
         musicService.playPreviousSong();
-        setTitleAndSong();
     }
 
     private View.OnClickListener setRandomMusicModeOnClick = new View.OnClickListener() {
