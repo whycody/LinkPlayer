@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.data.MusicListData;
+import com.linkplayer.linkplayer.data.SharedPrefDao;
 import com.linkplayer.linkplayer.data.SongDao;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.fragment.artist.ArtistFragment;
@@ -25,9 +26,10 @@ public class MainPresenterImpl implements MainPresenter{
     private MediaPlayerService musicService;
     private MainView mainView;
 
-    private final String PREFERENCES = "preferences";
+    private final String RANDOM = "random";
+    private final String REPEAT = "repeat";
     private boolean random, repeat = false;
-    private SharedPreferences sharedPreferences;
+    private SharedPrefDao sharedPrefDao;
     private ArrayList<Song> songList;
     private ArrayList<SongList> artistSongLists, playlistSongLists;
     private SongListDao songListDao;
@@ -38,8 +40,8 @@ public class MainPresenterImpl implements MainPresenter{
         this.context = context;
         this.mainView = mainView;
         songDao = new SongDao(context);
+        sharedPrefDao = new SharedPrefDao(context);
         songListDao = new SongListDao(context);
-        sharedPreferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         songList = songListDao.getLatestSongList().getSongList();
         artistSongLists = new MusicListData(context).getArtistList();
         playlistSongLists = songListDao.getAllTheSongLists();
@@ -48,8 +50,8 @@ public class MainPresenterImpl implements MainPresenter{
 
     @Override
     public void getPreferencesAndSetButtons() {
-        random = sharedPreferences.getBoolean("random", false);
-        repeat = sharedPreferences.getBoolean("repeat", false);
+        random = sharedPrefDao.getBooleanValue(RANDOM);
+        repeat = sharedPrefDao.getBooleanValue(REPEAT);
 
         mainView.setSettings(random, repeat);
         saveRandomPreferences(random);
@@ -58,6 +60,7 @@ public class MainPresenterImpl implements MainPresenter{
 
     @Override
     public void saveRandomPreferences(boolean random){
+        this.random = random;
         songList = songListDao.getLatestSongList().getSongList();
         if(musicService.getSongList()==null)
             musicService.setLists(songList, true);
@@ -77,6 +80,7 @@ public class MainPresenterImpl implements MainPresenter{
 
     @Override
     public void saveRepeatReferences(boolean repeat){
+        this.repeat = repeat;
         if(repeat)
             mainView.showRepeatIsChosed();
         else
@@ -104,10 +108,8 @@ public class MainPresenterImpl implements MainPresenter{
 
     @Override
     public void saveSettingsInPreferences(boolean random, boolean repeat) {
-        SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
-        preferencesEditor.putBoolean("random", random);
-        preferencesEditor.putBoolean("repeat", repeat);
-        preferencesEditor.apply();
+        sharedPrefDao.saveBooleanValue(RANDOM, random);
+        sharedPrefDao.saveBooleanValue(REPEAT, repeat);
     }
 
     @Override
