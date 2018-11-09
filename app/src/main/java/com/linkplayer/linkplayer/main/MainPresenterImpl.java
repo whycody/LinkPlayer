@@ -18,7 +18,6 @@ import com.linkplayer.linkplayer.model.SongList;
 import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class MainPresenterImpl implements MainPresenter{
 
@@ -27,17 +26,12 @@ public class MainPresenterImpl implements MainPresenter{
     private MainView mainView;
 
     private final String PREFERENCES = "preferences";
-    private boolean random = false;
-    private boolean repeat = false;
+    private boolean random, repeat = false;
     private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor preferencesEditor;
-    private MusicListData musicListData;
-    private SongDao songDao;
-    private SongListDao songListDao;
     private ArrayList<Song> songList;
-    private ArrayList<Song> shuffledSongList;
-    private ArrayList<SongList> artisSongLists;
-    private ArrayList<SongList> playlistSongLists;
+    private ArrayList<SongList> artistSongLists, playlistSongLists;
+    private SongListDao songListDao;
+    private SongDao songDao;
 
 
     public MainPresenterImpl(Context context, MainView mainView){
@@ -46,11 +40,8 @@ public class MainPresenterImpl implements MainPresenter{
         songDao = new SongDao(context);
         songListDao = new SongListDao(context);
         sharedPreferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        musicListData = new MusicListData(context);
         songList = songListDao.getLatestSongList().getSongList();
-        shuffledSongList = songListDao.getLatestSongList().getSongList();
-        Collections.shuffle(shuffledSongList);
-        artisSongLists = musicListData.getArtistList();
+        artistSongLists = new MusicListData(context).getArtistList();
         playlistSongLists = songListDao.getAllTheSongLists();
 
     }
@@ -79,17 +70,17 @@ public class MainPresenterImpl implements MainPresenter{
             musicService.setLists(songList, false);
             mainView.showRandomIsNotChosed();
         }
+        mainView.setTitleAndSong();
         musicService.setOptionsRandomRepeat(random, repeat);
         saveSettingsInPreferences(random, repeat);
     }
 
     @Override
     public void saveRepeatReferences(boolean repeat){
-        if(repeat){
+        if(repeat)
             mainView.showRepeatIsChosed();
-        }else {
+        else
             mainView.showRepeatIsNotChosed();
-        }
         musicService.setOptionsRandomRepeat(random, repeat);
         saveSettingsInPreferences(random, repeat);
     }
@@ -98,19 +89,14 @@ public class MainPresenterImpl implements MainPresenter{
     public String getTitle() {
         String title = songDao.getLatestSong().getTitle();
         String author = songDao.getLatestSong().getArtist();
-        if (!author.equals("<unknown>")) {
-            return author + " - " + title;
-        } else {
-            return title;
-        }
+        return author.equals("<unkown>") ? author + " - " + title : title;
     }
 
     @Override
     public int getLatestSong() {
         for(int i =0; i<songList.size(); i++){
-            if(songList.get(i).getId()==songDao.getLatestSong().getId()){
+            if(songList.get(i).getId()==songDao.getLatestSong().getId())
                 return i;
-            }
         }
         return 0;
     }
@@ -118,7 +104,7 @@ public class MainPresenterImpl implements MainPresenter{
 
     @Override
     public void saveSettingsInPreferences(boolean random, boolean repeat) {
-        preferencesEditor = sharedPreferences.edit();
+        SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
         preferencesEditor.putBoolean("random", random);
         preferencesEditor.putBoolean("repeat", repeat);
         preferencesEditor.apply();
@@ -135,93 +121,19 @@ public class MainPresenterImpl implements MainPresenter{
             String type = "none";
             SongList songList = null;
             if(resultCode == Activity.RESULT_OK){
-                notifyMusicFragment();
+                int position = data.getIntExtra("position", 0);
                 type = data.getStringExtra("type");
                 songList = getSongListByType(type, data);
                 songListDao.changeLatestSongList(songList);
-
-                refreshNowFragment(data.getIntExtra("position", 0), songList);
                 musicService.setLists(songList.getSongList(), random);
-
-                if(random)
-                    musicService.setTargetRandomSongTruePosition(data.getIntExtra("position", 0));
-                else
-                    musicService.setSongPosAndNotifyActivity(data.getIntExtra("position", 0));
+                refreshMusicFragment();
+                refreshNowFragment();
+                setSongPos(random, position);
                 musicService.playSong();
                 mainView.setPagerCurrentItem(3);
                 mainView.showIsPlaying();
             }
-
             notifyFragments(type, songList);
-        }
-    }
-
-    private void notifyMusicFragment() {
-        MusicFragment musicFragment = mainView.getMusicFragment();
-        musicFragment.refreshData();
-    }
-
-    private void notifyFragments(String type, SongList songList){
-        switch (type) {
-            case PlaylistViewActivity.ARTIST_TYPE:
-                notifyArtistFragment(songList);
-                break;
-            case PlaylistViewActivity.PLAYLIST_TYPE:
-                notifyPlaylistFragment(songList);
-                break;
-            default:
-                notifyAllData();
-                break;
-        }
-    }
-
-    private void notifyArtistFragment(SongList songList){
-        int position = 0;
-        ArtistFragment artistFragment = mainView.getArtistFragment();
-        if(artistFragment!=null) {
-            for (int i = 0; i < artisSongLists.size(); i++) {
-                if (artisSongLists.get(i).getTitle().equals(songList.getTitle()))
-                    position = i;
-            }
-            artistFragment.notifyItemChanged(position, songList);
-        }
-    }
-
-    private void notifyPlaylistFragment(SongList songList) {
-        int position = 0;
-        PlaylistFragment playlistFragment = mainView.getPlaylistFragment();
-        if(playlistFragment!=null) {
-            for (int i = 0; i < playlistSongLists.size(); i++) {
-                if (playlistSongLists.get(i).getKey() == songList.getKey())
-                    position = i;
-            }
-            playlistFragment.notifyItemChanged(songList, position);
-        }
-    }
-
-    @Override
-    public void notifyAllData() {
-        notifyArtistFragmentWithoutPosition();
-        notifyPlaylistFragmentWithoutPosition();
-    }
-
-    private void notifyArtistFragmentWithoutPosition(){
-        ArtistFragment artistFragment = mainView.getArtistFragment();
-        artisSongLists = musicListData.getArtistList();
-        if(artistFragment!=null) {
-            for (int i = 0; i < artisSongLists.size(); i++) {
-                artistFragment.notifyItemChanged(i, artisSongLists.get(i));
-            }
-        }
-    }
-
-    private void notifyPlaylistFragmentWithoutPosition(){
-        PlaylistFragment playlistFragment = mainView.getPlaylistFragment();
-        playlistSongLists = songListDao.getAllTheSongLists();
-        if(playlistFragment!=null) {
-            for (int i = 0; i < playlistSongLists.size(); i++) {
-                playlistFragment.notifyItemChanged(playlistSongLists.get(i), i);
-            }
         }
     }
 
@@ -243,17 +155,83 @@ public class MainPresenterImpl implements MainPresenter{
     }
 
     private SongList getPlaylistSongList(int key){
-        SongList songList = songListDao.getSongListWithKey(key);
-        return songList;
+        return songListDao.getSongListWithKey(key);
     }
 
-    private void refreshNowFragment(int position, SongList songList){
+    private void refreshMusicFragment() {
+        MusicFragment musicFragment = mainView.getMusicFragment();
+        musicFragment.refreshData();
+    }
+
+    private void refreshNowFragment(){
         NowFragment nowFragment = mainView.getNowFragment();
-        if(nowFragment!=null) {
-            nowFragment.refreshData();
+        nowFragment.refreshData();
+    }
+
+    private void setSongPos(boolean random, int position){
+        if(random)
+            musicService.setTargetRandomSongTruePosition(position);
+        else
+            musicService.setSongPosAndNotifyActivity(position);
+    }
+
+    private void notifyFragments(String type, SongList songList){
+        switch (type) {
+            case PlaylistViewActivity.ARTIST_TYPE:
+                refreshArtistFragment(songList);
+                break;
+            case PlaylistViewActivity.PLAYLIST_TYPE:
+                refreshPlaylistFragment(songList);
+                break;
+            default:
+                refreshAllData();
+                break;
         }
     }
 
+    private void refreshArtistFragment(SongList songList){
+        int position = 0;
+        ArtistFragment artistFragment = mainView.getArtistFragment();
+        if(artistFragment!=null) {
+            for (int i = 0; i < artistSongLists.size(); i++) {
+                if (artistSongLists.get(i).getTitle().equals(songList.getTitle())) {
+                    position = i;
+                    break;
+                }
+            }
+            artistFragment.notifyItemChanged(position, songList);
+        }
+    }
+
+    private void refreshPlaylistFragment(SongList songList) {
+        int position = 0;
+        PlaylistFragment playlistFragment = mainView.getPlaylistFragment();
+        if(playlistFragment!=null) {
+            for (int i = 0; i < playlistSongLists.size(); i++) {
+                if (playlistSongLists.get(i).getKey() == songList.getKey()) {
+                    position = i;
+                    break;
+                }
+            }
+            playlistFragment.notifyItemChanged(songList, position);
+        }
+    }
+
+    @Override
+    public void refreshAllData() {
+        refreshArtistFragmentWithoutPosition();
+        refreshPlaylistFragmentWithoutPosition();
+    }
+
+    private void refreshArtistFragmentWithoutPosition(){
+        ArtistFragment artistFragment = mainView.getArtistFragment();
+        artistFragment.refreshData();
+    }
+
+    private void refreshPlaylistFragmentWithoutPosition(){
+        PlaylistFragment playlistFragment = mainView.getPlaylistFragment();
+        playlistFragment.refreshData();
+    }
 
 
 }
