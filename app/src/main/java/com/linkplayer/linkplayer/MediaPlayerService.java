@@ -174,9 +174,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     public void notifyItemChanged(int position){
         if (lastSongPoisition < getSongList().size())
-            refreshView.notifyItemChanged(lastSongPoisition, position);
+            refreshView.notifySongChanged(lastSongPoisition, position);
         else
-            refreshView.notifyItemChanged(0, position);
+            refreshView.notifySongChanged(0, position);
         lastSongPoisition = songPos;
     }
 
@@ -305,7 +305,15 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     public void setOptionsRandomRepeat(boolean random, boolean repeat){
+        setRandom(random);
+        setRepeat(repeat);
+    }
+
+    public void setRandom(boolean random){
         this.random = random;
+    }
+
+    public void setRepeat(boolean repeat){
         this.repeat = repeat;
     }
 
