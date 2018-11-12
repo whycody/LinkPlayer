@@ -8,6 +8,8 @@ public interface MainPresenter {
 
     void saveSettingsInPreferences(boolean random, boolean repeat);
 
+    void initializeFragments();
+
     void getPreferencesAndSetButtons();
 
     void saveRandomPreferences(boolean random);
