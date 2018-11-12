@@ -12,13 +12,9 @@ public interface MainView {
 
     void setSettings(boolean random, boolean repeat);
 
-    void showRandomIsChosed();
+    void showRandomIsActive(boolean active);
 
-    void showRandomIsNotChosed();
-
-    void showRepeatIsChosed();
-
-    void showRepeatIsNotChosed();
+    void showRepeatIsActive(boolean active);
 
     void showIsPlaying();
 

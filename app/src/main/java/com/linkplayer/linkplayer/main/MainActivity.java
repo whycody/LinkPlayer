@@ -298,28 +298,33 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 setPositionIfItIsPossible(position);
                 setTitleAndSong();
             }
-        }else{
+        }else
             musicService.setSongPosAndNotifyActivity(musicService.getSongPos());
-        }
     }
 
     private void setPositionIfItIsPossible(int position){
-        if (position > 0) {
+        if (position > 0)
             musicService.setSongPosAndNotifyActivity(position - 1);
-        } else if (musicService.getSongList().size() - 1 > position) {
+        else if (musicService.getSongList().size() - 1 > position)
             musicService.setSongPosAndNotifyActivity(position + 1);
-        }
     }
 
     @Override
-    public void notifyItemChanged(int lastPosition, int position) {
-        musicFragment = tabsPagerAdapter.getMusicFragment();
-        nowFragment = tabsPagerAdapter.getNowFragment();
-        playlistFragment = tabsPagerAdapter.getPlaylistFragment();
-        artistFragment = tabsPagerAdapter.getArtistFragment();
+    public void notifySongChanged(int lastPosition, int position) {
+        initializeFragmentsIfNull();
         notifyMusicFragmentIfNotNull(lastPosition, position);
         notifyNowFragmentIfNotNull(lastPosition, position);
         setTitleAndSong();
+    }
+
+    private void initializeFragmentsIfNull(){
+        if(musicFragment==null){
+            musicFragment = tabsPagerAdapter.getMusicFragment();
+            nowFragment = tabsPagerAdapter.getNowFragment();
+            playlistFragment = tabsPagerAdapter.getPlaylistFragment();
+            artistFragment = tabsPagerAdapter.getArtistFragment();
+            mainPresenter.initializeFragments();
+        }
     }
 
     @Override
@@ -328,19 +333,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     private void notifyMusicFragmentIfNotNull(int lastPosition, int position){
-        if(musicFragment!=null) {
-            musicFragment.notifyItemChanged(lastPosition, position);
-            musicFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
-                    musicService.getSongList().get(position));
-        }
+        musicFragment.notifyItemChanged(lastPosition, position);
+        musicFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
+                musicService.getSongList().get(position));
     }
 
     private void notifyNowFragmentIfNotNull(int lastPosition, int position){
-        if(nowFragment!=null) {
-            nowFragment.notifyItemChanged(lastPosition, position);
-            nowFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
-                    musicService.getSongList().get(position));
-        }
+        nowFragment.notifyItemChanged(lastPosition, position);
+        nowFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
+                musicService.getSongList().get(position));
     }
 
     @Override
@@ -425,31 +426,23 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     };
 
     @Override
-    public void showRandomIsChosed(){
-        randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorYellow),
-                PorterDuff.Mode.MULTIPLY);
-        randomMusicBtn.setAlpha(1f);
+    public void showRandomIsActive(boolean choosed){
+        if(choosed)
+            randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this,
+                    R.color.colorYellow), PorterDuff.Mode.MULTIPLY);
+        else
+            randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this,
+                    android.R.color.white), PorterDuff.Mode.MULTIPLY);
     }
 
     @Override
-    public void showRandomIsNotChosed(){
-        randomMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, android.R.color.white),
-                PorterDuff.Mode.MULTIPLY);
-        randomMusicBtn.setAlpha(0.8f);
-    }
-
-    @Override
-    public void showRepeatIsChosed(){
-        repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorYellow),
-                PorterDuff.Mode.MULTIPLY);
-        repeatMusicBtn.setAlpha(1f);
-    }
-
-    @Override
-    public void showRepeatIsNotChosed(){
-        repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this, android.R.color.white),
-                PorterDuff.Mode.MULTIPLY);
-        repeatMusicBtn.setAlpha(0.8f);
+    public void showRepeatIsActive(boolean active){
+        if(active)
+            repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this,
+                    R.color.colorYellow), PorterDuff.Mode.MULTIPLY);
+        else
+            repeatMusicBtn.setColorFilter(ContextCompat.getColor(MainActivity.this,
+                    android.R.color.white), PorterDuff.Mode.MULTIPLY);
     }
 
     @Override
