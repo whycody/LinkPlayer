@@ -3,7 +3,6 @@ package com.linkplayer.linkplayer.main;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 
 import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.data.MusicListData;
@@ -35,6 +34,11 @@ public class MainPresenterImpl implements MainPresenter{
     private SongListDao songListDao;
     private SongDao songDao;
 
+    private MusicFragment musicFragment;
+    private ArtistFragment artistFragment;
+    private PlaylistFragment playlistFragment;
+    private NowFragment nowFragment;
+
 
     public MainPresenterImpl(Context context, MainView mainView){
         this.context = context;
@@ -45,7 +49,6 @@ public class MainPresenterImpl implements MainPresenter{
         songList = songListDao.getLatestSongList().getSongList();
         artistSongLists = new MusicListData(context).getArtistList();
         playlistSongLists = songListDao.getAllTheSongLists();
-
     }
 
     @Override
@@ -67,26 +70,22 @@ public class MainPresenterImpl implements MainPresenter{
         if(random) {
             musicService.setLists(songList, true);
             musicService.setSongPos(musicService.getTargetRandomSongTruePosition(musicService.getSongPos()));
-            mainView.showRandomIsChosed();
         }else {
             musicService.setSongPos(musicService.getRandomSongTruePosition(musicService.getSongPos()));
             musicService.setLists(songList, false);
-            mainView.showRandomIsNotChosed();
         }
         mainView.setTitleAndSong();
-        musicService.setOptionsRandomRepeat(random, repeat);
-        saveSettingsInPreferences(random, repeat);
+        musicService.setRandom(random);
+        mainView.showRandomIsActive(random);
+        saveRandomSettingInPreferences(random);
     }
 
     @Override
     public void saveRepeatReferences(boolean repeat){
         this.repeat = repeat;
-        if(repeat)
-            mainView.showRepeatIsChosed();
-        else
-            mainView.showRepeatIsNotChosed();
-        musicService.setOptionsRandomRepeat(random, repeat);
-        saveSettingsInPreferences(random, repeat);
+        mainView.showRepeatIsActive(repeat);
+        musicService.setRepeat(repeat);
+        saveRepeatSettingInPreferences(repeat);
     }
 
     @Override
@@ -105,10 +104,25 @@ public class MainPresenterImpl implements MainPresenter{
         return 0;
     }
 
-
     @Override
     public void saveSettingsInPreferences(boolean random, boolean repeat) {
+        saveRandomSettingInPreferences(random);
+        saveRepeatSettingInPreferences(repeat);
+    }
+
+    @Override
+    public void initializeFragments() {
+        musicFragment = mainView.getMusicFragment();
+        artistFragment = mainView.getArtistFragment();
+        playlistFragment = mainView.getPlaylistFragment();
+        nowFragment = mainView.getNowFragment();
+    }
+
+    private void saveRandomSettingInPreferences(boolean random){
         sharedPrefDao.saveBooleanValue(RANDOM, random);
+    }
+
+    private void saveRepeatSettingInPreferences(boolean repeat){
         sharedPrefDao.saveBooleanValue(REPEAT, repeat);
     }
 
@@ -117,26 +131,30 @@ public class MainPresenterImpl implements MainPresenter{
         this.musicService = musicService;
     }
 
+    private String typeOfPlaylist;
+    private SongList choosedSongList;
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode==1){
-            String type = "none";
-            SongList songList = null;
-            if(resultCode == Activity.RESULT_OK){
-                int position = data.getIntExtra("position", 0);
-                type = data.getStringExtra("type");
-                songList = getSongListByType(type, data);
-                songListDao.changeLatestSongList(songList);
-                musicService.setLists(songList.getSongList(), random);
-                refreshMusicFragment();
-                refreshNowFragment();
-                setSongPos(random, position);
-                musicService.playSong();
-                mainView.setPagerCurrentItem(3);
-                mainView.showIsPlaying();
-            }
-            notifyFragments(type, songList);
+            if(resultCode == Activity.RESULT_OK)
+                prepareAndPlaySongList(data);
+            notifyFragments(typeOfPlaylist, choosedSongList);
         }
+    }
+
+    private void prepareAndPlaySongList(Intent data){
+        int position = data.getIntExtra("position", 0);
+        typeOfPlaylist = data.getStringExtra("type");
+        choosedSongList = getSongListByType(typeOfPlaylist, data);
+        songListDao.changeLatestSongList(choosedSongList);
+        musicService.setLists(choosedSongList.getSongList(), random);
+        refreshMusicFragment();
+        refreshNowFragment();
+        setSongPos(random, position);
+        musicService.playSong();
+        mainView.setPagerCurrentItem(3);
+        mainView.showIsPlaying();
     }
 
     private SongList getSongListByType(String type, Intent data){
@@ -161,12 +179,10 @@ public class MainPresenterImpl implements MainPresenter{
     }
 
     private void refreshMusicFragment() {
-        MusicFragment musicFragment = mainView.getMusicFragment();
         musicFragment.refreshData();
     }
 
     private void refreshNowFragment(){
-        NowFragment nowFragment = mainView.getNowFragment();
         nowFragment.refreshData();
     }
 
@@ -193,47 +209,30 @@ public class MainPresenterImpl implements MainPresenter{
 
     private void refreshArtistFragment(SongList songList){
         int position = 0;
-        ArtistFragment artistFragment = mainView.getArtistFragment();
-        if(artistFragment!=null) {
-            for (int i = 0; i < artistSongLists.size(); i++) {
-                if (artistSongLists.get(i).getTitle().equals(songList.getTitle())) {
-                    position = i;
-                    break;
-                }
+        for (int i = 0; i < artistSongLists.size(); i++) {
+            if (artistSongLists.get(i).getTitle().equals(songList.getTitle())) {
+                position = i;
+                break;
             }
-            artistFragment.notifyItemChanged(position, songList);
         }
+        artistFragment.notifyItemChanged(position, songList);
     }
 
     private void refreshPlaylistFragment(SongList songList) {
         int position = 0;
-        PlaylistFragment playlistFragment = mainView.getPlaylistFragment();
-        if(playlistFragment!=null) {
-            for (int i = 0; i < playlistSongLists.size(); i++) {
-                if (playlistSongLists.get(i).getKey() == songList.getKey()) {
-                    position = i;
-                    break;
-                }
+        for (int i = 0; i < playlistSongLists.size(); i++) {
+            if (playlistSongLists.get(i).getKey() == songList.getKey()) {
+                position = i;
+                break;
             }
-            playlistFragment.notifyItemChanged(songList, position);
         }
+        playlistFragment.notifyItemChanged(songList, position);
     }
 
     @Override
     public void refreshAllData() {
-        refreshArtistFragmentWithoutPosition();
-        refreshPlaylistFragmentWithoutPosition();
-    }
-
-    private void refreshArtistFragmentWithoutPosition(){
-        ArtistFragment artistFragment = mainView.getArtistFragment();
         artistFragment.refreshData();
-    }
-
-    private void refreshPlaylistFragmentWithoutPosition(){
-        PlaylistFragment playlistFragment = mainView.getPlaylistFragment();
         playlistFragment.refreshData();
     }
-
 
 }
