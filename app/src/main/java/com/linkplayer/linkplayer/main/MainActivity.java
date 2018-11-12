@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -40,6 +41,7 @@ import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         randomMusicBtn.setOnClickListener(setRandomMusicModeOnClick);
         repeatMusicBtn.setOnClickListener(setRepeatMusicModeOnClick);
         trashCircle.setOnClickListener(deleteSongOnClick);
+        shareCircle.setOnClickListener(shareSongOnClick);
 
         Glide.with(this).load(R.drawable.back2_white).into(backSongBtn);
         Glide.with(this).load(R.drawable.back2_white).into(nextSongBtn);
@@ -311,20 +314,18 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public void notifySongChanged(int lastPosition, int position) {
-        initializeFragmentsIfNull();
+        initializeFragments();
         notifyMusicFragmentIfNotNull(lastPosition, position);
         notifyNowFragmentIfNotNull(lastPosition, position);
         setTitleAndSong();
     }
 
-    private void initializeFragmentsIfNull(){
-        if(musicFragment==null){
-            musicFragment = tabsPagerAdapter.getMusicFragment();
-            nowFragment = tabsPagerAdapter.getNowFragment();
-            playlistFragment = tabsPagerAdapter.getPlaylistFragment();
-            artistFragment = tabsPagerAdapter.getArtistFragment();
-            mainPresenter.initializeFragments();
-        }
+    private void initializeFragments(){
+        musicFragment = tabsPagerAdapter.getMusicFragment();
+        nowFragment = tabsPagerAdapter.getNowFragment();
+        playlistFragment = tabsPagerAdapter.getPlaylistFragment();
+        artistFragment = tabsPagerAdapter.getArtistFragment();
+        mainPresenter.initializeFragments();
     }
 
     @Override
@@ -422,8 +423,26 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             dialogFragment.setSong(showedSong);
             dialogFragment.setPosition(musicService.getSongPos());
             dialogFragment.show(getFragmentManager(), "DeleteSongDialogFragment");
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
     };
+
+    private View.OnClickListener shareSongOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            shareSong(showedSong);
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+    };
+
+    private void shareSong(Song song){
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(Intent.EXTRA_TEXT, showedSong.getTitle());
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(song.getPath())));
+        intent.setType("media/mp3");
+        startActivity(Intent.createChooser(intent, "Share song by"));
+    }
 
     @Override
     public void showRandomIsActive(boolean choosed){
