@@ -12,4 +12,7 @@
     <string name="delete_playlist">Delete playlist</string>
     <string name="add_songs">Add songs</string>
     <string name="songs">Songs</string>
+    <string name="cancel">Cancel</string>
+    <string name="permission">Permission</string>
+    <string name="need_permission">We need memory permission to show your songs in appliaction. Please allow access to memory.</string>
 </resources>
