@@ -130,9 +130,7 @@ public class MainPresenterImpl implements MainPresenter{
     public void setMusicService(MediaPlayerService musicService){
         this.musicService = musicService;
     }
-
-    private String typeOfPlaylist;
-    private SongList choosedSongList;
+    
     private String typeOfPlaylist = "";
     private SongList selectedSongList;
 
@@ -141,7 +139,6 @@ public class MainPresenterImpl implements MainPresenter{
         if(requestCode==1){
             if(resultCode == Activity.RESULT_OK)
                 prepareAndPlaySongList(data);
-            notifyFragments(typeOfPlaylist, choosedSongList);
             notifyFragments(typeOfPlaylist, selectedSongList);
         }
     }
@@ -149,9 +146,6 @@ public class MainPresenterImpl implements MainPresenter{
     private void prepareAndPlaySongList(Intent data){
         int position = data.getIntExtra("position", 0);
         typeOfPlaylist = data.getStringExtra("type");
-        choosedSongList = getSongListByType(typeOfPlaylist, data);
-        songListDao.changeLatestSongList(choosedSongList);
-        musicService.setLists(choosedSongList.getSongList(), random);
         selectedSongList = getSongListByType(typeOfPlaylist, data);
         songListDao.changeLatestSongList(selectedSongList);
         musicService.setLists(selectedSongList.getSongList(), random);
