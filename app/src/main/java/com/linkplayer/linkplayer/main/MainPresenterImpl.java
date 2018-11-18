@@ -133,6 +133,7 @@ public class MainPresenterImpl implements MainPresenter{
 
     private String typeOfPlaylist;
     private SongList choosedSongList;
+    private String typeOfPlaylist = "";
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
