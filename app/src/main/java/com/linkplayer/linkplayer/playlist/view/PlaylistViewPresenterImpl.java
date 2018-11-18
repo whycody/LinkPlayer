@@ -4,14 +4,17 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 
+import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.dialog.fragments.DownloadMusicYoutubeDialogFragment;
+import com.linkplayer.linkplayer.fragment.playlist.PlaylistPresenterImpl;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsDialogFragment;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenter;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenterImpl;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsRecyclerAdapter;
+import com.linkplayer.linkplayer.main.MainPresenterImpl;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
@@ -32,11 +35,13 @@ public class PlaylistViewPresenterImpl implements PlaylistViewPresenter{
     @Override
     public void onCreate() {
         if(getType().equals(PlaylistViewActivity.PLAYLIST_TYPE)){
-            playlistView.setTopButtonText("Add songs");
+            String addSongs = activity.getString(R.string.add_songs);
+            playlistView.setTopButtonText(addSongs);
             playlistView.setTopButtonOnClickListener(addSongsOnClick);
             playlistView.setDeletePlaylistButtonVisiblity(View.VISIBLE);
         }else if(getType().equals(PlaylistViewActivity.ARTIST_TYPE)){
-            playlistView.setTopButtonText("Download more music from Youtube");
+            String downloadMore = activity.getString(R.string.download_music_from_youtube);
+            playlistView.setTopButtonText(downloadMore);
             playlistView.setTopButtonOnClickListener(downloadSongsOnClick);
             playlistView.setDeletePlaylistButtonVisiblity(View.GONE);
         }
@@ -45,11 +50,10 @@ public class PlaylistViewPresenterImpl implements PlaylistViewPresenter{
     @Override
     public void returnOKResult(int position) {
         Intent intent = new Intent();
-        intent.putExtra("songPath", getSongList().getSongList().get(position).getPath());
-        intent.putExtra("type", getType());
-        intent.putExtra("key", getKey());
-        intent.putExtra("artist", getArtist());
-        intent.putExtra("position", position);
+        intent.putExtra(MainPresenterImpl.TYPE, getType());
+        intent.putExtra(MainPresenterImpl.KEY, getKey());
+        intent.putExtra(MainPresenterImpl.ARTIST, getArtist());
+        intent.putExtra(MainPresenterImpl.POSITION, position);
         activity.setResult(Activity.RESULT_OK, intent);
         activity.finish();
     }
@@ -77,7 +81,6 @@ public class PlaylistViewPresenterImpl implements PlaylistViewPresenter{
     public SongList getSongList() {
         int key = getKey();
         String artist = getArtist();
-
         if(getType().equals(PlaylistViewActivity.PLAYLIST_TYPE))
             return new SongListDao(activity).getSongListWithKey(key);
         else
@@ -94,17 +97,17 @@ public class PlaylistViewPresenterImpl implements PlaylistViewPresenter{
 
     @Override
     public String getType(){
-        return activity.getIntent().getStringExtra("type");
+        return activity.getIntent().getStringExtra(MainPresenterImpl.TYPE);
     }
 
     @Override
     public int getKey() {
-        return activity.getIntent().getIntExtra("songList", 1);
+        return activity.getIntent().getIntExtra(PlaylistPresenterImpl.SONG_LIST, 1);
     }
 
     @Override
     public String getArtist() {
-        return activity.getIntent().getStringExtra("artist");
+        return activity.getIntent().getStringExtra(MainPresenterImpl.ARTIST);
     }
 
 

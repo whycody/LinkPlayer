@@ -21,13 +21,17 @@ import java.util.ArrayList;
 
 public class MainPresenterImpl implements MainPresenter{
 
+    private boolean random, repeat = false;
+    private final String RANDOM = "random";
+    private final String REPEAT = "repeat";
+    public static final String TYPE = "type";
+    public static final String KEY = "key";
+    public static final String ARTIST = "artist";
+    public static final String POSITION = "position";
+
     private Context context;
     private MediaPlayerService musicService;
     private MainView mainView;
-
-    private final String RANDOM = "random";
-    private final String REPEAT = "repeat";
-    private boolean random, repeat = false;
     private SharedPrefDao sharedPrefDao;
     private ArrayList<Song> songList;
     private ArrayList<SongList> artistSongLists, playlistSongLists;
@@ -130,7 +134,7 @@ public class MainPresenterImpl implements MainPresenter{
     public void setMusicService(MediaPlayerService musicService){
         this.musicService = musicService;
     }
-    
+
     private String typeOfPlaylist = "";
     private SongList selectedSongList;
 
@@ -144,8 +148,8 @@ public class MainPresenterImpl implements MainPresenter{
     }
 
     private void prepareAndPlaySongList(Intent data){
-        int position = data.getIntExtra("position", 0);
-        typeOfPlaylist = data.getStringExtra("type");
+        int position = data.getIntExtra(POSITION, 0);
+        typeOfPlaylist = data.getStringExtra(TYPE);
         selectedSongList = getSongListByType(typeOfPlaylist, data);
         songListDao.changeLatestSongList(selectedSongList);
         musicService.setLists(selectedSongList.getSongList(), random);
@@ -161,10 +165,10 @@ public class MainPresenterImpl implements MainPresenter{
         SongList songList = null;
         switch(type){
             case(PlaylistViewActivity.ARTIST_TYPE):
-                songList = getArtistSongList(data.getStringExtra("artist"));
+                songList = getArtistSongList(data.getStringExtra(ARTIST));
                 break;
             case(PlaylistViewActivity.PLAYLIST_TYPE):
-                songList = getPlaylistSongList(data.getIntExtra("key", 0));
+                songList = getPlaylistSongList(data.getIntExtra(KEY, 0));
                 break;
         }
         return songList;

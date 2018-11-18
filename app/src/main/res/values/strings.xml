@@ -11,4 +11,5 @@
     <string name="new_playlist">New playlist</string>
     <string name="delete_playlist">Delete playlist</string>
     <string name="add_songs">Add songs</string>
+    <string name="songs">Songs</string>
 </resources>

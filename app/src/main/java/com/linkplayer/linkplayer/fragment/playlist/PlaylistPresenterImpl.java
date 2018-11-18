@@ -16,6 +16,7 @@ import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenter;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenterImpl;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsRecyclerAdapter;
+import com.linkplayer.linkplayer.main.MainPresenterImpl;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 
 public class PlaylistPresenterImpl implements PlaylistPresenter {
 
+    public static final String SONG_LIST = "songList";
     private ArrayList<SongList> songListArrayList;
     private Activity activity;
     private SongListDao songListDao;
@@ -61,8 +63,8 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
 
     private void sendToNextActivity(int position){
         Intent intent = new Intent(activity, PlaylistViewActivity.class);
-        intent.putExtra("type", PlaylistViewActivity.PLAYLIST_TYPE);
-        intent.putExtra("songList", songListArrayList.get(position).getKey());
+        intent.putExtra(MainPresenterImpl.TYPE, PlaylistViewActivity.PLAYLIST_TYPE);
+        intent.putExtra(SONG_LIST, songListArrayList.get(position).getKey());
         activity.startActivityForResult(intent, 1);
     }
 
