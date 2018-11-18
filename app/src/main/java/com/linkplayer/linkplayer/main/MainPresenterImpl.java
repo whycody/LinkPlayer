@@ -134,6 +134,7 @@ public class MainPresenterImpl implements MainPresenter{
     private String typeOfPlaylist;
     private SongList choosedSongList;
     private String typeOfPlaylist = "";
+    private SongList selectedSongList;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -141,6 +142,7 @@ public class MainPresenterImpl implements MainPresenter{
             if(resultCode == Activity.RESULT_OK)
                 prepareAndPlaySongList(data);
             notifyFragments(typeOfPlaylist, choosedSongList);
+            notifyFragments(typeOfPlaylist, selectedSongList);
         }
     }
 
@@ -150,6 +152,9 @@ public class MainPresenterImpl implements MainPresenter{
         choosedSongList = getSongListByType(typeOfPlaylist, data);
         songListDao.changeLatestSongList(choosedSongList);
         musicService.setLists(choosedSongList.getSongList(), random);
+        selectedSongList = getSongListByType(typeOfPlaylist, data);
+        songListDao.changeLatestSongList(selectedSongList);
+        musicService.setLists(selectedSongList.getSongList(), random);
         refreshMusicFragment();
         refreshNowFragment();
         setSongPos(random, position);
