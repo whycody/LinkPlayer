@@ -3,14 +3,12 @@ package com.linkplayer.linkplayer.dialog.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.fragment.playlist.PlaylistView;
-import com.linkplayer.linkplayer.mappers.SongListMapper;
 import com.linkplayer.linkplayer.model.SongList;
 
 public class DeletePlaylistDialogFragment extends DialogFragment {

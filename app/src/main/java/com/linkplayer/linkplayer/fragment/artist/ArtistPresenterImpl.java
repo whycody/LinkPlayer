@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.view.View;
 
 import com.linkplayer.linkplayer.R;
-import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.main.MainPresenterImpl;
 import com.linkplayer.linkplayer.model.SongList;
 import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;

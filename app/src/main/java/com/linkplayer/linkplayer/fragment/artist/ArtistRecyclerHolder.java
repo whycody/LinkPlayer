@@ -1,7 +1,6 @@
 package com.linkplayer.linkplayer.fragment.artist;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;

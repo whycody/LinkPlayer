@@ -10,13 +10,11 @@ import android.widget.Button;
 
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
-import com.linkplayer.linkplayer.dialog.fragments.NewPlaylistInformator;
 import com.linkplayer.linkplayer.fragment.LinearVerticalSpacing;
 import com.linkplayer.linkplayer.fragment.music.MusicFragmentView;
 import com.linkplayer.linkplayer.fragment.music.MusicPresenterImpl;
 import com.linkplayer.linkplayer.fragment.music.MusicRecyclerAdapter;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
-import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 

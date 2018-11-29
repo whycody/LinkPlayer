@@ -1,7 +1,6 @@
 package com.linkplayer.linkplayer.fragment.music;
 
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.view.View;
 
 public interface MusicRowView {

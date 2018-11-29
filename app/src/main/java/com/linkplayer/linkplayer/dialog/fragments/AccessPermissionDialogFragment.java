@@ -38,7 +38,6 @@ public class AccessPermissionDialogFragment extends DialogFragment {
                     }
                 });
 
-        AlertDialog alertDialog = builder.create();
-        return alertDialog;
+        return builder.create();
     }
 }

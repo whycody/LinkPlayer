@@ -1,6 +1,5 @@
 package com.linkplayer.linkplayer.fragment.now;
 
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;

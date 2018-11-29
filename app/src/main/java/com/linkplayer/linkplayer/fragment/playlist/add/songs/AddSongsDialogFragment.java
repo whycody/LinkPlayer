@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.linkplayer.linkplayer.R;
-import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
 public class AddSongsDialogFragment extends DialogFragment{

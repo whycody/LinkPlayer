@@ -1,7 +1,5 @@
 package com.linkplayer.linkplayer.fragment.playlist.add.songs;
 
-
-import android.view.View;
 import android.widget.CompoundButton;
 
 public interface AddSongRowView {

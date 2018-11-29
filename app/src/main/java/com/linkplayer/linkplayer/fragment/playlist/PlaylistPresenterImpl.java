@@ -2,7 +2,6 @@ package com.linkplayer.linkplayer.fragment.playlist;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -17,7 +16,6 @@ import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenter;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenterImpl;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsRecyclerAdapter;
 import com.linkplayer.linkplayer.main.MainPresenterImpl;
-import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 
