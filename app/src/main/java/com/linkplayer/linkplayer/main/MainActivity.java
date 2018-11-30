@@ -456,6 +456,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 showAddSongToPlaylistDialogFragment(songLists);
             else
                 showNoPlaylistsAvailableDialogFragment();
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
     };
 
