@@ -13,15 +13,15 @@ import com.linkplayer.linkplayer.R;
 
 public class AccessPermissionDialogFragment extends DialogFragment {
 
+    private String OK, PERMISSION, NEED_PERMISSION;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        String title = getActivity().getString(R.string.permission);
-        String text = getActivity().getString(R.string.need_permission);
+        initializeStrings();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle(title)
-                .setMessage(text)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setTitle(PERMISSION)
+                .setMessage(NEED_PERMISSION)
+                .setPositiveButton(OK, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent();
@@ -39,5 +39,11 @@ public class AccessPermissionDialogFragment extends DialogFragment {
                 });
 
         return builder.create();
+    }
+
+    private void initializeStrings(){
+        OK = getResources().getString(R.string.ok);
+        PERMISSION = getString(R.string.permission);
+        NEED_PERMISSION = getString(R.string.need_permission);
     }
 }

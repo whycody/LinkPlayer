@@ -1,4 +1,4 @@
-package com.linkplayer.linkplayer.fragment.playlist.add.songs;
+package com.linkplayer.linkplayer.dialog.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
+import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenter;
+import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsRecyclerAdapter;
 import com.linkplayer.linkplayer.model.SongList;
 
 public class AddSongsDialogFragment extends DialogFragment{
@@ -23,32 +26,35 @@ public class AddSongsDialogFragment extends DialogFragment{
     private int position;
     private AddSongsInformator addSongsInformator;
 
+    private String CANCEL, ADD;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        initializeStrings();
         addSongsPresenter.setAddSongsInformator(addSongsInformator);
         addSongsPresenter.setPosition(position);
 
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.add_songs_dialog, null);
+        setRecyclerViewProperties(view);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                .setView(view)
+                .setPositiveButton(ADD, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        addSongsPresenter.addSongsToPlaylist(songList);
+                    }
+                }).setNegativeButton(CANCEL, null);
 
+        return builder.create();
+    }
+
+    private void setRecyclerViewProperties(View view){
         RecyclerView recyclerView = view.findViewById(R.id.add_songs_recycler);
         recyclerView.setAdapter(recyclerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setView(view)
-                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        addSongsPresenter.addSongsToPlaylist(songList);
-                    }
-                }).setNegativeButton("Cancel", null);
-
-        Dialog dialog = builder.create();
-
-        return dialog;
     }
 
     public void setRecyclerAdapter(AddSongsRecyclerAdapter recyclerAdapter){
@@ -69,5 +75,10 @@ public class AddSongsDialogFragment extends DialogFragment{
 
     public void setAddSongInformator(AddSongsInformator addSongInformator){
         this.addSongsInformator = addSongInformator;
+    }
+
+    private void initializeStrings(){
+        CANCEL = getResources().getString(R.string.cancel);
+        ADD = getResources().getString(R.string.add);
     }
 }

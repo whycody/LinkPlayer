@@ -9,10 +9,28 @@
     <string name="delete_song">Delete song</string>
     <string name="add_to_playlist">Add to playlist</string>
     <string name="new_playlist">New playlist</string>
-    <string name="delete_playlist">Delete playlist</string>
     <string name="add_songs">Add songs</string>
+    <string name="add_new_playlist">Add new playlist</string>
+
+    <string name="really_delete_file">Do you really want to delete file "</string>
+    <string name="from_device">" from the device memory?</string>
+    <string name="cannot_delete">Cannot delete</string>
+
+    <string name="delete_playlist">Delete playlist</string>
+    <string name="really_delete">Are you really want to delete&#160;"</string>
+    <string name="playlist_deleted">Playlist deleted</string>
+    <string name="delete">Delete</string>
+
     <string name="songs">Songs</string>
     <string name="cancel">Cancel</string>
+    <string name="add">Add</string>
+    <string name="ok">Ok</string>
+
+    <string name="playlist_added">Playlist added</string>
+    <string name="add_the_playlist_title">Add the playlist title</string>
     <string name="permission">Permission</string>
     <string name="need_permission">We need memory permission to show your songs in appliaction. Please allow access to memory.</string>
+    <string name="added_to_playlist">&#160;added to playlist&#160;</string>
+    <string name="any_playlist">You don\'t have any playlist, or all your playlists already have song&#160;</string>
+    <string name="lets_create_new">. Create new one now!</string>
 </resources>

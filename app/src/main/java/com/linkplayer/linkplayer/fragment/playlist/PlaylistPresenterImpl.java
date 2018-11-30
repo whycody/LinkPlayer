@@ -10,7 +10,7 @@ import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.dialog.fragments.DeletePlaylistDialogFragment;
-import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsDialogFragment;
+import com.linkplayer.linkplayer.dialog.fragments.AddSongsDialogFragment;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsInformator;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenter;
 import com.linkplayer.linkplayer.fragment.playlist.add.songs.AddSongsPresenterImpl;

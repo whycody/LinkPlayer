@@ -15,7 +15,7 @@ public class AddSongsRecyclerHolder extends RecyclerView.ViewHolder implements A
 
     public AddSongsRecyclerHolder(View itemView) {
         super(itemView);
-        titleText = itemView.findViewById(R.id.title_text);
+        titleText = itemView.findViewById(R.id.playlist_text);
         artistText = itemView.findViewById(R.id.author_text);
         addSongBox = itemView.findViewById(R.id.add_song_box);
         itemView.setOnClickListener(onClickListener);

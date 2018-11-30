@@ -16,7 +16,7 @@ public class PlaylistRecyclerHolder extends RecyclerView.ViewHolder implements P
     public PlaylistRecyclerHolder(View itemView) {
         super(itemView);
         this.itemView = itemView;
-        titleText = itemView.findViewById(R.id.title_text);
+        titleText = itemView.findViewById(R.id.playlist_text);
         songsNumberText = itemView.findViewById(R.id.songs_number_text);
         dotesButton = itemView.findViewById(R.id.dotes_button);
     }

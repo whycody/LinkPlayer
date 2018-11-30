@@ -11,8 +11,8 @@ import android.os.Bundle;
 import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
+import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.SongListDao;
-import com.linkplayer.linkplayer.fragment.music.MusicFragmentView;
 import com.linkplayer.linkplayer.model.Song;
 
 import java.io.File;
@@ -23,20 +23,22 @@ public class DeleteSongDialogFragment extends DialogFragment {
     private DeleteSongInformator deleteSongInformator;
     private int position;
 
+    private String DELETE_SONG, REALLY_DELETE_FILE, FROM_DEVICE, DELETE, CANCEL, CANNOT_DELETE;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        String title = "Delete song";
-        String message = "Do you really want to delete file \"" + song.getPath() + "\" from the device memory?";
+        initializeStrings();
+        String message = REALLY_DELETE_FILE + song.getPath() + FROM_DEVICE;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle(title)
+                .setTitle(DELETE_SONG)
                 .setMessage(message)
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                .setPositiveButton(DELETE, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         deleteSong();
                     }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                }).setNegativeButton(CANCEL, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -73,7 +75,7 @@ public class DeleteSongDialogFragment extends DialogFragment {
             songListDao.deleteAllSongsByPath(path);
             deleteSongInformator.notifySongDeleted(position, true);
         }else {
-            Toast.makeText(getActivity(), "Cannot delete", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), CANNOT_DELETE, Toast.LENGTH_SHORT).show();
             deleteSongInformator.notifySongDeleted(position, false);
         }
     }
@@ -88,5 +90,14 @@ public class DeleteSongDialogFragment extends DialogFragment {
 
     public void setInformator(DeleteSongInformator deleteSongInformator){
         this.deleteSongInformator = deleteSongInformator;
+    }
+
+    private void initializeStrings(){
+        DELETE_SONG = getResources().getString(R.string.delete_song);
+        REALLY_DELETE_FILE = getResources().getString(R.string.really_delete_file);
+        FROM_DEVICE = getResources().getString(R.string.from_device);
+        DELETE = getResources().getString(R.string.delete);
+        CANCEL = getResources().getString(R.string.cancel);
+        CANNOT_DELETE = getResources().getString(R.string.cannot_delete);
     }
 }

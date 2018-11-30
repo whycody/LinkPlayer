@@ -15,7 +15,7 @@ public class MusicRecyclerHolder extends RecyclerView.ViewHolder implements Musi
     public MusicRecyclerHolder(View itemView){
         super(itemView);
         this.itemView = itemView;
-        titleText = itemView.findViewById(R.id.title_text);
+        titleText = itemView.findViewById(R.id.playlist_text);
         musicRowBackground = itemView.findViewById(R.id.music_row_background);
         authorText = itemView.findViewById(R.id.author_text);
         minutesNumber = itemView.findViewById(R.id.minutes_number);

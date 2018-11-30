@@ -30,12 +30,18 @@ import com.linkplayer.linkplayer.MediaPlayerService;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongListDao;
+import com.linkplayer.linkplayer.dialog.fragments.AddSongToPlaylistDialogFragment;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongDialogFragment;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
+import com.linkplayer.linkplayer.dialog.fragments.NewPlaylistInformator;
+import com.linkplayer.linkplayer.dialog.fragments.NoPlaylistsAvailableDialogFragment;
 import com.linkplayer.linkplayer.fragment.artist.ArtistFragment;
 import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
+import com.linkplayer.linkplayer.main.add.song.to.playlist.AddSongToPlaylistAdapter;
+import com.linkplayer.linkplayer.main.add.song.to.playlist.AddSongToPlaylistPresenter;
+import com.linkplayer.linkplayer.main.add.song.to.playlist.AddSongToPlaylistPresenterImpl;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
@@ -46,7 +52,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView,
-        DeleteSongInformator{
+        DeleteSongInformator, NewPlaylistInformator {
 
     private Toolbar mainToolbar;
     private TabLayout mainTabLayout;
@@ -58,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private ConstraintLayout constraintBottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;
     private MainPresenter mainPresenter;
-
     private MediaPlayerService musicService;
 
     private Intent playIntent;
@@ -100,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         repeatMusicBtn.setOnClickListener(setRepeatMusicModeOnClick);
         trashCircle.setOnClickListener(deleteSongOnClick);
         shareCircle.setOnClickListener(shareSongOnClick);
+        playlistCircle.setOnClickListener(addSongToPlaylistOnClick);
 
         Glide.with(this).load(R.drawable.back2_white).into(backSongBtn);
         Glide.with(this).load(R.drawable.back2_white).into(nextSongBtn);
@@ -442,6 +448,41 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         startActivity(Intent.createChooser(intent, "Share song by"));
     }
 
+    private View.OnClickListener addSongToPlaylistOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            ArrayList<SongList> songLists = getAvailableSongLists();
+            if(songLists.size()!=0)
+                showAddSongToPlaylistDialogFragment(songLists);
+            else
+                showNoPlaylistsAvailableDialogFragment();
+        }
+    };
+
+    private ArrayList<SongList> getAvailableSongLists(){
+        ArrayList<SongList> songLists = new ArrayList<>();
+        for(final SongList songList: songListDao.getAllTheSongLists()) {
+            if(!songListDao.songListContainsSong(songList.getKey(), showedSong))
+                songLists.add(songList);
+        }
+        return songLists;
+    }
+
+    private void showAddSongToPlaylistDialogFragment(ArrayList<SongList> songLists){
+        AddSongToPlaylistPresenter presenter = new AddSongToPlaylistPresenterImpl(MainActivity.this, showedSong, songLists);
+        AddSongToPlaylistAdapter adapter = new AddSongToPlaylistAdapter(presenter, MainActivity.this);
+        AddSongToPlaylistDialogFragment dialogFragment = new AddSongToPlaylistDialogFragment();
+        dialogFragment.setAdapter(adapter);
+        dialogFragment.show(MainActivity.this.getFragmentManager(), "AddSongToPlaylistDialogFragment");
+    }
+
+    private void showNoPlaylistsAvailableDialogFragment() {
+        NoPlaylistsAvailableDialogFragment dialogFragment = new NoPlaylistsAvailableDialogFragment();
+        dialogFragment.setInformator(this);
+        dialogFragment.setSong(showedSong);
+        dialogFragment.show(getFragmentManager(), "NoPlaylistAvailableDialogFragment");
+    }
+
     @Override
     public void showRandomIsActive(boolean choosed){
         if(choosed)
@@ -504,5 +545,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         if(deleted) {
             notifyAllData(nowFragment.getPosition(), showedSong);
         }
+    }
+
+    @Override
+    public void notifyNewPlaylistAdded(boolean added) {
+        if(added)
+            notifyAllFragments();
     }
 }

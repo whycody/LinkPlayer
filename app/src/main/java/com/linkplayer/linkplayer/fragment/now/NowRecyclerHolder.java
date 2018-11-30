@@ -13,7 +13,7 @@ public class NowRecyclerHolder extends RecyclerView.ViewHolder implements NowRow
     public NowRecyclerHolder(View itemView) {
         super(itemView);
         this.itemView = itemView;
-        titleText = itemView.findViewById(R.id.title_text);
+        titleText = itemView.findViewById(R.id.playlist_text);
         timeText = itemView.findViewById(R.id.time_text);
         nowDotesButton = itemView.findViewById(R.id.dotes_button);
     }

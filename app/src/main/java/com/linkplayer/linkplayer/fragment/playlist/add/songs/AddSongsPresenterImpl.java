@@ -31,7 +31,6 @@ public class AddSongsPresenterImpl implements AddSongsPresenter {
         holder.setOnCheckedListener(null);
         holder.setChoosed(songItems.get(position).isChoosed());
         holder.setOnCheckedListener(getCheckedChangeListener(position));
-
     }
 
     private CompoundButton.OnCheckedChangeListener getCheckedChangeListener(final int position) {
