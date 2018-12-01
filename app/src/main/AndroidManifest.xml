@@ -28,7 +28,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".main.MainActivity" >
+            android:name=".main.MainActivity"
+            android:theme="@style/noAnimTheme">
         </activity>
 
         <provider
@@ -41,7 +42,10 @@
                 android:resource="@xml/fileaccess_paths" />
         </provider>
 
-        <activity android:name=".playlist.view.PlaylistViewActivity"></activity>
+        <activity
+            android:name=".playlist.view.PlaylistViewActivity"
+            android:theme="@style/noAnimTheme">
+        </activity>
     </application>
 
 </manifest>
