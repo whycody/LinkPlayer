@@ -3,6 +3,7 @@ package com.linkplayer.linkplayer.dialog.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,12 +15,16 @@ import android.view.ViewGroup;
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.main.add.song.to.playlist.AddSongToPlaylistAdapter;
 import com.linkplayer.linkplayer.main.add.song.to.playlist.AddSongToPlaylistInformator;
+import com.linkplayer.linkplayer.model.Song;
 
 public class AddSongToPlaylistDialogFragment extends DialogFragment implements AddSongToPlaylistInformator {
 
     private AddSongToPlaylistAdapter adapter;
+    private NewPlaylistInformator newPlaylistInformator;
+    private Song song;
 
     private String CANCEL;
+    private String CREATE_NEW;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -37,13 +42,30 @@ public class AddSongToPlaylistDialogFragment extends DialogFragment implements A
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setView(recyclerView)
-                .setNegativeButton(CANCEL, null);
+                .setNegativeButton(CANCEL, null)
+                .setPositiveButton(CREATE_NEW, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AddNewPlaylistDialogFragment dialogFragment = new AddNewPlaylistDialogFragment();
+                        dialogFragment.setNewPlaylistInformator(newPlaylistInformator);
+                        dialogFragment.setSong(song);
+                        dialogFragment.show(getFragmentManager(), "AddNewPlaylistDialogFragment");
+                    }
+                });
 
         return builder.create();
     }
 
     public void setAdapter(AddSongToPlaylistAdapter adapter) {
         this.adapter = adapter;
+    }
+
+    public void setSong(Song song) {
+        this.song = song;
+    }
+
+    public void setNewPlaylistInformator(NewPlaylistInformator newPlaylistInformator) {
+        this.newPlaylistInformator = newPlaylistInformator;
     }
 
     @Override
@@ -53,5 +75,6 @@ public class AddSongToPlaylistDialogFragment extends DialogFragment implements A
 
     private void initializeStrings(){
         CANCEL = getResources().getString(R.string.cancel);
+        CREATE_NEW = getResources().getString(R.string.create_new);
     }
 }

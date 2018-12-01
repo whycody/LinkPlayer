@@ -474,6 +474,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         AddSongToPlaylistAdapter adapter = new AddSongToPlaylistAdapter(presenter, MainActivity.this);
         AddSongToPlaylistDialogFragment dialogFragment = new AddSongToPlaylistDialogFragment();
         dialogFragment.setAdapter(adapter);
+        dialogFragment.setSong(showedSong);
+        dialogFragment.setNewPlaylistInformator(this);
         dialogFragment.show(MainActivity.this.getFragmentManager(), "AddSongToPlaylistDialogFragment");
     }
 

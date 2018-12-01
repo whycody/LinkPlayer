@@ -11,6 +11,7 @@
     <string name="new_playlist">New playlist</string>
     <string name="add_songs">Add songs</string>
     <string name="add_new_playlist">Add new playlist</string>
+    <string name="create_new">Create new</string>
 
     <string name="really_delete_file">Do you really want to delete file&#160;\"</string>
     <string name="from_device">\" from the device memory?</string>
