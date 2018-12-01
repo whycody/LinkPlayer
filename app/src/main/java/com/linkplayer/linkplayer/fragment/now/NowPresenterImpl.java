@@ -12,11 +12,13 @@ import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.dialog.fragments.AddNewPlaylistDialogFragment;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongDialogFragment;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
+import com.linkplayer.linkplayer.dialog.fragments.NewPlaylistInformator;
 import com.linkplayer.linkplayer.fragment.music.MusicFragmentView;
+import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
-public class NowPresenterImpl {
+public class NowPresenterImpl implements NewPlaylistInformator {
 
     private SongList songList;
     private Activity activity;
@@ -86,8 +88,9 @@ public class NowPresenterImpl {
                         .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
-                                songListDao.insertSongToListWithKey(songList.getKey(), songList.getSongList().get(position));
-                                musicFragmentView.notifySongAddedToPlaylist();
+                                songListDao.insertSongToListWithKey(songList.getKey(),
+                                        NowPresenterImpl.this.songList.getSongList().get(position));
+                                refreshPlaylistFragmentData();
                                 return true;
                             }
                         });
@@ -107,6 +110,7 @@ public class NowPresenterImpl {
                         return true;
                     case(R.id.new_playlist_item):
                         AddNewPlaylistDialogFragment playlistDialogFragment = new AddNewPlaylistDialogFragment();
+                        playlistDialogFragment.setNewPlaylistInformator(NowPresenterImpl.this);
                         playlistDialogFragment.setSong(songList.getSongList().get(position));
                         playlistDialogFragment.show(activity.getFragmentManager(), "AddNewPlaylistDialogFragment");
                         return true;
@@ -129,5 +133,16 @@ public class NowPresenterImpl {
 
     public SongList getSongList() {
         return songList;
+    }
+
+    @Override
+    public void notifyNewPlaylistAdded(boolean added) {
+        if(added)
+            refreshPlaylistFragmentData();
+    }
+
+    private void refreshPlaylistFragmentData(){
+        MainActivity mainActivity = (MainActivity) activity;
+        mainActivity.getPlaylistFragment().refreshData();
     }
 }
