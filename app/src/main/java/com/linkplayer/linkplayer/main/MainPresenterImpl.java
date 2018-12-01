@@ -29,7 +29,7 @@ public class MainPresenterImpl implements MainPresenter{
     public static final String ARTIST = "artist";
     public static final String POSITION = "position";
 
-    private Context context;
+    private Activity activity;
     private MediaPlayerService musicService;
     private MainView mainView;
     private SharedPrefDao sharedPrefDao;
@@ -44,14 +44,14 @@ public class MainPresenterImpl implements MainPresenter{
     private NowFragment nowFragment;
 
 
-    public MainPresenterImpl(Context context, MainView mainView){
-        this.context = context;
+    public MainPresenterImpl(Activity activity, MainView mainView){
+        this.activity = activity;
         this.mainView = mainView;
-        songDao = new SongDao(context);
-        sharedPrefDao = new SharedPrefDao(context);
-        songListDao = new SongListDao(context);
+        songDao = new SongDao(activity);
+        sharedPrefDao = new SharedPrefDao(activity);
+        songListDao = new SongListDao(activity);
         songList = songListDao.getLatestSongList().getSongList();
-        artistSongLists = new MusicListData(context).getArtistList();
+        artistSongLists = new MusicListData(activity).getArtistList();
         playlistSongLists = songListDao.getAllTheSongLists();
     }
 
@@ -175,7 +175,7 @@ public class MainPresenterImpl implements MainPresenter{
     }
 
     private SongList getArtistSongList(String artist){
-        return new MusicListData(context).getArtistSongList(artist);
+        return new MusicListData(activity).getArtistSongList(artist);
     }
 
     private SongList getPlaylistSongList(int key){
@@ -209,6 +209,8 @@ public class MainPresenterImpl implements MainPresenter{
                 refreshAllData();
                 break;
         }
+        MainActivity mainActivity = (MainActivity) activity;
+        mainActivity.notifySongAddedToPlaylist();
     }
 
     private void refreshArtistFragment(SongList songList){

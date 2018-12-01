@@ -42,21 +42,37 @@ public class NowPresenterImpl implements NewPlaylistInformator {
         nowRecyclerHolder.setTime(getTime(Integer.parseInt(song.getDuration())));
         if(song.isChoosed()){
             nowRecyclerHolder.setTextColor(activity.getResources().getColor(R.color.colorYellow));
-        }else
+            nowRecyclerHolder.setOnClickPopupMenu(getShowBottomSheetOnClickListener());
+        }else {
             nowRecyclerHolder.setTextColor(activity.getResources().getColor(R.color.colorLightWhite));
+            nowRecyclerHolder.setOnClickPopupMenu(getShowPopupMenuOnClickListener(position));
+        }
         nowRecyclerHolder.setOnClickItemView(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 musicFragmentView.onItemClick(position);
             }
         });
-        nowRecyclerHolder.setOnClickPopupMenu(new View.OnClickListener() {
+
+    }
+
+    private View.OnClickListener getShowBottomSheetOnClickListener(){
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) activity).showOrHideBottomSheet();
+            }
+        };
+    }
+
+    private View.OnClickListener getShowPopupMenuOnClickListener(final int position) {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPopupMenu(v, position);
+                ((MainActivity) activity).hideBottomSheet();
             }
-        });
-
+        };
     }
 
     private String getTime(int time){

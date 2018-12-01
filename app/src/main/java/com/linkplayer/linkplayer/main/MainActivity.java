@@ -179,6 +179,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         return super.onKeyDown(keyCode, event);
     }
 
+    public void showOrHideBottomSheet(){
+        if(bottomSheetBehavior.getState()== BottomSheetBehavior.STATE_EXPANDED)
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        else
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
+
+    public void hideBottomSheet(){
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
     private void registerBecomingNoisyReceiver(){
         BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
             @Override
@@ -338,9 +349,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     private void notifyMusicFragmentIfNotNull(int lastPosition, int position){
-        musicFragment.notifyItemChanged(lastPosition, position);
-        musicFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
-                musicService.getSongList().get(position));
+        if(musicFragment!=null) {
+            musicFragment.notifyItemChanged(lastPosition, position);
+            musicFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
+                    musicService.getSongList().get(position));
+        }
     }
 
     private void notifyNowFragmentIfNotNull(int lastPosition, int position){
