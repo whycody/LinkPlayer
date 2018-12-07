@@ -18,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -65,15 +66,19 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private BottomSheetBehavior bottomSheetBehavior;
     private MainPresenter mainPresenter;
     private MediaPlayerService musicService;
+    private BroadcastReceiver receiver;
 
     private Intent playIntent;
     private Song showedSong;
     private boolean repeat, random = false;
+    private int lastPosition, position;
     private MusicFragment musicFragment;
     private NowFragment nowFragment;
     private PlaylistFragment playlistFragment;
     private ArtistFragment artistFragment;
     private SongListDao songListDao;
+
+    private String mainTag = "MainActivityTag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,10 +152,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         startService(playIntent);
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
+        if(musicService!=null)
+            notifySongChanged(lastPosition,position);
         setTitleAndSong();
     }
 
@@ -191,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     private void registerBecomingNoisyReceiver(){
-        BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 musicService.pauseSong();
@@ -199,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             }
         };
         IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-        registerReceiver(becomingNoisyReceiver, intentFilter);
+        registerReceiver(receiver, intentFilter);
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
@@ -329,7 +335,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public void notifySongChanged(int lastPosition, int position) {
-        initializeFragments();
+        this.lastPosition = lastPosition;
+        this.position = position;
+        if(musicFragment==null)
+            initializeFragments();
         notifyMusicFragmentIfNotNull(lastPosition, position);
         notifyNowFragmentIfNotNull(lastPosition, position);
         setTitleAndSong();
@@ -357,9 +366,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     private void notifyNowFragmentIfNotNull(int lastPosition, int position){
-        nowFragment.notifyItemChanged(lastPosition, position);
-        nowFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
-                musicService.getSongList().get(position));
+        if(nowFragment!=null) {
+            nowFragment.notifyItemChanged(lastPosition, position);
+            nowFragment.notifyItemChanged(musicService.getSongList().get(lastPosition),
+                    musicService.getSongList().get(position));
+        }
     }
 
     @Override
