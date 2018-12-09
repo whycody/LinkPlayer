@@ -36,6 +36,7 @@ import com.linkplayer.linkplayer.dialog.fragments.DeleteSongDialogFragment;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
 import com.linkplayer.linkplayer.dialog.fragments.NewPlaylistInformator;
 import com.linkplayer.linkplayer.dialog.fragments.NoPlaylistsAvailableDialogFragment;
+import com.linkplayer.linkplayer.dialog.fragments.SetSongAsRingstoneDialogFragment;
 import com.linkplayer.linkplayer.fragment.artist.ArtistFragment;
 import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 import com.linkplayer.linkplayer.fragment.now.NowFragment;
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         repeatMusicBtn.setOnClickListener(setRepeatMusicModeOnClick);
         trashCircle.setOnClickListener(deleteSongOnClick);
         shareCircle.setOnClickListener(shareSongOnClick);
+        bellCircle.setOnClickListener(setSongAsRingstoneOnClick);
         playlistCircle.setOnClickListener(addSongToPlaylistOnClick);
 
         Glide.with(this).load(R.drawable.back2_white).into(backSongBtn);
@@ -451,6 +453,16 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             dialogFragment.setSong(showedSong);
             dialogFragment.setPosition(musicService.getSongPos());
             dialogFragment.show(getFragmentManager(), "DeleteSongDialogFragment");
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+    };
+
+    private View.OnClickListener setSongAsRingstoneOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SetSongAsRingstoneDialogFragment dialogFragment = new SetSongAsRingstoneDialogFragment();
+            dialogFragment.setSong(showedSong);
+            dialogFragment.show(getFragmentManager(), "SetSongAsRingstoneDialogFragment");
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
     };
