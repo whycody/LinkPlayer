@@ -44,9 +44,17 @@ public class DeleteSongDialogFragment extends DialogFragment {
 
                     }
                 });
-
         AlertDialog alertDialog = builder.create();
         return alertDialog;
+    }
+
+    private void initializeStrings(){
+        DELETE_SONG = getResources().getString(R.string.delete_song);
+        REALLY_DELETE_FILE = getResources().getString(R.string.really_delete_file);
+        FROM_DEVICE = getResources().getString(R.string.from_device);
+        DELETE = getResources().getString(R.string.delete);
+        CANCEL = getResources().getString(R.string.cancel);
+        CANNOT_DELETE = getResources().getString(R.string.cannot_delete);
     }
 
     private void deleteSong(){
@@ -92,12 +100,4 @@ public class DeleteSongDialogFragment extends DialogFragment {
         this.deleteSongInformator = deleteSongInformator;
     }
 
-    private void initializeStrings(){
-        DELETE_SONG = getResources().getString(R.string.delete_song);
-        REALLY_DELETE_FILE = getResources().getString(R.string.really_delete_file);
-        FROM_DEVICE = getResources().getString(R.string.from_device);
-        DELETE = getResources().getString(R.string.delete);
-        CANCEL = getResources().getString(R.string.cancel);
-        CANNOT_DELETE = getResources().getString(R.string.cannot_delete);
-    }
 }

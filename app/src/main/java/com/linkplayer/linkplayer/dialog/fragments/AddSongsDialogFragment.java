@@ -49,6 +49,11 @@ public class AddSongsDialogFragment extends DialogFragment{
         return builder.create();
     }
 
+    private void initializeStrings(){
+        CANCEL = getResources().getString(R.string.cancel);
+        ADD = getResources().getString(R.string.add);
+    }
+
     private void setRecyclerViewProperties(View view){
         RecyclerView recyclerView = view.findViewById(R.id.add_songs_recycler);
         recyclerView.setAdapter(recyclerAdapter);
@@ -77,8 +82,4 @@ public class AddSongsDialogFragment extends DialogFragment{
         this.addSongsInformator = addSongInformator;
     }
 
-    private void initializeStrings(){
-        CANCEL = getResources().getString(R.string.cancel);
-        ADD = getResources().getString(R.string.add);
-    }
 }

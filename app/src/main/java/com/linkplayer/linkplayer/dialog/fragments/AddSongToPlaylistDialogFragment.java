@@ -56,6 +56,11 @@ public class AddSongToPlaylistDialogFragment extends DialogFragment implements A
         return builder.create();
     }
 
+    private void initializeStrings(){
+        CANCEL = getResources().getString(R.string.cancel);
+        CREATE_NEW = getResources().getString(R.string.create_new);
+    }
+
     public void setAdapter(AddSongToPlaylistAdapter adapter) {
         this.adapter = adapter;
     }
@@ -73,8 +78,4 @@ public class AddSongToPlaylistDialogFragment extends DialogFragment implements A
         dismiss();
     }
 
-    private void initializeStrings(){
-        CANCEL = getResources().getString(R.string.cancel);
-        CREATE_NEW = getResources().getString(R.string.create_new);
-    }
 }

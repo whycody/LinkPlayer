@@ -31,6 +31,13 @@ public class NoPlaylistsAvailableDialogFragment extends DialogFragment {
         return builder.create();
     }
 
+    private void initializeStrings(){
+        CANCEL = getResources().getString(R.string.cancel);
+        OK = getResources().getString(R.string.ok);
+        ANY_PLAYLIST = getResources().getString(R.string.any_playlist);
+        LETS_CREATE_NEW = getResources().getString(R.string.lets_create_new);
+    }
+
     private String getMessage() {
         return ANY_PLAYLIST + "\"" + song.getTitle() + "\"" + LETS_CREATE_NEW;
     }
@@ -50,10 +57,4 @@ public class NoPlaylistsAvailableDialogFragment extends DialogFragment {
         this.informator = informator;
     }
 
-    private void initializeStrings(){
-        CANCEL = getResources().getString(R.string.cancel);
-        OK = getResources().getString(R.string.ok);
-        ANY_PLAYLIST = getResources().getString(R.string.any_playlist);
-        LETS_CREATE_NEW = getResources().getString(R.string.lets_create_new);
-    }
 }

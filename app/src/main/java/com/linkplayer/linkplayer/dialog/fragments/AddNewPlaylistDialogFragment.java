@@ -55,19 +55,19 @@ public class AddNewPlaylistDialogFragment extends DialogFragment {
         return alertDialog;
     }
 
-    public void setSong(Song song){
-        this.song = song;
-    }
-
-    public void setNewPlaylistInformator(NewPlaylistInformator newPlaylistInformator){
-        this.newPlaylistInformator = newPlaylistInformator;
-    }
-
     private void initializeStrings(){
         CANCEL = getResources().getString(R.string.cancel);
         PLAYLIST_ADDED = getResources().getString(R.string.playlist_added);
         PLAYLIST_TITLE = getResources().getString(R.string.add_the_playlist_title);
         ADD = getResources().getString(R.string.add);
         ADD_NEW_PLAYLIST = getResources().getString(R.string.add_new_playlist);
+    }
+
+    public void setSong(Song song){
+        this.song = song;
+    }
+
+    public void setNewPlaylistInformator(NewPlaylistInformator newPlaylistInformator){
+        this.newPlaylistInformator = newPlaylistInformator;
     }
 }

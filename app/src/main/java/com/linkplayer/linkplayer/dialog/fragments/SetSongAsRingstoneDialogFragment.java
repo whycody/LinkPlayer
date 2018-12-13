@@ -9,8 +9,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.model.Song;
@@ -35,41 +33,50 @@ public class SetSongAsRingstoneDialogFragment extends DialogFragment {
         return dialog.create();
     }
 
-    private DialogInterface.OnClickListener setSongAsRingtoneOnClick = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            try{
-                String filepath =song.getPath();
-                File ringtoneFile = new File(filepath);
-
-                ContentValues content = new ContentValues();
-                content.put(MediaStore.MediaColumns.DATA,ringtoneFile.getAbsolutePath());
-                content.put(MediaStore.MediaColumns.TITLE, song.getTitle());
-                content.put(MediaStore.MediaColumns.MIME_TYPE, "audio/*");
-                content.put(MediaStore.Audio.Media.ARTIST, song.getArtist());
-                content.put(MediaStore.Audio.Media.DURATION, Integer.parseInt(song.getDuration()));
-                content.put(MediaStore.Audio.Media.IS_RINGTONE, true);
-                content.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
-                content.put(MediaStore.Audio.Media.IS_ALARM, false);
-                content.put(MediaStore.Audio.Media.IS_MUSIC, false);
-
-                Uri uri = MediaStore.Audio.Media.getContentUriForPath(
-                        ringtoneFile.getAbsolutePath());
-                Uri newUri = getActivity().getContentResolver().insert(uri, content);
-                RingtoneManager.setActualDefaultRingtoneUri(getActivity(),
-                        RingtoneManager.TYPE_RINGTONE,newUri);
-            }catch(Exception exc){
-                Log.d("MYTAG", exc.toString());
-            }
-        }
-    };
-
     private void initializeStrings(){
         RINGTONE = getActivity().getResources().getString(R.string.ringtone);
         WANT_SET_SONG = getActivity().getResources().getString(R.string.want_set_song);
         AS_RINGTONE = getActivity().getResources().getString(R.string.as_ringtone);
         CANCEL = getActivity().getResources().getString(R.string.cancel);
         OK = getActivity().getResources().getString(R.string.ok);
+    }
+
+    private DialogInterface.OnClickListener setSongAsRingtoneOnClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            setSongAsRingtone(song);
+        }
+    };
+
+    private void setSongAsRingtone(Song song){
+        File ringtoneFile = new File(song.getPath());
+        String filePathToDelete = MediaStore.MediaColumns.DATA + "=\"" + ringtoneFile.getAbsolutePath() + "\"";
+        ContentValues content = getContentValuesOfTheSong(song, ringtoneFile);
+        Uri uri = MediaStore.Audio.Media.getContentUriForPath(ringtoneFile.getAbsolutePath());
+
+        getActivity().getContentResolver().delete(uri, filePathToDelete, null);
+        setNewRingtone(uri, content);
+    }
+
+    private ContentValues getContentValuesOfTheSong(Song song, File ringtoneFile){
+        ContentValues content = new ContentValues();
+        content.put(MediaStore.MediaColumns.DATA,ringtoneFile.getAbsolutePath());
+        content.put(MediaStore.MediaColumns.TITLE, song.getTitle());
+        content.put(MediaStore.MediaColumns.SIZE, 215454);
+        content.put(MediaStore.MediaColumns.MIME_TYPE, "audio/*");
+        content.put(MediaStore.Audio.Media.ARTIST, song.getArtist());
+        content.put(MediaStore.Audio.Media.DURATION, song.getDuration());
+        content.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+        content.put(MediaStore.Audio.Media.IS_NOTIFICATION, true);
+        content.put(MediaStore.Audio.Media.IS_ALARM, true);
+        content.put(MediaStore.Audio.Media.IS_MUSIC, true);
+        return content;
+    }
+
+    private void setNewRingtone(Uri uri, ContentValues content){
+        Uri newUri = getActivity().getContentResolver().insert(uri, content);
+        RingtoneManager.setActualDefaultRingtoneUri(getActivity(),
+                RingtoneManager.TYPE_RINGTONE, newUri);
     }
 
     public void setSong(Song song) {
