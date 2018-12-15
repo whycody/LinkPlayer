@@ -16,7 +16,7 @@ public class LinearVerticalSpacing extends RecyclerView.ItemDecoration {
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                RecyclerView.State state) {
 
-        outRect.top = verticalSpaceHeight;
+        outRect.bottom = verticalSpaceHeight;
 
     }
 }

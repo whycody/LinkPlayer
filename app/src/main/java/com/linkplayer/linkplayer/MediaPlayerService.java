@@ -1,16 +1,22 @@
 package com.linkplayer.linkplayer;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.linkplayer.linkplayer.data.SongDao;
@@ -113,16 +119,43 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
-        buildNotification();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            startMyOwnForeground();
+        else
+            buildNotification();
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private void startMyOwnForeground(){
+        String NOTIFICATION_CHANNEL_ID = "my.app";
+        String channelName = "My Background Service";
+        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+        chan.setLightColor(getResources().getColor(R.color.colorPrimary));
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert manager != null;
+        manager.createNotificationChannel(chan);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        Notification notification = notificationBuilder.setOngoing(true)
+                .setSmallIcon(R.drawable.play_icon_white)
+                .setContentTitle(songList.get(songPos).getTitle())
+                .setContentText(getNextSong().getTitle())
+                .setContentIntent(getNotificationPendingIntent())
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .setAutoCancel(false)
+                .build();
+        startForeground(2, notification);
     }
 
     private void buildNotification(){
-        PendingIntent notificationIntent = notificationPendingIntent();
+        PendingIntent notificationIntent = getNotificationPendingIntent();
         Notification musicNotification  = musicNotification(notificationIntent);
         startForeground(NOTIFY_ID, musicNotification);
     }
 
-    private PendingIntent notificationPendingIntent(){
+    private PendingIntent getNotificationPendingIntent(){
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);

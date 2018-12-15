@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
@@ -16,7 +17,6 @@ import java.util.Collections;
 public class MusicListData {
 
     private Context context;
-    private MediaMetadataRetriever metaRetriver = new MediaMetadataRetriever();
     public static final String ALL_MUSIC_SONGLIST = "allMusicPlaylist18";
 
     public MusicListData(Context context){
@@ -36,19 +36,13 @@ public class MusicListData {
             int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int durationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
             int column_index = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-
             do {
                 long id = musicCursor.getLong(idColumn);
                 String path = musicCursor.getString(column_index);
                 String title = musicCursor.getString(titleColumn);
                 String artist = musicCursor.getString(artistColumn);
                 String duration = musicCursor.getString(durationColumn);
-
-                try {
-                    metaRetriver.setDataSource(path);
-                    songList.add(new Song(id, title, artist, path, duration));
-                }catch (Exception exc){}
-
+                songList.add(new Song(id, title, artist, path, duration));
             } while (musicCursor.moveToNext());
         }
         return songList;

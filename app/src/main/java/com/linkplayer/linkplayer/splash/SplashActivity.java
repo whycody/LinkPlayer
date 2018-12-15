@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
+import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.main.MainActivity;
 
 public class SplashActivity extends AppCompatActivity implements SplashView{
@@ -14,6 +15,7 @@ public class SplashActivity extends AppCompatActivity implements SplashView{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.background_splash);
         splashPresenter = new SplashPresenterImpl(this, this);
         splashPresenter.checkPermissionsAndStartActivity();
     }

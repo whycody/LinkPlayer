@@ -14,6 +14,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.linkplayer.linkplayer.MediaPlayerService;
@@ -476,12 +478,16 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     };
 
     private void shareSong(Song song){
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(Intent.EXTRA_TEXT, showedSong.getTitle());
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(song.getPath())));
-        intent.setType("media/mp3");
-        startActivity(Intent.createChooser(intent, "Share song by"));
+        try {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(Intent.EXTRA_TEXT, showedSong.getTitle());
+            intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(MainActivity.this, "com.linkplayer.linkplayer.fileprovider", new File(song.getPath())));
+            intent.setType("media/mp3");
+            startActivity(Intent.createChooser(intent, "Share song by"));
+        }catch(Exception exc) {
+            Toast.makeText(this, "It's impossible", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private View.OnClickListener addSongToPlaylistOnClick = new View.OnClickListener() {

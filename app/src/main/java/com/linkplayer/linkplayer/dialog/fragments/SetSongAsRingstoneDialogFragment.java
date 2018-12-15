@@ -5,12 +5,16 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.media.MediaScannerConnection;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.widget.Toast;
 
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.model.Song;
 
 import java.io.File;
