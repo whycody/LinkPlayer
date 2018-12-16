@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.IBinder;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -19,7 +18,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -56,7 +54,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView,
-        DeleteSongInformator, NewPlaylistInformator {
+        DeleteSongInformator, NewPlaylistInformator, AudioManager.OnAudioFocusChangeListener {
 
     private Toolbar mainToolbar;
     private TabLayout mainTabLayout;
@@ -80,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private PlaylistFragment playlistFragment;
     private ArtistFragment artistFragment;
     private SongListDao songListDao;
+
+    boolean songIsPlaying = false;
 
     private String mainTag = "MainActivityTag";
 
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mainPresenter = new MainPresenterImpl(MainActivity.this, MainActivity.this);
         songListDao = new SongListDao(this);
 
-        playSongBtn.setOnClickListener(playLatestSongOnClick);
+        playSongBtn.setOnClickListener(resumeOnClick);
         backSongBtn.setOnClickListener(playPreviousSongOnClick);
         nextSongBtn.setOnClickListener(playNextSongOnClick);
         randomMusicBtn.setOnClickListener(setRandomMusicModeOnClick);
@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     protected void onDestroy() {
         stopService(playIntent);
         musicService = null;
+        releaseAudioFocusForMyApp();
         super.onDestroy();
     }
 
@@ -265,10 +266,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public void playSong(int position) {
-        setSongPosIfRandom(position);
-        musicService.playSong();
-        showIsPlaying();
-        setTitleAndSong();
+        if(requestAudioFocusForMyApp()) {
+            songIsPlaying = true;
+            setSongPosIfRandom(position);
+            musicService.playSong();
+            showIsPlaying();
+            setTitleAndSong();
+        }
     }
 
     private void setSongPosIfRandom(int position){
@@ -322,6 +326,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         if(musicService.getSong().getPath().equals(song.getPath())) {
             showIsStopped();
             musicService.pauseSong();
+            songIsPlaying = false;
             if (musicService.getSongList().size() > 0) {
                 setPositionIfItIsPossible(position);
                 setTitleAndSong();
@@ -390,24 +395,22 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         public void onClick(View v) {
             musicService.pauseSong();
             showIsStopped();
-        }
-    };
-
-    private View.OnClickListener playLatestSongOnClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            musicService.playSong();
-            showIsPlaying();
+            songIsPlaying = false;
         }
     };
 
     private View.OnClickListener resumeOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            musicService.resumeSong();
-            showIsPlaying();
+            if(requestAudioFocusForMyApp()) {
+                songIsPlaying = true;
+                musicService.resumeSong();
+                showIsPlaying();
+            }
         }
     };
+
+
 
     private View.OnClickListener playNextSongOnClick = new View.OnClickListener() {
         @Override
@@ -596,5 +599,37 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void notifyNewPlaylistAdded(boolean added) {
         if(added)
             notifyAllFragments();
+    }
+
+    private boolean requestAudioFocusForMyApp() {
+        AudioManager am = (AudioManager)this.getSystemService(Context.AUDIO_SERVICE);
+        assert am != null;
+        int result = am.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN);
+        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+
+    private void releaseAudioFocusForMyApp() {
+        AudioManager am = (AudioManager)this.getSystemService(Context.AUDIO_SERVICE);
+        assert am != null;
+        am.abandonAudioFocus(this);
+    }
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                if(songIsPlaying) {
+                    showIsPlaying();
+                    musicService.resumeSong();
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                showIsStopped();
+                musicService.pauseSong();
+                break;
+        }
     }
 }

@@ -188,7 +188,17 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     @Override
     public void onAudioFocusChange(int focusChange) {
-
+        if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            pauseSong();
+        }
+        else if(focusChange == AudioManager.AUDIOFOCUS_GAIN)
+        {
+            resumeSong();
+        }
+        else if(focusChange == AudioManager.AUDIOFOCUS_LOSS)
+        {
+            pauseSong();
+        }
     }
 
     private int lastSongPoisition;
