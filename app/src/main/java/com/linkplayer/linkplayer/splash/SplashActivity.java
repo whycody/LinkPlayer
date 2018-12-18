@@ -1,5 +1,6 @@
 package com.linkplayer.linkplayer.splash;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,7 +16,6 @@ public class SplashActivity extends AppCompatActivity implements SplashView{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.background_splash);
         splashPresenter = new SplashPresenterImpl(this, this);
         splashPresenter.checkPermissionsAndStartActivity();
     }
