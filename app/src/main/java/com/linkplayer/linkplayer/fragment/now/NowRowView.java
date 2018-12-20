@@ -13,4 +13,6 @@ public interface NowRowView {
     void setOnClickItemView(View.OnClickListener onClick);
 
     void setOnClickPopupMenu(View.OnClickListener onClick);
+
+    void setRotation(int rotation);
 }

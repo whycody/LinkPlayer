@@ -43,9 +43,11 @@ public class NowPresenterImpl implements NewPlaylistInformator {
         if(song.isChoosed()){
             nowRecyclerHolder.setTextColor(activity.getResources().getColor(R.color.colorYellow));
             nowRecyclerHolder.setOnClickPopupMenu(getShowBottomSheetOnClickListener());
+            nowRecyclerHolder.setRotation(90);
         }else {
             nowRecyclerHolder.setTextColor(activity.getResources().getColor(R.color.colorLightWhite));
             nowRecyclerHolder.setOnClickPopupMenu(getShowPopupMenuOnClickListener(position));
+            nowRecyclerHolder.setRotation(0);
         }
         nowRecyclerHolder.setOnClickItemView(new View.OnClickListener() {
             @Override

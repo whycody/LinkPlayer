@@ -43,4 +43,9 @@ public class NowRecyclerHolder extends RecyclerView.ViewHolder implements NowRow
     public void setOnClickPopupMenu(View.OnClickListener onClick) {
         nowDotesButton.setOnClickListener(onClick);
     }
+
+    @Override
+    public void setRotation(int rotation) {
+        nowDotesButton.setRotation(rotation);
+    }
 }
