@@ -48,6 +48,32 @@ public class MusicListData {
         return songList;
     }
 
+    public Song getSongByPath(String pathToSong){
+        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+        ContentResolver musicResolver = context.getContentResolver();
+        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Cursor musicCursor = musicResolver.query(musicUri, null, selection, null, null);
+
+        if (musicCursor != null && musicCursor.moveToFirst()) {
+            int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+            int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+            int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int durationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+            int column_index = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+            do {
+                String path = musicCursor.getString(column_index);
+                if(path.equals(pathToSong)){
+                    long id = musicCursor.getLong(idColumn);
+                    String title = musicCursor.getString(titleColumn);
+                    String artist = musicCursor.getString(artistColumn);
+                    String duration = musicCursor.getString(durationColumn);
+                    return new Song(id, title, artist, path, duration);
+                }
+            } while (musicCursor.moveToNext());
+        }
+        return new Song();
+    }
+
     public SongList getAllMusicSongList(){
         return new SongList(getSongList(), ALL_MUSIC_SONGLIST, 0);
     }
