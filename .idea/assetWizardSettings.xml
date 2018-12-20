@@ -33,19 +33,13 @@
                                   </option>
                                   <option name="values">
                                     <map>
+                                      <entry key="assetType" value="IMAGE" />
                                       <entry key="outputName" value="ic_three_dotes_white" />
-                                      <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="ffffff" />
                                     </map>
                                   </option>
                                 </PersistentState>
                               </value>
                             </entry>
-                          </map>
-                        </option>
-                        <option name="values">
-                          <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>
@@ -54,6 +48,11 @@
                 </map>
               </option>
             </PersistentState>
+          </value>
+        </entry>
+        <entry key="vectorWizard">
+          <value>
+            <PersistentState />
           </value>
         </entry>
       </map>
