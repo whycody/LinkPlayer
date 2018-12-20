@@ -64,6 +64,19 @@ public class SongListDao {
         });
     }
 
+    public void changeSongID(final long oldID, final long newID){
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<SongRealm> realms = realm.where(SongRealm.class).equalTo("id", oldID).findAll();
+                for(SongRealm songRealm: realms){
+                    songRealm.setId(newID);
+                    SongRealm newSongRealm = realm.copyToRealmOrUpdate(songRealm);
+                }
+            }
+        });
+    }
+
     public void deleteSongFromSonglist(int songKey, int songListKey){
         realm.beginTransaction();
 

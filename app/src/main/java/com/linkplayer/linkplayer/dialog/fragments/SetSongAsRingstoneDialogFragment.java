@@ -5,16 +5,13 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.media.MediaScannerConnection;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.Settings;
-import android.widget.Toast;
 
 import com.linkplayer.linkplayer.R;
-import com.linkplayer.linkplayer.main.MainActivity;
+import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.model.Song;
 
 import java.io.File;
@@ -22,12 +19,15 @@ import java.io.File;
 public class SetSongAsRingstoneDialogFragment extends DialogFragment {
 
     private String RINGTONE, WANT_SET_SONG, AS_RINGTONE, CANCEL, OK;
+    private String tag = "RingtoneDialogFragment";
+    private SongListDao songListDao;
     private Song song;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         initializeStrings();
         String message = WANT_SET_SONG + song.getTitle() + AS_RINGTONE;
+        songListDao = new SongListDao(getActivity().getApplicationContext());
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
                 .setTitle(RINGTONE)
@@ -81,6 +81,13 @@ public class SetSongAsRingstoneDialogFragment extends DialogFragment {
         Uri newUri = getActivity().getContentResolver().insert(uri, content);
         RingtoneManager.setActualDefaultRingtoneUri(getActivity(),
                 RingtoneManager.TYPE_RINGTONE, newUri);
+//        updateSongIDInPlaylists(newUri);
+    }
+
+    private void updateSongIDInPlaylists(Uri newUri){
+        int id = Integer.parseInt(newUri.toString().substring
+                (newUri.toString().length()-5, newUri.toString().length()));
+        songListDao.changeSongID(song.getId(), id);
     }
 
     public void setSong(Song song) {
