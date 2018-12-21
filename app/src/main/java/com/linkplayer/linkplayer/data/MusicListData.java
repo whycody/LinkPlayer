@@ -38,16 +38,27 @@ public class MusicListData {
             int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int durationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
             int column_index = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+            int dateModified = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED);
             do {
                 long id = musicCursor.getLong(idColumn);
+                long dateModif = musicCursor.getLong(dateModified);
                 String path = musicCursor.getString(column_index);
                 String title = musicCursor.getString(titleColumn);
                 String artist = musicCursor.getString(artistColumn);
                 String duration = musicCursor.getString(durationColumn);
-                songList.add(new Song(id, title, artist, path, duration));
+                songList.add(new Song(id, dateModif, title, artist, path, duration));
             } while (musicCursor.moveToNext());
         }
-        return songList;
+
+        Song[] songs = new Song[songList.size()];
+        songs = songList.toArray(songs);
+
+        Arrays.sort(songs, new Comparator<Song>(){
+            public int compare(Song s1, Song s2) {
+                return Long.valueOf(s1.getDateModified()).compareTo(s2.getDateModified());
+            } });
+
+        return new ArrayList<>(Arrays.asList(songs));
     }
 
     public long getIDOfNewRingtone(){

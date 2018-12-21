@@ -13,6 +13,7 @@ public class SongMapper {
         song.setTitle(songRealm.getTitle());
         song.setDuration(songRealm.getDuration());
         song.setKey(songRealm.getKey());
+        song.setDateModified(songRealm.getDateModified());
         return song;
     }
 
@@ -24,6 +25,7 @@ public class SongMapper {
         songRealm.setTitle(song.getTitle());
         songRealm.setDuration(song.getDuration());
         songRealm.setKey(song.getKey());
+        songRealm.setDateModified(song.getDateModified());
         return songRealm;
     }
 }

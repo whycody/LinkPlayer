@@ -2,7 +2,6 @@ package com.linkplayer.linkplayer.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.linkplayer.linkplayer.mappers.SongListMapper;
 import com.linkplayer.linkplayer.mappers.SongMapper;
@@ -15,6 +14,7 @@ import com.linkplayer.linkplayer.playlist.view.PlaylistViewActivity;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
@@ -36,7 +36,10 @@ public class SongListDao {
     public SongListDao(Context context){
         this.context = context;
         Realm.init(context);
-        realm = Realm.getDefaultInstance();
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        realm = Realm.getInstance(config);
         songMapper = new SongMapper();
         songListMapper = new SongListMapper();
         sharedPreferences = context.getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
@@ -145,12 +148,16 @@ public class SongListDao {
         songRealmNew.setPath(song.getPath());
         songRealmNew.setArtist(song.getArtist());
         songRealmNew.setDuration(song.getDuration());
+        songRealmNew.setDateModified(song.getDateModified());
         return songRealmNew;
     }
 
     public SongList getSongListWithKey(int key){
         SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("key", key).findFirst();
-        return songListMapper.fromRealm(songListRealm);
+        if(songListRealm!=null)
+            return songListMapper.fromRealm(songListRealm);
+        else
+            return musicListData.getAllMusicSongList();
     }
 
     public SongList insertSongList(String title){

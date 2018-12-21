@@ -5,14 +5,15 @@ public class Song {
 
     private String title, artist, path, duration;
     private boolean choosed = false;
-    private long id;
+    private long id, dateModified;
     private int key;
 
     public Song() {
     }
 
-    public Song(long id, String title, String artist, String path, String duration) {
+    public Song(long id, long dateModified, String title, String artist, String path, String duration) {
         this.title = title;
+        this.dateModified = dateModified;
         this.id = id;
         this.artist = artist;
         this.path = path;
@@ -73,6 +74,14 @@ public class Song {
 
     public void setKey(int key) {
         this.key = key;
+    }
+
+    public void setDateModified(long dateModified) {
+        this.dateModified = dateModified;
+    }
+
+    public long getDateModified() {
+        return dateModified;
     }
 
     @Override

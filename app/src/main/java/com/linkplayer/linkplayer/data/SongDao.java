@@ -7,6 +7,7 @@ import com.linkplayer.linkplayer.mappers.SongMapper;
 import com.linkplayer.linkplayer.model.SongRealm;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class SongDao {
 
@@ -18,7 +19,10 @@ public class SongDao {
     public SongDao(Context context){
         this.context = context;
         Realm.init(context);
-        realm = Realm.getDefaultInstance();
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        realm = Realm.getInstance(config);
     }
 
     public void changeLatestSong(Song song){
@@ -50,6 +54,7 @@ public class SongDao {
         songRealm.setPath(song.getPath());
         songRealm.setTitle(song.getTitle());
         songRealm.setDuration(song.getDuration());
+        songRealm.setDateModified(song.getDateModified());
     }
 
     public Song getLatestSong(){
