@@ -614,8 +614,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public void notifyNewPlaylistAdded(boolean added) {
-        if(added)
+        if(added) {
             notifyAllFragments();
+            notifySongChanged();
+        }
     }
 
     private boolean requestAudioFocusForMyApp() {
