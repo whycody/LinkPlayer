@@ -275,10 +275,14 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     public void resumeSong(){
+        Log.d("MyTag", "resumeSong");
         if(currentSong == songPos) {
             mediaPlayer.start();
-        }else
+            Log.d("MyTag", "startSong");
+        }else {
             playSong();
+            Log.d("MyTag", "playSong");
+        }
     }
 
     public void playNextSong(){

@@ -18,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mainPresenter = new MainPresenterImpl(MainActivity.this, MainActivity.this);
         songListDao = new SongListDao(this);
 
-        playSongBtn.setOnClickListener(resumeOnClick);
+        playSongBtn.setOnClickListener(playOnClick);
         backSongBtn.setOnClickListener(playPreviousSongOnClick);
         nextSongBtn.setOnClickListener(playNextSongOnClick);
         randomMusicBtn.setOnClickListener(setRandomMusicModeOnClick);
@@ -419,7 +420,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         }
     };
 
-
+    private View.OnClickListener playOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            songIsPlaying = true;
+            musicService.playSong();
+            showIsPlaying();
+        }
+    };
 
     private View.OnClickListener playNextSongOnClick = new View.OnClickListener() {
         @Override
