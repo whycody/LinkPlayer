@@ -364,6 +364,14 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         this.repeat = repeat;
     }
 
+    public ArrayList<Song> getNotShuffledList() {
+        return notShuffledList;
+    }
+
+    public ArrayList<Song> getShuffledList() {
+        return shuffledList;
+    }
+
     public class LocalBinder extends Binder{
         public MediaPlayerService getService(){
             return MediaPlayerService.this;

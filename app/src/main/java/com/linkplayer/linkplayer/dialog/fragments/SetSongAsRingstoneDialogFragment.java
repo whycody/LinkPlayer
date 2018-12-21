@@ -66,6 +66,7 @@ public class SetSongAsRingstoneDialogFragment extends DialogFragment {
 
         getActivity().getContentResolver().delete(uri, filePathToDelete, null);
         setNewRingtone(uri, content);
+        updateSongIDInPlaylists(song);
     }
 
     private ContentValues getContentValuesOfTheSong(Song song, File ringtoneFile){
@@ -87,16 +88,16 @@ public class SetSongAsRingstoneDialogFragment extends DialogFragment {
         Uri newUri = getActivity().getContentResolver().insert(uri, content);
         RingtoneManager.setActualDefaultRingtoneUri(getActivity(),
                 RingtoneManager.TYPE_RINGTONE, newUri);
-        updateSongIDInPlaylists();
     }
 
-    private void updateSongIDInPlaylists(){
+    private void updateSongIDInPlaylists(Song song){
         musicListData = new MusicListData(getActivity());
         songList = musicListData.getSongList();
         long id = musicListData.getIDOfNewRingtone();
         songListDao.changeSongID(song.getId(), id);
-        ((MainActivity)getActivity()).notifyMusicFragment(songList);
-        ((MainActivity)getActivity()).refreshService(songListDao.getLatestSongList());
+        
+        song.setId(id);
+        ((MainActivity)getActivity()).changeSongInService(song);
     }
 
     public void setSong(Song song) {

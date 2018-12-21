@@ -620,6 +620,19 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         }
     }
 
+    public void changeSongInService(Song song){
+        for(int i =0; i<musicService.getShuffledList().size(); i++){
+            Song songShuffled = musicService.getShuffledList().get(i);
+            if(songShuffled.getPath().equals(song.getPath()))
+                musicService.getShuffledList().set(i, song);
+        }
+        for(int i =0; i<musicService.getNotShuffledList().size(); i++){
+            Song songNotShuffled = musicService.getNotShuffledList().get(i);
+            if(songNotShuffled.getPath().equals(song.getPath()))
+                musicService.getNotShuffledList().set(i, song);
+        }
+    }
+
     private boolean requestAudioFocusForMyApp() {
         AudioManager am = (AudioManager)this.getSystemService(Context.AUDIO_SERVICE);
         assert am != null;
