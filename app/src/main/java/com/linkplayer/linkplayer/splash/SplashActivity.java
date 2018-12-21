@@ -1,12 +1,10 @@
 package com.linkplayer.linkplayer.splash;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
-import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.main.MainActivity;
 
 public class SplashActivity extends AppCompatActivity implements SplashView{

@@ -45,7 +45,7 @@ public class SplashPresenterImpl implements SplashPresenter{
         boolean canShowRequestPermission = true;
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M)
             canShowRequestPermission = canShowRequestPermission();
-        if(canShowRequestPermission)
+        if(!canShowRequestPermission)
             requestPermission();
         else
             showInformationAboutPermission();
