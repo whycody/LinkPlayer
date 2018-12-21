@@ -2,6 +2,7 @@ package com.linkplayer.linkplayer.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.linkplayer.linkplayer.mappers.SongListMapper;
 import com.linkplayer.linkplayer.mappers.SongMapper;
@@ -132,9 +133,8 @@ public class SongListDao {
                     for(Song song: songListRealmNew) {
                         SongRealm songRealm = createSongRealm(song);
                         SongRealm savedSongRealm = realm.copyToRealmOrUpdate(songRealm);
-                        if (!songs.contains(savedSongRealm)) {
+                        if (!songs.contains(savedSongRealm))
                             songs.add(savedSongRealm);
-                        }
                     }
                 }
             }
@@ -188,10 +188,9 @@ public class SongListDao {
 
     public SongList getLatestSongList(){
         SongList songList;
-
         String type = sharedPreferences.getString(LATEST_SONGLIST_TYPE, UNASSIGNED);
         String title = sharedPreferences.getString(LATEST_SONGLIST_TITLE, UNASSIGNED);
-        int key = sharedPreferences.getInt(LATEST_SONGLIST_KEY, 0);
+        int key = sharedPreferences.getInt(LATEST_SONGLIST_KEY, 1);
 
         if(type.equals(UNASSIGNED) || type.equals(PlaylistViewActivity.ALL_SONGS_TYPE))
             return musicListData.getAllMusicSongList();
@@ -216,7 +215,7 @@ public class SongListDao {
 
     private int generateIdForList() {
         if(realm.where(SongListRealm.class).max("key")==null)
-            return 0;
+            return 1;
         return realm.where(SongListRealm.class).max("key").intValue() + 1;
     }
 

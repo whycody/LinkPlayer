@@ -225,14 +225,7 @@ public class MainPresenterImpl implements MainPresenter{
     }
 
     private void refreshPlaylistFragment(SongList songList) {
-        int position = 0;
-        for (int i = 0; i < playlistSongLists.size(); i++) {
-            if (playlistSongLists.get(i).getKey() == songList.getKey()) {
-                position = i;
-                break;
-            }
-        }
-        playlistFragment.notifyItemChanged(songList, position);
+        playlistFragment.refreshData();
     }
 
     @Override
