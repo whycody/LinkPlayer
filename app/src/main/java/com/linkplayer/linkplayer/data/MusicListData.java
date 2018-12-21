@@ -12,7 +12,9 @@ import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 
 public class MusicListData {
 
@@ -48,30 +50,16 @@ public class MusicListData {
         return songList;
     }
 
-    public Song getSongByPath(String pathToSong){
+    public long getIDOfNewRingtone(){
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         ContentResolver musicResolver = context.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, selection, null, null);
-
-        if (musicCursor != null && musicCursor.moveToFirst()) {
-            int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+        if (musicCursor != null && musicCursor.moveToLast()) {
             int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int durationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-            int column_index = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-            do {
-                String path = musicCursor.getString(column_index);
-                if(path.equals(pathToSong)){
-                    long id = musicCursor.getLong(idColumn);
-                    String title = musicCursor.getString(titleColumn);
-                    String artist = musicCursor.getString(artistColumn);
-                    String duration = musicCursor.getString(durationColumn);
-                    return new Song(id, title, artist, path, duration);
-                }
-            } while (musicCursor.moveToNext());
+            return musicCursor.getLong(idColumn);
         }
-        return new Song();
+        return 0;
     }
 
     public SongList getAllMusicSongList(){

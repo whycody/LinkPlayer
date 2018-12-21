@@ -164,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setTitleAndSong();
     }
 
+
     @Override
     protected void onDestroy() {
         stopService(playIntent);
@@ -305,6 +306,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         playlistFragment.refreshData();
     }
 
+    public void notifyMusicFragment(ArrayList<Song> songList){
+        musicFragment.refreshData(songList);
+    }
+
     public void notifySongAddedToPlaylist(){
         if(nowFragment!=null && playlistFragment!=null) {
             nowFragment.refreshData();
@@ -351,6 +356,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         notifyMusicFragmentIfNotNull(lastPosition, position);
         notifyNowFragmentIfNotNull(lastPosition, position);
         setTitleAndSong();
+    }
+
+    public void notifySongChanged(){
+        notifySongChanged(lastPosition, position);
     }
 
     private void initializeFragments(){

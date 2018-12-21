@@ -122,6 +122,11 @@ public class MusicFragment extends Fragment implements MusicFragmentView, Delete
         recyclerAdapter.notifyDataSetChanged();
     }
 
+    public void refreshData(ArrayList<Song> songList){
+        this.songList = songList;
+        recyclerAdapter.setSongArrayList(songList);
+        recyclerAdapter.notifyDataSetChanged();
+    }
 
     @Override
     public void notifySongDeleted(int position, boolean deleted) {

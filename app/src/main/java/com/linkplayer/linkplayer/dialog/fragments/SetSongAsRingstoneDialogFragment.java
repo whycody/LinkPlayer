@@ -11,23 +11,28 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.data.MusicListData;
 import com.linkplayer.linkplayer.data.SongListDao;
+import com.linkplayer.linkplayer.main.MainActivity;
 import com.linkplayer.linkplayer.model.Song;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class SetSongAsRingstoneDialogFragment extends DialogFragment {
 
     private String RINGTONE, WANT_SET_SONG, AS_RINGTONE, CANCEL, OK;
     private String tag = "RingtoneDialogFragment";
     private SongListDao songListDao;
+    private ArrayList<Song> songList;
+    private MusicListData musicListData;
     private Song song;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         initializeStrings();
         String message = WANT_SET_SONG + song.getTitle() + AS_RINGTONE;
-        songListDao = new SongListDao(getActivity().getApplicationContext());
+        songListDao = new SongListDao(getActivity());
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
                 .setTitle(RINGTONE)
@@ -81,13 +86,16 @@ public class SetSongAsRingstoneDialogFragment extends DialogFragment {
         Uri newUri = getActivity().getContentResolver().insert(uri, content);
         RingtoneManager.setActualDefaultRingtoneUri(getActivity(),
                 RingtoneManager.TYPE_RINGTONE, newUri);
-//        updateSongIDInPlaylists(newUri);
+        updateSongIDInPlaylists();
     }
 
-    private void updateSongIDInPlaylists(Uri newUri){
-        int id = Integer.parseInt(newUri.toString().substring
-                (newUri.toString().length()-5, newUri.toString().length()));
+    private void updateSongIDInPlaylists(){
+        musicListData = new MusicListData(getActivity());
+        songList = musicListData.getSongList();
+        long id = musicListData.getIDOfNewRingtone();
         songListDao.changeSongID(song.getId(), id);
+        ((MainActivity)getActivity()).notifyMusicFragment(songList);
+        ((MainActivity)getActivity()).refreshService(songListDao.getLatestSongList());
     }
 
     public void setSong(Song song) {
