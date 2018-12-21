@@ -9,6 +9,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.MusicListData;

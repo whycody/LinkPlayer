@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Random;
 
 public class MusicListData {
 
@@ -55,7 +56,9 @@ public class MusicListData {
 
         Arrays.sort(songs, new Comparator<Song>(){
             public int compare(Song s1, Song s2) {
-                return Long.valueOf(s1.getDateModified()).compareTo(s2.getDateModified());
+                return Long.valueOf
+                        (s1.getDateModified() + (s1.getId()%100) + Integer.parseInt(s1.getDuration()))
+                        .compareTo(s2.getDateModified() + (s2.getId()%100) + Integer.parseInt(s2.getDuration()));
             } });
 
         return new ArrayList<>(Arrays.asList(songs));
