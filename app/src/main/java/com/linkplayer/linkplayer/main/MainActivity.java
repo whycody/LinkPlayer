@@ -127,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         Glide.with(this).load(R.drawable.share_icon).into(shareCircle);
         Glide.with(this).load(R.drawable.trash_can_icon).into(trashCircle);
 
-
         final String MUSIC = getString(R.string.music);
         final String ARTIST = getString(R.string.artist);
         final String PLAYLIST = getString(R.string.playlist);
