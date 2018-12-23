@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.media.AudioManager;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -18,7 +20,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -56,7 +57,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView,
-        DeleteSongInformator, NewPlaylistInformator, AudioManager.OnAudioFocusChangeListener {
+        DeleteSongInformator, NewPlaylistInformator, AudioManager.OnAudioFocusChangeListener, SeekBar.OnSeekBarChangeListener {
 
     private Toolbar mainToolbar;
     private TabLayout mainTabLayout;
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         shareCircle.setOnClickListener(shareSongOnClick);
         bellCircle.setOnClickListener(setSongAsRingstoneOnClick);
         playlistCircle.setOnClickListener(addSongToPlaylistOnClick);
+        mainSeekBar.setOnSeekBarChangeListener(this);
         mainSeekBar.setPadding(0,0,0,0);
 
         Glide.with(this).load(R.drawable.back2_white).into(backSongBtn);
@@ -226,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             musicService.setRefreshView(MainActivity.this);
             mainPresenter.setMusicService(musicService);
             mainPresenter.getPreferencesAndSetButtons();
+            runThread();
             if(!random)
                 musicService.setSongPosAndNotifyActivity(mainPresenter.getLatestSong());
             else
@@ -280,6 +283,22 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         }
     }
 
+    boolean userIsChangingDuration = false;
+
+    private void runThread(){
+        final Handler handler = new Handler();
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(musicService!=null && !userIsChangingDuration) {
+                    mainSeekBar.setMax(musicService.getDuration() / 1000);
+                    mainSeekBar.setProgress(musicService.getCurrentPosition() / 1000);
+                }
+                handler.postDelayed(this, 1000);
+            }
+        });
+    }
+
     private void setSongPosIfRandom(int position){
         if(random)
             musicService.setTargetRandomSongTruePosition(position);
@@ -308,10 +327,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         musicFragment.refreshData();
         artistFragment.refreshData();
         playlistFragment.refreshData();
-    }
-
-    public void notifyMusicFragment(ArrayList<Song> songList){
-        musicFragment.refreshData(songList);
     }
 
     public void notifySongAddedToPlaylist(){
@@ -667,4 +682,28 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 break;
         }
     }
+
+    private boolean isPlaying = false;
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+        userIsChangingDuration = true;
+        isPlaying = musicService.isPlaying();
+        if(isPlaying)
+            musicService.pauseSong();
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        userIsChangingDuration = false;
+        musicService.seekTo(seekBar.getProgress()*1000);
+        if(isPlaying)
+            musicService.resumeSong();
+    }
+
 }

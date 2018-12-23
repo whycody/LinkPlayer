@@ -107,8 +107,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
-        mp.reset();
-        return false;
+        return true;
     }
 
     @Override
@@ -275,14 +274,10 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     public void resumeSong(){
-        Log.d("MyTag", "resumeSong");
-        if(currentSong == songPos) {
+        if(currentSong == songPos)
             mediaPlayer.start();
-            Log.d("MyTag", "startSong");
-        }else {
+        else
             playSong();
-            Log.d("MyTag", "playSong");
-        }
     }
 
     public void playNextSong(){
@@ -296,6 +291,26 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         }
         if(mediaPlayer.isPlaying())
             playSong();
+    }
+
+    public boolean isPlaying(){
+        return mediaPlayer.isPlaying();
+    }
+
+    public void seekTo(int time){
+        mediaPlayer.seekTo(time);
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
+    public int getCurrentPosition(){
+        return mediaPlayer.getCurrentPosition();
+    }
+
+    public int getDuration(){
+        return mediaPlayer.getDuration();
     }
 
     private void shuffleListIfRandom(){
@@ -343,8 +358,6 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         notShuffledList = (ArrayList<Song>)songList.clone();
         shuffledList = (ArrayList<Song>)songList.clone();
         Collections.shuffle(shuffledList);
-
-        Log.d("GutenTag", "a");
         if(random)
             this.songList = shuffledList;
         else
