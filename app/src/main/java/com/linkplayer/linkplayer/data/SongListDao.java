@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.mappers.SongListMapper;
 import com.linkplayer.linkplayer.mappers.SongMapper;
 import com.linkplayer.linkplayer.model.Song;
@@ -48,14 +49,31 @@ public class SongListDao {
         musicListData = new MusicListData(context);
     }
 
+    private final int FAVOURITES_PLAYLIST_ID = 1;
+
     public ArrayList<SongList> getAllTheSongLists() {
         ArrayList<SongList> songs = new ArrayList<>();
         SongListMapper songListMapper = new SongListMapper();
         RealmResults<SongListRealm> all = realm.where(SongListRealm.class).findAll().sort("key");
+        songs.add(getFavouritesSongList());
         for (SongListRealm songListRealm : all) {
+            if(songListRealm.getKey()== FAVOURITES_PLAYLIST_ID)
+                continue;
             songs.add(songListMapper.fromRealm(songListRealm));
         }
         return songs;
+    }
+
+    private SongList getFavouritesSongList(){
+        String FAVOURITES = context.getResources().getString(R.string.favourites);
+        SongListRealm songListRealm = realm.where(SongListRealm.class).equalTo("name", FAVOURITES).findFirst();
+        SongListMapper songListMapper = new SongListMapper();
+        if(songListRealm!=null)
+            return songListMapper.fromRealm(songListRealm);
+        else{
+            insertSongList(FAVOURITES, FAVOURITES_PLAYLIST_ID);
+            return getFavouritesSongList();
+        }
     }
 
     public void deleteAllSongsByPath(final String path){
@@ -162,12 +180,20 @@ public class SongListDao {
 
     public SongList insertSongList(String title){
         realm.beginTransaction();
-
         SongListRealm songListRealm = realm.createObject(SongListRealm.class, generateIdForList());
         songListRealm.setTitle(title);
         realm.commitTransaction();
         return songListMapper.fromRealm(songListRealm);
     }
+
+    public SongList insertSongList(String title, int id){
+        realm.beginTransaction();
+        SongListRealm songListRealm = realm.createObject(SongListRealm.class, id);
+        songListRealm.setTitle(title);
+        realm.commitTransaction();
+        return songListMapper.fromRealm(songListRealm);
+    }
+
 
     public void editSongListTitle(int key, String title){
         realm.beginTransaction();

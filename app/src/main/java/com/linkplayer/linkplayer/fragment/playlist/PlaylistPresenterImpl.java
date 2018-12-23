@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import com.linkplayer.linkplayer.R;
 import com.linkplayer.linkplayer.data.MusicListData;
@@ -75,11 +76,14 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.delete_playlits_item:
-                        DeletePlaylistDialogFragment dialogFragment = new DeletePlaylistDialogFragment();
-                        dialogFragment.setPosition(position);
-                        dialogFragment.setSongList(new SongListDao(activity).getAllTheSongLists().get(position));
-                        dialogFragment.setPlaylistView(playlistView);
-                        dialogFragment.show(activity.getFragmentManager(), "DeletePlaylistDialogFragment");
+                        if(position!=0) {
+                            DeletePlaylistDialogFragment dialogFragment = new DeletePlaylistDialogFragment();
+                            dialogFragment.setPosition(position);
+                            dialogFragment.setSongList(new SongListDao(activity).getAllTheSongLists().get(position));
+                            dialogFragment.setPlaylistView(playlistView);
+                            dialogFragment.show(activity.getFragmentManager(), "DeletePlaylistDialogFragment");
+                        }else
+                            Toast.makeText(activity, "You can't delete \"Favourites\" playlist.", Toast.LENGTH_SHORT).show();
                         return true;
                     case R.id.add_song_to_playlist_item:
                         AddSongsPresenter addSongsPresenter = new AddSongsPresenterImpl

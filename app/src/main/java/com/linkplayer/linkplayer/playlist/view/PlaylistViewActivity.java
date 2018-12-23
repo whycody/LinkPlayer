@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -26,6 +27,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
     public static final String ARTIST_TYPE = "artist";
     public static final String PLAYLIST_TYPE = "playlist";
     public static final String ALL_SONGS_TYPE = "all";
+    private boolean playlistChanged = false;
 
     private Toolbar playlistToolbar;
     private Button playlistTopBtn, deletePlaylistBtn;
@@ -62,7 +64,8 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
 
     @Override
     protected void onDestroy() {
-        viewPresenter.returnCanceledResult();
+        if(playlistChanged)
+            viewPresenter.returnCanceledResult();
         super.onDestroy();
     }
 
@@ -93,6 +96,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
 
     @Override
     public void notifyItemDeleted(int position) {
+        playlistChanged = true;
         viewPresenter.getSongList().getSongList().remove(position);
         musicRecyclerAdapter.notifyItemRemoved(position);
     }
@@ -109,6 +113,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
 
     @Override
     public void notifyItemChanged(SongList songList, int position) {
+        playlistChanged = true;
         musicPresenter.setSongArrayList(songList.getSongList());
         musicRecyclerAdapter.notifyDataSetChanged();
     }

@@ -25,6 +25,7 @@
     <string name="really_delete">Are you really want to delete&#160;\"</string>
     <string name="playlist_deleted">Playlist deleted</string>
     <string name="delete">Delete</string>
+    <string name="favourites">Favourites</string>
 
     <string name="songs">Songs</string>
     <string name="cancel">Cancel</string>
