@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private TextView musicTitleView;
     private ImageButton playSongBtn, backSongBtn, nextSongBtn, randomMusicBtn, repeatMusicBtn;
     private CircleImageView playlistCircle, bellCircle, shareCircle, trashCircle;
+    private SeekBar mainSeekBar;
     private ConstraintLayout constraintBottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;
     private MainPresenter mainPresenter;
@@ -102,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         bellCircle = findViewById(R.id.bell_circle);
         shareCircle = findViewById(R.id.share_circle);
         trashCircle = findViewById(R.id.trash_circle);
+        mainSeekBar = findViewById(R.id.main_seek_bar);
         constraintBottomSheet = findViewById(R.id.constraintBottomSheet);
         bottomSheetBehavior = BottomSheetBehavior.from(constraintBottomSheet);
         mainPresenter = new MainPresenterImpl(MainActivity.this, MainActivity.this);
@@ -116,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         shareCircle.setOnClickListener(shareSongOnClick);
         bellCircle.setOnClickListener(setSongAsRingstoneOnClick);
         playlistCircle.setOnClickListener(addSongToPlaylistOnClick);
+        mainSeekBar.setPadding(0,0,0,0);
 
         Glide.with(this).load(R.drawable.back2_white).into(backSongBtn);
         Glide.with(this).load(R.drawable.back2_white).into(nextSongBtn);

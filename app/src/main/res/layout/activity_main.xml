@@ -60,14 +60,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <View
-        android:id="@+id/shadow_view"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:background="@drawable/shadow"
-        app:layout_anchor="@+id/constraintBottomSheet"
-        app:layout_anchorGravity="top|center" />
-
     <android.support.v4.view.ViewPager
         android:id="@+id/main_view_pager"
         android:layout_width="match_parent"
@@ -76,9 +68,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tab_background_view">
-
-    </android.support.v4.view.ViewPager>
+        app:layout_constraintTop_toBottomOf="@+id/tab_background_view"/>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintBottomSheet"
@@ -232,6 +222,14 @@
         </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
+
+    <SeekBar
+        android:id="@+id/main_seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@+id/constraintBottomSheet"
+        app:layout_anchorGravity="top|center"
+        android:padding="0dp"/>
 
 
 </android.support.design.widget.CoordinatorLayout>
