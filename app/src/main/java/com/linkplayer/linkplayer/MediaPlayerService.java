@@ -301,10 +301,6 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         mediaPlayer.seekTo(time);
     }
 
-    public MediaPlayer getMediaPlayer() {
-        return mediaPlayer;
-    }
-
     public int getCurrentPosition(){
         return mediaPlayer.getCurrentPosition();
     }

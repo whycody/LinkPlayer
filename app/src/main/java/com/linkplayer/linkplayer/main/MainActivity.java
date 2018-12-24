@@ -705,5 +705,4 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         if(isPlaying)
             musicService.resumeSong();
     }
-
 }

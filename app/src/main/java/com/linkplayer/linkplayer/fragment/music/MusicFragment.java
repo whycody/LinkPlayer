@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.linkplayer.linkplayer.data.SongListDao;
 import com.linkplayer.linkplayer.dialog.fragments.DeleteSongInformator;
@@ -118,12 +119,6 @@ public class MusicFragment extends Fragment implements MusicFragmentView, Delete
 
     public void refreshData(){
         songList = musicListData.getSongList();
-        recyclerAdapter.setSongArrayList(songList);
-        recyclerAdapter.notifyDataSetChanged();
-    }
-
-    public void refreshData(ArrayList<Song> songList){
-        this.songList = songList;
         recyclerAdapter.setSongArrayList(songList);
         recyclerAdapter.notifyDataSetChanged();
     }
