@@ -14,4 +14,6 @@ public interface PlaylistPresenter {
     void setAddSongsInformator(AddSongsInformator addSongsInformator);
 
     void setSongListArrayList(ArrayList<SongList> songListArrayList);
+
+    ArrayList<SongList> getSongListArrayList();
 }

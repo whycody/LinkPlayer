@@ -120,4 +120,9 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
     public void setSongListArrayList(ArrayList<SongList> songListArrayList) {
         this.songListArrayList = songListArrayList;
     }
+
+    @Override
+    public ArrayList<SongList> getSongListArrayList() {
+        return songListArrayList;
+    }
 }

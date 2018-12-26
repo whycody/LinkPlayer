@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.linkplayer.linkplayer.R;
+import com.linkplayer.linkplayer.model.Song;
 import com.linkplayer.linkplayer.model.SongList;
 
 import java.util.ArrayList;
@@ -45,5 +46,11 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistRecycl
         playlistPresenter.setSongListArrayList(songListArrayList);
         this.notifyDataSetChanged();
     }
+
+    public ArrayList<SongList> getSongListArrayList(){
+        return playlistPresenter.getSongListArrayList();
+    }
+
+
 
 }

@@ -44,9 +44,9 @@ public class PlaylistFragment extends Fragment implements PlaylistView, AddSongs
 
     @Override
     public void notifyItemDeleted(int position) {
-        songListArrayList.remove(position);
+        recyclerAdapter.getSongListArrayList().remove(position);
         recyclerAdapter.notifyItemRemoved(position);
-        recyclerAdapter.notifyItemRangeChanged(position, songListArrayList.size());
+        recyclerAdapter.notifyItemRangeChanged(position, recyclerAdapter.getSongListArrayList().size());
     }
 
     @Override
