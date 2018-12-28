@@ -21,6 +21,7 @@ public class SplashPresenterImpl implements SplashPresenter{
     }
 
     private String permission =  Manifest.permission.READ_EXTERNAL_STORAGE;
+    private String permissionTwo = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
     @Override
     public void checkPermissionsAndStartActivity(){
@@ -57,7 +58,7 @@ public class SplashPresenterImpl implements SplashPresenter{
     }
 
     private void requestPermission(){
-        ActivityCompat.requestPermissions(activity, new String[]{permission}, 1);
+        ActivityCompat.requestPermissions(activity, new String[]{permission, permissionTwo}, 1);
     }
 
     @Override

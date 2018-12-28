@@ -64,13 +64,14 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView,
     }
 
     @Override
-    public void notifyItemDeleted(int position) {
-        MusicFragment musicFragment = ((MainActivity)getActivity()).getMusicFragment();
-        musicFragment.refreshData();
+    public void notifyItemDeleted(int position, boolean deleted) {
+        ((MainActivity)getActivity()).notifySongDeleted(position, deleted);
+    }
+
+    public void notifyFragmentItemDeleted(int position){
         nowPresenter.getSongList().getSongList().remove(position);
         nowRecyclerAdapter.notifyItemRemoved(position);
         nowRecyclerAdapter.notifyItemRangeChanged(position, nowPresenter.getSongList().getSongList().size());
-        ((MainActivity)getActivity()).notifyAllData(position, songList.getSongList().get(position));
     }
 
     public int getPosition(){
@@ -115,6 +116,6 @@ public class NowFragment extends Fragment implements MusicFragmentView, NowView,
     @Override
     public void notifySongDeleted(int position, boolean deleted) {
         if(deleted)
-            notifyItemDeleted(position);
+            notifyItemDeleted(position, deleted);
     }
 }

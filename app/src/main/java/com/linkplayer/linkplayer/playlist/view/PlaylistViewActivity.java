@@ -95,7 +95,7 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
     }
 
     @Override
-    public void notifyItemDeleted(int position) {
+    public void notifyItemDeleted(int position, boolean deleted) {
         playlistChanged = true;
         viewPresenter.getSongList().getSongList().remove(position);
         musicRecyclerAdapter.notifyItemRemoved(position);
@@ -121,6 +121,6 @@ public class PlaylistViewActivity extends AppCompatActivity implements PlaylistV
     @Override
     public void notifySongDeleted(int position, boolean deleted) {
         if(deleted)
-            notifyItemDeleted(position);
+            notifyItemDeleted(position, deleted);
     }
 }

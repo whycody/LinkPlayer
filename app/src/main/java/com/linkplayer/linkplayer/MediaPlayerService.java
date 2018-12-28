@@ -17,7 +17,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.linkplayer.linkplayer.data.SongDao;
 import com.linkplayer.linkplayer.main.MainActivity;
@@ -249,6 +248,11 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     public void playSong(){
+        prepareDataSource();
+        mediaPlayer.prepareAsync();
+    }
+
+    public void prepareDataSource(){
         try{
             mediaPlayer.reset();
             currentSong = songPos;
@@ -256,13 +260,10 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             long currentSong = playSong.getId();
             saveSongAsLast();
             Uri trackUri = ContentUris.withAppendedId(
-                android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                currentSong);
+                    android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    currentSong);
             mediaPlayer.setDataSource(getApplicationContext(), trackUri);
-        }catch(Exception e){
-            Log.e("MUSIC SERVICE", "Error setting data source", e);
-        }
-        mediaPlayer.prepareAsync();
+        }catch(Exception ignored){}
     }
 
     public void setRefreshView(RefreshView refreshView){

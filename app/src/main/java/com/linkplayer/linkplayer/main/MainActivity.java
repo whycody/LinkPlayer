@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.IBinder;
@@ -20,6 +19,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -45,6 +45,7 @@ import com.linkplayer.linkplayer.fragment.music.MusicFragment;
 import com.linkplayer.linkplayer.fragment.now.NowFragment;
 import com.linkplayer.linkplayer.fragment.playlist.PlaylistFragment;
 import com.linkplayer.linkplayer.main.add.song.to.playlist.AddSongToPlaylistAdapter;
+import com.linkplayer.linkplayer.main.add.song.to.playlist.AddSongToPlaylistInformator;
 import com.linkplayer.linkplayer.main.add.song.to.playlist.AddSongToPlaylistPresenter;
 import com.linkplayer.linkplayer.main.add.song.to.playlist.AddSongToPlaylistPresenterImpl;
 import com.linkplayer.linkplayer.model.Song;
@@ -57,7 +58,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, MainView, RefreshView,
-        DeleteSongInformator, NewPlaylistInformator, AudioManager.OnAudioFocusChangeListener, SeekBar.OnSeekBarChangeListener {
+        DeleteSongInformator, NewPlaylistInformator, AudioManager.OnAudioFocusChangeListener, SeekBar.OnSeekBarChangeListener, AddSongToPlaylistInformator {
 
     private Toolbar mainToolbar;
     private TabLayout mainTabLayout;
@@ -307,19 +308,22 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     public void refreshService(SongList songList){
-        if(nowFragment!=null)
-            nowFragment.refreshData();
+        nowFragment.refreshData();
         SongList realSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(),
                 songList.getTitle(), songList.getKey());
         musicService.setLists(realSongList.getSongList(), random);
         musicService.setSongPosAndNotifyActivity(musicService.getSongPos());
     }
 
-    public void notifyAllData(int position, Song song){
-        ArrayList<Song> songList = getSongListAvailable();
-        checkIsMusicServiceIsPlayingDeletedSong(position, song);
-        musicService.setLists(songList, random);
-        notifyAllFragments();
+    public void refreshServiceDeletedSong(SongList songList){
+        nowFragment.refreshData();
+        SongList realSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(),
+                songList.getTitle(), songList.getKey());
+        musicService.setLists(realSongList.getSongList(), random);
+        if(realSongList.getSongList().size()>musicService.getSongPos())
+            musicService.setSongPosAndNotifyActivity(musicService.getSongPos());
+        else if(realSongList.getSongList().size()>0 && musicService.getSongPos()==realSongList.getSongList().size())
+            musicService.setSongPosAndNotifyActivity(musicService.getSongPos() - 1);
     }
 
     public void notifyAllFragments(){
@@ -329,41 +333,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         playlistFragment.refreshData();
     }
 
+    public void notifyPlaylistFragments(){
+        playlistFragment.refreshData();
+        artistFragment.refreshData();
+    }
+
     public void notifySongAddedToPlaylist(){
-        if(nowFragment!=null && playlistFragment!=null) {
-            nowFragment.refreshData();
-            playlistFragment.refreshData();
-        }
+        nowFragment.refreshData();
+        playlistFragment.refreshData();
         refreshService(songListDao.getLatestSongList());
-    }
-
-    private ArrayList<Song> getSongListAvailable(){
-        SongListDao songListDao = new SongListDao(this);
-        ArrayList<Song> songList = songListDao.getLatestSongList().getSongList();
-        if(songList.size()>0)
-            return songList;
-        else
-            return new MusicListData(this).getSongList();
-    }
-
-    private void checkIsMusicServiceIsPlayingDeletedSong(int position, Song song){
-        if(musicService.getSong().getPath().equals(song.getPath())) {
-            showIsStopped();
-            musicService.pauseSong();
-            songIsPlaying = false;
-            if (musicService.getSongList().size() > 0) {
-                setPositionIfItIsPossible(position);
-                setTitleAndSong();
-            }
-        }else
-            musicService.setSongPosAndNotifyActivity(musicService.getSongPos());
-    }
-
-    private void setPositionIfItIsPossible(int position){
-        if (position > 0)
-            musicService.setSongPosAndNotifyActivity(position - 1);
-        else if (musicService.getSongList().size() - 1 > position)
-            musicService.setSongPosAndNotifyActivity(position + 1);
     }
 
     @Override
@@ -551,6 +529,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private void showAddSongToPlaylistDialogFragment(ArrayList<SongList> songLists){
         AddSongToPlaylistPresenter presenter = new AddSongToPlaylistPresenterImpl(MainActivity.this, showedSong, songLists);
+        presenter.setAddSongToPlaylistInformator(MainActivity.this);
         AddSongToPlaylistAdapter adapter = new AddSongToPlaylistAdapter(presenter, MainActivity.this);
         AddSongToPlaylistDialogFragment dialogFragment = new AddSongToPlaylistDialogFragment();
         dialogFragment.setAdapter(adapter);
@@ -626,7 +605,20 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void notifySongDeleted(int position, boolean deleted) {
         if(deleted) {
-            notifyAllData(nowFragment.getPosition(), showedSong);
+            SongList latestSongList = songListDao.getLatestSongList();
+            notifyPlaylistFragments();
+            musicFragment.refreshData();
+            nowFragment.refreshData();
+            checkServiceIsPlaying(position);
+            refreshServiceDeletedSong(latestSongList);
+        }
+    }
+
+    private void checkServiceIsPlaying(int position){
+        if(musicService.isPlaying() && position==musicService.getSongPos()) {
+            musicService.prepareDataSource();
+            showIsStopped();
+            playSongBtn.setOnClickListener(playOnClick);
         }
     }
 
@@ -704,5 +696,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         musicService.seekTo(seekBar.getProgress()*1000);
         if(isPlaying)
             musicService.resumeSong();
+    }
+
+    @Override
+    public void songAddedToPlaylist(boolean added) {
+        notifySongAddedToPlaylist();
     }
 }

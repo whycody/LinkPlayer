@@ -22,6 +22,16 @@
             android:name=".MediaPlayerService"
             android:exported="true" />
 
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.linkplayer.linkplayer.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/fileaccess_paths" />
+        </provider>
+
         <activity
             android:name=".splash.SplashActivity"
             android:theme="@style/SplashTheme">
@@ -44,16 +54,6 @@
         <activity
             android:name=".main.MainActivity"
             android:theme="@style/noAnimTheme" />
-
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.linkplayer.linkplayer.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/fileaccess_paths" />
-        </provider>
 
         <activity
             android:name=".playlist.view.PlaylistViewActivity"

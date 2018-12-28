@@ -3,12 +3,15 @@ package com.linkplayer.linkplayer.dialog.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.linkplayer.linkplayer.R;
@@ -22,6 +25,7 @@ public class DeleteSongDialogFragment extends DialogFragment {
     private Song song;
     private DeleteSongInformator deleteSongInformator;
     private int position;
+    private final String TAG = "DeleteSongDialog";
 
     private String DELETE_SONG, REALLY_DELETE_FILE, FROM_DEVICE, DELETE, CANCEL, CANNOT_DELETE;
 
@@ -36,16 +40,10 @@ public class DeleteSongDialogFragment extends DialogFragment {
                 .setPositiveButton(DELETE, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        deleteSong();
+                        deleteSongs();
                     }
-                }).setNegativeButton(CANCEL, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-        AlertDialog alertDialog = builder.create();
-        return alertDialog;
+                }).setNegativeButton(CANCEL, null);
+        return builder.create();
     }
 
     private void initializeStrings(){
@@ -55,6 +53,46 @@ public class DeleteSongDialogFragment extends DialogFragment {
         DELETE = getResources().getString(R.string.delete);
         CANCEL = getResources().getString(R.string.cancel);
         CANNOT_DELETE = getResources().getString(R.string.cannot_delete);
+    }
+
+    private void deleteSongFile(){
+        String path = song.getPath();
+        File songFile = new File(path);
+
+        Log.d(TAG, "Song exists: " + songFile.exists());
+        Log.d(TAG, "Song path: " + songFile.getPath());
+        Log.d(TAG, "Song name: " + songFile.getName());
+
+        if(songFile.getAbsoluteFile().delete()){
+            SongListDao songListDao = new SongListDao(getActivity());
+            songListDao.deleteAllSongsByPath(path);
+            deleteSongInformator.notifySongDeleted(position, true);
+        }else{
+            Toast.makeText(getActivity(), CANNOT_DELETE, Toast.LENGTH_SHORT).show();
+            deleteSongInformator.notifySongDeleted(position, false);
+        }
+    }
+
+    private void deleteSongs(){
+        Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, song.getId());
+        getActivity().getContentResolver().delete(uri, null, null);
+        File newSongFile = new File(uri.getPath());
+        if(!newSongFile.exists()){
+            notifySongDeleted();
+        }else{
+            if(newSongFile.delete())
+                notifySongDeleted();
+            else{
+                Toast.makeText(getActivity(), CANNOT_DELETE, Toast.LENGTH_SHORT).show();
+                deleteSongInformator.notifySongDeleted(position, false);
+            }
+        }
+    }
+
+    private void notifySongDeleted(){
+        SongListDao songListDao = new SongListDao(getActivity());
+        songListDao.deleteAllSongsByPath(song.getPath());
+        deleteSongInformator.notifySongDeleted(position, true);
     }
 
     private void deleteSong(){
