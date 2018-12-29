@@ -23,7 +23,7 @@ public class DeletePlaylistDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         initializeStrings();
-        String message = REALLY_DELETE + "\"" + songList.getTitle() + "\" " + PLAYLIST + "?";
+        String message = REALLY_DELETE + songList.getTitle() + "\" " + PLAYLIST + "?";
         final SongListDao songListDao = new SongListDao(getActivity());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())

@@ -100,6 +100,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     private void playNextSongAutomatically(){
         if(songPos == songList.size()-1 && repeat){
             setSongPosAndNotifyActivity(0);
+            shuffleListIfRandom();
         }else
             setSongPosAndNotifyActivity(songPos + 1);
         playSong();
