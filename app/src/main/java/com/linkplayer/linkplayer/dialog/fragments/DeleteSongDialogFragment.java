@@ -55,24 +55,6 @@ public class DeleteSongDialogFragment extends DialogFragment {
         CANNOT_DELETE = getResources().getString(R.string.cannot_delete);
     }
 
-    private void deleteSongFile(){
-        String path = song.getPath();
-        File songFile = new File(path);
-
-        Log.d(TAG, "Song exists: " + songFile.exists());
-        Log.d(TAG, "Song path: " + songFile.getPath());
-        Log.d(TAG, "Song name: " + songFile.getName());
-
-        if(songFile.getAbsoluteFile().delete()){
-            SongListDao songListDao = new SongListDao(getActivity());
-            songListDao.deleteAllSongsByPath(path);
-            deleteSongInformator.notifySongDeleted(position, true);
-        }else{
-            Toast.makeText(getActivity(), CANNOT_DELETE, Toast.LENGTH_SHORT).show();
-            deleteSongInformator.notifySongDeleted(position, false);
-        }
-    }
-
     private void deleteSongs(){
         Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, song.getId());
         getActivity().getContentResolver().delete(uri, null, null);
@@ -93,37 +75,6 @@ public class DeleteSongDialogFragment extends DialogFragment {
         SongListDao songListDao = new SongListDao(getActivity());
         songListDao.deleteAllSongsByPath(song.getPath());
         deleteSongInformator.notifySongDeleted(position, true);
-    }
-
-    private void deleteSong(){
-        boolean deleted;
-        Uri uri = null;
-        String path = song.getPath();
-        String authority = "com.linkplayer.linkplayer.fileprovider";
-        File file = new File(path);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            try {
-                uri =  FileProvider.getUriForFile(getActivity(), authority, file);
-                getActivity().getContentResolver().delete(uri, null, null);
-                deleted = true;
-            }catch(Exception e){
-                deleted = false;
-            }
-        } else {
-            deleted = file.getAbsoluteFile().delete();
-        }
-
-        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
-        getActivity().sendBroadcast(intent);
-        if(deleted) {
-            SongListDao songListDao = new SongListDao(getActivity());
-            songListDao.deleteAllSongsByPath(path);
-            deleteSongInformator.notifySongDeleted(position, true);
-        }else {
-            Toast.makeText(getActivity(), CANNOT_DELETE, Toast.LENGTH_SHORT).show();
-            deleteSongInformator.notifySongDeleted(position, false);
-        }
     }
 
     public void setSong(Song song){

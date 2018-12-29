@@ -17,6 +17,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.linkplayer.linkplayer.data.SongDao;
 import com.linkplayer.linkplayer.main.MainActivity;
@@ -320,7 +321,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         }
     }
 
-    private int getRealPositionOfSong(Song song){
+    public int getRealPositionOfSong(Song song){
         for(int i =0; i<songList.size(); i++){
             Song songFromList = songList.get(i);
             if(songFromList.getPath().equals(song.getPath()))

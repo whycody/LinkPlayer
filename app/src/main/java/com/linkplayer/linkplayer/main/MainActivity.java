@@ -315,15 +315,35 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         musicService.setSongPosAndNotifyActivity(musicService.getSongPos());
     }
 
-    public void refreshServiceDeletedSong(SongList songList){
+    private boolean sameSong;
+
+    public void refreshServiceDeletedSong(SongList songList, int position){
         nowFragment.refreshData();
         SongList realSongList = new SongList((ArrayList<Song>)songList.getSongList().clone(),
                 songList.getTitle(), songList.getKey());
+        Song currentSong = musicService.getSong();
         musicService.setLists(realSongList.getSongList(), random);
-        if(realSongList.getSongList().size()>musicService.getSongPos())
-            musicService.setSongPosAndNotifyActivity(musicService.getSongPos());
-        else if(realSongList.getSongList().size()>0 && musicService.getSongPos()==realSongList.getSongList().size())
-            musicService.setSongPosAndNotifyActivity(musicService.getSongPos() - 1);
+        setSongPosAfterDelete(currentSong, position);
+    }
+
+    private void setSongPosAfterDelete(Song currentSong, int position){
+        ArrayList<Song> realSongList = musicService.getNotShuffledList();
+        if(!random) {
+            if (realSongList.size() > musicService.getSongPos() && !sameSong)
+                musicService.setSongPosAndNotifyActivity(musicService.getSongPos());
+            else if (realSongList.size() > 0 && position>0)
+                musicService.setSongPosAndNotifyActivity(musicService.getSongPos() - 1);
+            else if(realSongList.size() > 0 && position<realSongList.size())
+                musicService.setSongPosAndNotifyActivity(musicService.getSongPos());
+        }else {
+            if (realSongList.size() > musicService.getSongPos() && !sameSong)
+                musicService.setSongPosAndNotifyActivity(musicService.getRealPositionOfSong(currentSong));
+            else if (realSongList.size() > 0 && position>0)
+                musicService.setTargetRandomSongTruePosition(position - 1);
+            else if(realSongList.size() > 0 && position<realSongList.size())
+                musicService.setTargetRandomSongTruePosition(position);
+
+        }
     }
 
     public void notifyAllFragments(){
@@ -469,7 +489,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             DeleteSongDialogFragment dialogFragment = new DeleteSongDialogFragment();
             dialogFragment.setInformator(MainActivity.this);
             dialogFragment.setSong(showedSong);
-            dialogFragment.setPosition(musicService.getSongPos());
+            dialogFragment.setPosition(random ? musicService.getRandomSongTruePosition(musicService.getSongPos()) : musicService.getSongPos());
             dialogFragment.show(getFragmentManager(), "DeleteSongDialogFragment");
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
@@ -606,16 +626,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void notifySongDeleted(int position, boolean deleted) {
         if(deleted) {
             SongList latestSongList = songListDao.getLatestSongList();
-            notifyPlaylistFragments();
-            musicFragment.refreshData();
-            nowFragment.refreshData();
-            checkServiceIsPlaying(position);
-            refreshServiceDeletedSong(latestSongList);
+            notifyAllFragments();
+            sameSong = position==musicService.getRandomSongTruePosition(musicService.getSongPos());
+            checkServiceIsPlaying();
+            refreshServiceDeletedSong(latestSongList, position);
         }
     }
 
-    private void checkServiceIsPlaying(int position){
-        if(musicService.isPlaying() && position==musicService.getSongPos()) {
+    private void checkServiceIsPlaying(){
+        if(sameSong) {
             musicService.prepareDataSource();
             showIsStopped();
             playSongBtn.setOnClickListener(playOnClick);

@@ -109,7 +109,8 @@ public class MusicFragment extends Fragment implements MusicFragmentView, Delete
 
     @Override
     public void notifyItemDeleted(int position, boolean deleted) {
-        ((MainActivity)getActivity()).notifySongDeleted(position, deleted);
+        if(deleted)
+            ((MainActivity)getActivity()).notifySongDeleted(position, deleted);
     }
 
     public void notifyFragmentItemDeleted(int position){
@@ -126,8 +127,7 @@ public class MusicFragment extends Fragment implements MusicFragmentView, Delete
 
     @Override
     public void notifySongDeleted(int position, boolean deleted) {
-        if(deleted)
-            notifyItemDeleted(position, deleted);
+        notifyItemDeleted(position, deleted);
     }
 
     @Override
